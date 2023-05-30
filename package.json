@@ -1,0 +1,53 @@
+{
+  "name": "@swup/fragment-plugin",
+  "amdName": "SwupFragmentPlugin",
+  "version": "0.0.1",
+  "description": "Allow for swup to replace fragments instead of the default containers between selected page visits",
+  "type": "module",
+  "source": "src/index.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.module.js",
+  "exports": "./dist/index.modern.js",
+  "unpkg": "./dist/index.umd.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "swup-plugin build",
+    "dev": "swup-plugin dev",
+    "lint": "swup-plugin lint",
+    "format": "swup-plugin format",
+    "prepublish": "npm run build"
+  },
+  "author": {
+    "name": "Rasso Hilber",
+    "email": "mail@rassohilber.com",
+    "url": "https://rassohilber.com"
+  },
+  "contributors": [
+    {
+      "name": "Philipp Daun",
+      "email": "daun@daun.ltd",
+      "url": "https://philippdaun.net"
+    }
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/swup/fragment-plugin.git"
+  },
+  "dependencies": {
+    "@swup/plugin": "^2.0.0",
+    "scrl": "^2.0.0"
+  },
+  "devDependencies": {
+    "swup": "^3.0.0"
+  },
+  "peerDependencies": {
+    "swup": "^3.0.0"
+  },
+  "browserslist": [
+    "extends @swup/browserslist-config"
+  ],
+  "prettier": "@swup/prettier-config"
+}
