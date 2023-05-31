@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@swup/plugin": "^2.0.0",
+    "path-to-regexp": "^6.2.1",
     "scrl": "^2.0.0"
   },
   "devDependencies": {
