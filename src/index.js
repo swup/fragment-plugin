@@ -86,7 +86,7 @@ export default class extends Plugin {
 		document.documentElement.classList.add('is-fragment');
 
 		this.disableScrollPluginForCurrentVisit();
-	}
+	};
 
 	/**
 	 * Disable the scroll plugin for fragment visits
@@ -105,7 +105,7 @@ export default class extends Plugin {
 	onTransitionEnd = () => {
 		this.currentRoute = null;
 		document.documentElement.classList.remove('is-fragment');
-	}
+	};
 
 	/**
 	 * Set the current Route if any matches
@@ -113,9 +113,7 @@ export default class extends Plugin {
 	 * @param {object} {from: string, to: string}
 	 */
 	setCurrentRoute({ from, to }) {
-		this.currentRoute = this.routes.findLast((route) =>
-			route.matches({ from, to })
-		) || null;
+		this.currentRoute = this.routes.findLast((route) => route.matches({ from, to })) || null;
 	}
 
 	/**
@@ -172,7 +170,6 @@ export default class extends Plugin {
 	 * @returns
 	 */
 	replaceContent = async (page) => {
-
 		// If one of the routes matched, do a dynamic replace
 		if (this.currentRoute != null) {
 			this.replaceContainers(page, this.currentRoute.containers);
@@ -207,7 +204,7 @@ export default class extends Plugin {
 				console.warn('[swup] Container missing in current document:', selector);
 				return;
 			}
-			incomingElement.setAttribute('data-swup-fragment', String(index+1));
+			incomingElement.setAttribute('data-swup-fragment', String(index + 1));
 			currentElement.replaceWith(incomingElement);
 		});
 	}
