@@ -38,7 +38,7 @@ export default class extends Plugin {
 
 		swup.on('popState', this.onPopState);
 		swup.on('clickLink', this.onClickLink);
-		swup.on('animationOutStart', this.onAnimationOutStart);
+		swup.on('transitionStart', this.onTransitionStart);
 		swup.on('transitionEnd', this.onTransitionEnd);
 	}
 
@@ -52,8 +52,8 @@ export default class extends Plugin {
 
 		swup.off('popState', this.onPopState);
 		swup.off('clickLink', this.onClickLink);
-		swup.on('animationOutStart', this.onAnimationOutStart);
-		swup.on('transitionEnd', this.onTransitionEnd);
+		swup.off('transitionStart', this.onTransitionStart);
+		swup.off('transitionEnd', this.onTransitionEnd);
 	}
 
 	/**
@@ -79,12 +79,12 @@ export default class extends Plugin {
 	};
 
 	/**
-	 * Add a class during animations, if this is a fragment visit
+	 * Do special things if this is a fragment visit
 	 */
-	onAnimationOutStart = () => {
-		if (this.currentRoute) {
-			document.documentElement.classList.add('is-fragment');
-		}
+	onTransitionStart = () => {
+		if (!this.currentRoute) return;
+
+		document.documentElement.classList.add('is-fragment');
 	}
 
 	/**
