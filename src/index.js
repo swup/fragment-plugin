@@ -15,6 +15,10 @@ export default class extends Plugin {
 	constructor(options = {}) {
 		super();
 
+		const regexp = pathToRegexp('/items/!item/:filter?');
+
+		console.log(regexp.test('/items'));
+
 		const defaultOptions = {
 			routes: [],
 			pathToRegexpOptions: {}
