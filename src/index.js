@@ -5,11 +5,7 @@ import { Location } from 'swup';
 export default class extends Plugin {
 	name = 'FragmentPlugin';
 
-	currentUrls = {
-		from: '',
-		to: ''
-	};
-
+	currentRoute = null;
 	routes = [];
 
 	/**
@@ -20,7 +16,8 @@ export default class extends Plugin {
 		super();
 
 		const defaultOptions = {
-			routes: []
+			routes: [],
+			pathToRegexpOptions: {}
 		};
 
 		this.options = {
@@ -39,8 +36,18 @@ export default class extends Plugin {
 		this.originalReplaceContent = swup.replaceContent;
 		swup.replaceContent = this.replaceContent;
 
-		swup.on('transitionStart', this.onTransitionStart);
+		swup.on('popState', this.onPopState);
 		swup.on('clickLink', this.onClickLink);
+
+		swup.on('animationOutStart', () => {
+			if (this.currentRoute) {
+				document.documentElement.classList.add('is-fragment');
+			}
+		})
+		swup.on('transitionEnd', () => {
+			this.currentRoute = null;
+			document.documentElement.classList.remove('is-fragment');
+		})
 	}
 
 	/**
@@ -51,27 +58,42 @@ export default class extends Plugin {
 
 		swup.replaceContent = this.originalReplaceContent;
 
-		swup.off('transitionStart', this.onTransitionStart);
+		swup.off('popState', this.onPopState);
+		swup.off('clickLink', this.onClickLink);
 	}
 
 	/**
-	 * Store the current page URL on `transitionStart`
+	 * Set the current route on PopState.
+	 * The browser URL has already changed during PopState
 	 */
-	onTransitionStart = (event) => {
-		this.currentUrls.from = this.swup.currentPageUrl;
-		// If this is a popstate event, the target URL is already active in the browser
-		if (event instanceof PopStateEvent) {
-			this.currentUrls.to = this.swup.getCurrentUrl();
-		}
+	onPopState = () => {
+		this.setCurrentRoute({
+			from: this.swup.currentPageUrl,
+			to: this.swup.getCurrentUrl()
+		});
 	};
 
 	/**
-	 * Update the `to` url when clicking a link
+	 * Set the current route when clicking a link
 	 * @param {PointerEvent} event
 	 */
 	onClickLink = (event) => {
-		this.currentUrls.to = Location.fromElement(event.delegateTarget).url;
+		this.setCurrentRoute({
+			from: this.swup.getCurrentUrl(),
+			to: Location.fromElement(event.delegateTarget).url
+		});
 	};
+
+	/**
+	 * Set the current Route if any matches
+	 *
+	 * @param {object} {from: string, to: string}
+	 */
+	setCurrentRoute({ from, to }) {
+		this.currentRoute = this.routes.findLast((route) =>
+			route.matches({ from, to })
+		) || null;
+	}
 
 	/**
 	 * Convert a string to a regex, with error handling
@@ -83,7 +105,7 @@ export default class extends Plugin {
 	 */
 	convertToRegexp(path) {
 		try {
-			return pathToRegexp(path, [], { start: false });
+			return pathToRegexp(path, [], this.options.pathToRegexpOptions);
 		} catch (error) {
 			console.warn(`Something went wrong while trying to convert ${path} to a regex:`);
 			console.warn(error);
@@ -127,17 +149,17 @@ export default class extends Plugin {
 	 * @returns
 	 */
 	replaceContent = async (page) => {
-		const matchingRoute = this.routes.findLast((route) => route.matches(this.currentUrls));
 
 		// If one of the routes matched, do a dynamic replace
-		if (matchingRoute != null) {
-			return this.replaceContainers(page, matchingRoute.containers);
+		if (this.currentRoute != null) {
+			this.replaceContainers(page, this.currentRoute.containers);
+			// Update browser title
+			document.title = page.title;
+			return Promise.resolve();
 		}
 
 		// No route matched. Run the default replaceContent
 		await this.originalReplaceContent(page);
-
-		// Return an instantly resolved promise
 		return Promise.resolve();
 	};
 
@@ -151,7 +173,7 @@ export default class extends Plugin {
 	replaceContainers(page, containers) {
 		const incomingDocument = new DOMParser().parseFromString(page.originalContent, 'text/html');
 
-		containers.forEach((selector) => {
+		containers.forEach((selector, index) => {
 			const incomingElement = incomingDocument.querySelector(selector);
 			if (!incomingElement) {
 				console.warn('[swup] Container missing in incoming document:', selector);
@@ -162,11 +184,8 @@ export default class extends Plugin {
 				console.warn('[swup] Container missing in current document:', selector);
 				return;
 			}
+			incomingElement.setAttribute('data-swup-fragment', String(index+1));
 			currentElement.replaceWith(incomingElement);
-			console.log('replaced:', currentElement);
-			return;
 		});
-
-		return Promise.resolve();
 	}
 }
