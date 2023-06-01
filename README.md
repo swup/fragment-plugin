@@ -4,6 +4,16 @@ Define fragments that should be replaced between selected page visits instead of
 
 ⚠️ **Please Note**: This plugin is not stable yet and should not be used in production.
 
+## Preview site
+
+https://swup.fragment-plugin.rassohilber.com/
+
+## Installation
+
+```bash
+npm i swup/fragment-plugin
+```
+
 ## Plugin API
 
 This is a quick example on how to replace only the element `#items` when filtering a list of items:
@@ -54,9 +64,5 @@ html.is-fragment .transition-main {
 ## Things I would like to discuss:
 
 - [ ] The general API (wording, structure)
-- [ ] `containers` as an array of single element selectors (`querySelector`, not `querySelectorAll`). That's the only reliable way to compare the elements between two documents I can think of
+- [ ] `containers` as an array of single element selectors (`querySelector`, not `querySelectorAll`). That's the only reliable way I can think of to make sure both the incoming and current document contain the same elements
 - [ ] Animations for fragments
-
-## Preview site
-
-https://swup.fragment-plugin.rassohilber.com/
