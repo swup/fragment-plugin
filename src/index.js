@@ -83,8 +83,20 @@ export default class extends Plugin {
 	 */
 	onTransitionStart = () => {
 		if (!this.currentRoute) return;
-
 		document.documentElement.classList.add('is-fragment');
+
+		this.disableScrollPluginForCurrentVisit();
+	}
+
+	/**
+	 * Disable the scroll plugin for fragment visits
+	 */
+	disableScrollPluginForCurrentVisit() {
+		// We still want scrolling if there is a hash in the target link
+		if (this.swup.scrollToElement) return;
+
+		const scrollPlugin = this.swup.findPlugin('ScrollPlugin');
+		if (scrollPlugin) scrollPlugin.ignorePageVisit = true;
 	}
 
 	/**
