@@ -15,10 +15,6 @@ export default class extends Plugin {
 	constructor(options = {}) {
 		super();
 
-		const regexp = pathToRegexp('/items/!item/:filter?');
-
-		console.log(regexp.test('/items'));
-
 		const defaultOptions = {
 			routes: [],
 			pathToRegexpOptions: {}
@@ -42,16 +38,8 @@ export default class extends Plugin {
 
 		swup.on('popState', this.onPopState);
 		swup.on('clickLink', this.onClickLink);
-
-		swup.on('animationOutStart', () => {
-			if (this.currentRoute) {
-				document.documentElement.classList.add('is-fragment');
-			}
-		})
-		swup.on('transitionEnd', () => {
-			this.currentRoute = null;
-			document.documentElement.classList.remove('is-fragment');
-		})
+		swup.on('animationOutStart', this.onAnimationOutStart);
+		swup.on('transitionEnd', this.onTransitionEnd);
 	}
 
 	/**
@@ -64,6 +52,8 @@ export default class extends Plugin {
 
 		swup.off('popState', this.onPopState);
 		swup.off('clickLink', this.onClickLink);
+		swup.on('animationOutStart', this.onAnimationOutStart);
+		swup.on('transitionEnd', this.onTransitionEnd);
 	}
 
 	/**
@@ -87,6 +77,23 @@ export default class extends Plugin {
 			to: Location.fromElement(event.delegateTarget).url
 		});
 	};
+
+	/**
+	 * Add a class during animations, if this is a fragment visit
+	 */
+	onAnimationOutStart = () => {
+		if (this.currentRoute) {
+			document.documentElement.classList.add('is-fragment');
+		}
+	}
+
+	/**
+	 * Reset everything after each transition
+	 */
+	onTransitionEnd = () => {
+		this.currentRoute = null;
+		document.documentElement.classList.remove('is-fragment');
+	}
 
 	/**
 	 * Set the current Route if any matches
