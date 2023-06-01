@@ -56,3 +56,7 @@ html.is-fragment .transition-main {
 - [ ] The general API (wording, structure)
 - [ ] `containers` as an array of single element selectors (`querySelector`, not `querySelectorAll`). That's the only reliable way to compare the elements between two documents I can think of
 - [ ] Animations for fragments
+
+## Preview site
+
+https://swup.fragment-plugin.rassohilber.com/
