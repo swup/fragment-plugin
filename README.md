@@ -51,7 +51,7 @@ html.is-fragment .transition-main {
 }
 ```
 
-## I need help with deciding the following things:
+## Things I would like to discuss:
 
 - [ ] The general API (wording, structure)
 - [ ] `containers` as an array of single element selectors (`querySelector`, not `querySelectorAll`). That's the only reliable way to compare the elements between two documents I can think of
