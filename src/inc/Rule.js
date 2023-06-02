@@ -14,10 +14,25 @@ export default class Route {
 	constructor(from = '', to = '', selectors = []) {
 		this.from = from;
 		this.to = to;
-		this.selectors = selectors;
+
+		this.selectors = selectors.map(selector => selector.trim());
+		this.validateSelectors();
 
 		this.fromRegEx = this.isRegex(from) ? from : this.convertToRegexp(from);
 		this.toRegEx = this.isRegex(to) ? to : this.convertToRegexp(to);
+	}
+
+	/**
+	 * Ensures all selectors are ids
+	 */
+	validateSelectors() {
+		this.selectors.forEach(selector => {
+			if (!selector.startsWith('#')) {
+				throw new Error(
+					`[swup-fragment-plugin] Invalid fragment selector: '${selector}'.
+					Make sure all your selectors are ids, e.g. '#my-fragment'`);
+			}
+		})
 	}
 
 	/**

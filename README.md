@@ -38,8 +38,10 @@ const swup = new Swup({
   ],
 });
 ```
+### Notes
 
-The last fragment that matches the current route wins.
+- All selectors need to be distinct, e.g. `#my-fragment`.
+- The last fragment that matches the current route wins.
 
 ## Animations for fragments
 
