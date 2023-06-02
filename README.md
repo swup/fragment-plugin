@@ -22,7 +22,7 @@ This is a quick example on how to replace only the element `#items` when filteri
 const swup = new Swup({
   plugins: [
     new SwupFragmentPlugin({
-      fragments: [
+      rules: [
         {
           between: "/items/",
           and: "/items/filter/:filter",
