@@ -43,24 +43,25 @@ The last fragment that matches the current route wins.
 
 ## Animations for fragments
 
-The default swup animations should be disabled for fragment visits. There is no built-in animation system, yet.
-
 ```css
-.transition-main {
-  transition-property: opacity;
-  transition-duration: 250ms;
+/*
+* The default transition (for visits without fragment)
+*/
+html:not(.is-fragment) .transition-main {
+  transition: opacity 250ms;
   opacity: 1;
 }
-html.is-animating .transition-main {
+html:not(.is-fragment).is-animating .transition-main {
   opacity: 0;
 }
 /*
- * Disable animations for fragment visits,
- * without swup complaining about it:
- */
-html.is-fragment .transition-main {
-  transition-duration: 1ms;
-  opacity: 1;
+* The transition for a fragment
+*/
+html.is-fragment .transition-my-fragment {
+  transition: opacity 250ms;
+}
+html.is-fragment.is-animating .transition-my-fragment {
+  opacity: 0;
 }
 ```
 
