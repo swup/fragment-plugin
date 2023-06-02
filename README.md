@@ -27,11 +27,13 @@ const swup = new Swup({
           between: "/items/",
           and: "/items/filter/:filter",
           replace: ["#items"],
+          name: "items",
         },
         {
           between: "/items/filter/:filter",
           and: "/items/filter/:filter",
           replace: ["#items"],
+          name: "items",
         },
       ],
     }),
@@ -40,8 +42,9 @@ const swup = new Swup({
 ```
 ### Notes
 
-- All selectors need to be distinct, e.g. `#my-fragment`.
-- The last fragment that matches the current route wins.
+- The `name` of the current rule will be added to the html as a class `is-fragment--${rule.name}`, to allow for fine-grained animation control
+- Only the first element will be matched for every entry in the `replace` array
+- The last fragment that matches the current route wins
 
 ## Animations for fragments
 
@@ -57,17 +60,12 @@ html:not(.is-fragment).is-animating .transition-main {
   opacity: 0;
 }
 /*
-* The transition for a fragment
+* The transition for a fragment with the name `items`
 */
-html.is-fragment .transition-my-fragment {
+html.is-fragment--items .transition-items {
   transition: opacity 250ms;
 }
-html.is-fragment.is-animating .transition-my-fragment {
+html.is-fragment--items.is-animating .transition-items {
   opacity: 0;
 }
 ```
-
-## Things I would like to discuss:
-
-- [ ] Animations for fragments
-- [ ] Right now, every selector in the `replace` array will be matched using `querySelector`, not `querySelectorAll`. That's the only reliable way I can think of to make sure both the incoming and current document contain the same elements.
