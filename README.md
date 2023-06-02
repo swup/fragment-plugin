@@ -24,14 +24,14 @@ const swup = new Swup({
     new SwupFragmentPlugin({
       routes: [
         {
-          from: "/items/",
-          to: "/items/filter/:filter",
-          containers: ["#items"],
+          between: "/items/",
+          and: "/items/filter/:filter",
+          replace: ["#items"],
         },
         {
-          from: "/items/filter/:filter",
-          to: "/items/filter/:filter",
-          containers: ["#items"],
+          between: "/items/filter/:filter",
+          and: "/items/filter/:filter",
+          replace: ["#items"],
         },
       ],
     }),
@@ -64,6 +64,5 @@ html.is-fragment .transition-main {
 
 ## Things I would like to discuss:
 
-- [ ] The `from`, `to`, `containers` wording is a bit misleading, since the routes are being tested from both directions, forwards and backwards. Maybe a better wording would be `between`, `and`, `replace`.
 - [ ] `containers` as an array of single element selectors (`querySelector`, not `querySelectorAll`). That's the only reliable way I can think of to make sure both the incoming and current document contain the same elements
 - [ ] Animations for fragments

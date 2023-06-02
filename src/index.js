@@ -1,6 +1,6 @@
 import Plugin from '@swup/plugin';
-import { pathToRegexp } from 'path-to-regexp';
 import { Location } from 'swup';
+import Route from './inc/Route.js';
 
 export default class extends Plugin {
 	name = 'FragmentPlugin';
@@ -16,15 +16,17 @@ export default class extends Plugin {
 		super();
 
 		const defaultOptions = {
-			routes: [],
-			pathToRegexpOptions: {}
+			routes: []
 		};
 
 		this.options = {
 			...defaultOptions,
 			...options
 		};
-		this.routes = this.options.routes.map(this.prepareRoute);
+
+		this.routes = this.options.routes.map(
+			({ between, and, replace }) => new Route(between, and, replace)
+		);
 	}
 
 	/**
@@ -117,63 +119,16 @@ export default class extends Plugin {
 	}
 
 	/**
-	 * Convert a string to a regex, with error handling
-	 *
-	 * @see https://github.com/pillarjs/path-to-regexp
-	 *
-	 * @param {path} string
-	 * @returns
-	 */
-	convertToRegexp(path) {
-		try {
-			return pathToRegexp(path, [], this.options.pathToRegexpOptions);
-		} catch (error) {
-			console.warn(`Something went wrong while trying to convert ${path} to a regex:`);
-			console.warn(error);
-		}
-		return path;
-	}
-
-	/**
-	 * Prepare a route:
-	 *
-	 * - Ensure every route has a `from` and `to` regex
-	 * - Inject a `matches` function
-	 *
-	 * @param {object} route
-	 * @returns
-	 */
-	prepareRoute = (route) => {
-		const isRegex = (str) => str instanceof RegExp;
-
-		return {
-			...route,
-			...{
-				regFrom: isRegex(route.from) ? route.from : this.convertToRegexp(route.from),
-				regTo: isRegex(route.to) ? route.to : this.convertToRegexp(route.to),
-				matches: function ({ from, to }) {
-					// Return true if the route matches forwards
-					if (this.regFrom.test(from) && this.regTo.test(to)) return true;
-					// Return true if the route matches backwards
-					if (this.regTo.test(from) && this.regFrom.test(to)) return true;
-					// Finally, return false
-					return false;
-				}
-			}
-		};
-	};
-
-	/**
 	 * Replace the content
 	 *
 	 * @param {object} page
 	 * @returns
 	 */
 	replaceContent = async (page) => {
-		// If one of the routes matched, do a dynamic replace
+		// If one of the routes matched, replace the fragments from that route
 		if (this.currentRoute != null) {
-			this.replaceContainers(page, this.currentRoute.containers);
-			// Update browser title
+			this.replaceFragments(page, this.currentRoute.fragments);
+			// Update the browser title
 			document.title = page.title;
 			return Promise.resolve();
 		}
@@ -184,16 +139,16 @@ export default class extends Plugin {
 	};
 
 	/**
-	 * Replace named containers from the incoming page
+	 * Replace fragments from the incoming page
 	 *
 	 * @param {object} page
-	 * @param {array} containers
+	 * @param {array} selectors
 	 * @returns
 	 */
-	replaceContainers(page, containers) {
+	replaceFragments(page, selectors) {
 		const incomingDocument = new DOMParser().parseFromString(page.originalContent, 'text/html');
 
-		containers.forEach((selector, index) => {
+		selectors.forEach((selector, index) => {
 			const incomingElement = incomingDocument.querySelector(selector);
 			if (!incomingElement) {
 				console.warn('[swup] Container missing in incoming document:', selector);
