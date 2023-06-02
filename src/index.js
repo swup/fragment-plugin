@@ -1,12 +1,12 @@
 import Plugin from '@swup/plugin';
 import { Location } from 'swup';
-import Fragment from './inc/Fragment.js';
+import Rule from './inc/Rule.js';
 
 export default class extends Plugin {
 	name = 'FragmentPlugin';
 
-	currentFragment = null;
-	fragments = [];
+	currentRule = null;
+	rules = [];
 
 	/**
 	 * Constructor
@@ -16,7 +16,7 @@ export default class extends Plugin {
 		super();
 
 		const defaultOptions = {
-			fragments: []
+			rules: []
 		};
 
 		this.options = {
@@ -24,8 +24,8 @@ export default class extends Plugin {
 			...options
 		};
 
-		this.fragments = this.options.fragments.map(
-			({ between, and, replace }) => new Fragment(between, and, replace)
+		this.rules = this.options.rules.map(
+			({ between, and, replace }) => new Rule(between, and, replace)
 		);
 	}
 
@@ -63,7 +63,7 @@ export default class extends Plugin {
 	 * The browser URL has already changed during PopState
 	 */
 	onPopState = () => {
-		this.setCurrentFragment({
+		this.setCurrentRule({
 			from: this.swup.currentPageUrl,
 			to: this.swup.getCurrentUrl()
 		});
@@ -74,7 +74,7 @@ export default class extends Plugin {
 	 * @param {PointerEvent} event
 	 */
 	onClickLink = (event) => {
-		this.setCurrentFragment({
+		this.setCurrentRule({
 			from: this.swup.getCurrentUrl(),
 			to: Location.fromElement(event.delegateTarget).url
 		});
@@ -84,7 +84,7 @@ export default class extends Plugin {
 	 * Do special things if this is a fragment visit
 	 */
 	onTransitionStart = () => {
-		if (!this.currentFragment) return;
+		if (!this.currentRule) return;
 		document.documentElement.classList.add('is-fragment');
 
 		this.disableScrollPluginForCurrentVisit();
@@ -105,17 +105,17 @@ export default class extends Plugin {
 	 * Reset everything after each transition
 	 */
 	onTransitionEnd = () => {
-		this.currentFragment = null;
+		this.currentRule = null;
 		document.documentElement.classList.remove('is-fragment');
 	};
 
 	/**
-	 * Set the current Fragment if any matches
+	 * Set the current Rule if any matches
 	 *
 	 * @param {object} {from: string, to: string}
 	 */
-	setCurrentFragment({ from, to }) {
-		this.currentFragment = this.fragments.findLast((fragment) => fragment.matches({ from, to })) || null;
+	setCurrentRule({ from, to }) {
+		this.currentRule = this.rules.findLast((fragment) => fragment.matches({ from, to })) || null;
 	}
 
 	/**
@@ -125,9 +125,9 @@ export default class extends Plugin {
 	 * @returns
 	 */
 	replaceContent = async (page) => {
-		// If one of the fragments matched, replace only that fragment
-		if (this.currentFragment != null) {
-			this.replaceFragment(page, this.currentFragment);
+		// If one of the rules matched, replace only that fragment
+		if (this.currentRule != null) {
+			this.replaceFragments(page, this.currentRule);
 			// Update the browser title
 			document.title = page.title;
 			return Promise.resolve();
@@ -139,13 +139,13 @@ export default class extends Plugin {
 	};
 
 	/**
-	 * Replace a fragment from the incoming page
+	 * Replace fragments from the incoming page, based on the current rule
 	 *
 	 * @param {object} page
-	 * @param {Fragment}
+	 * @param {Rule}
 	 * @returns
 	 */
-	replaceFragment(page, fragment) {
+	replaceFragments(page, fragment) {
 		const incomingDocument = new DOMParser().parseFromString(page.originalContent, 'text/html');
 
 		fragment.selectors.forEach((selector, index) => {
