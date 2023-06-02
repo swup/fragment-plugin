@@ -85,7 +85,15 @@ export default class extends Plugin {
 	 */
 	onTransitionStart = () => {
 		if (!this.currentRule) return;
-		document.documentElement.classList.add('is-fragment');
+
+		// Add a generic `is-fragment` class for identifying fragment visits
+		document.documentElement.classList.add('is-fragment-visit');
+
+		// Add a class for every fragment in the current rule
+		// e.g. "is-fragment--my-fragment"
+		this.currentRule.selectors.forEach((selector) => {
+			document.documentElement.classList.add(`is-fragment--${selector.replace(/^#/, '-')}`);
+		});
 
 		this.disableScrollPluginForCurrentVisit();
 	};
@@ -105,8 +113,15 @@ export default class extends Plugin {
 	 * Reset everything after each transition
 	 */
 	onTransitionEnd = () => {
+		if (!this.currentRule) return;
+		// Remove specific fragment classes
+		this.currentRule.selectors.forEach((selector) => {
+			document.documentElement.classList.remove(`is-fragment--${selector.replace(/^#/, '-')}`);
+		});
+		// Remove the general `is-fragment` class
+		document.documentElement.classList.remove('is-fragment-visit');
+		// Reset the current rule
 		this.currentRule = null;
-		document.documentElement.classList.remove('is-fragment');
 	};
 
 	/**
