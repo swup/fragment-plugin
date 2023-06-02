@@ -159,7 +159,6 @@ export default class extends Plugin {
 				console.warn('[swup] Container missing in current document:', selector);
 				return;
 			}
-			incomingElement.setAttribute('data-swup-fragment', String(index + 1));
 			currentElement.replaceWith(incomingElement);
 		});
 	}
