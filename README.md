@@ -64,5 +64,5 @@ html.is-fragment .transition-main {
 
 ## Things I would like to discuss:
 
-- [ ] `containers` as an array of single element selectors (`querySelector`, not `querySelectorAll`). That's the only reliable way I can think of to make sure both the incoming and current document contain the same elements
 - [ ] Animations for fragments
+- [ ] Right now, every selector in the `replace` array will be matched using `querySelector`, not `querySelectorAll`. That's the only reliable way I can think of to make sure both the incoming and current document contain the same elements.
