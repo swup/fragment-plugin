@@ -87,7 +87,7 @@ export default class extends Plugin {
 		if (!this.currentRule) return;
 
 		// Add a generic `is-fragment` class for identifying fragment visits
-		document.documentElement.classList.add('is-fragment-visit');
+		document.documentElement.classList.add('is-fragment');
 
 		// Add the transitionClass of the current rule
 		document.documentElement.classList.add(`is-fragment--${this.currentRule.name}`);
@@ -116,7 +116,7 @@ export default class extends Plugin {
 		document.documentElement.classList.remove(`is-fragment--${this.currentRule.name}`);
 
 		// Remove the general `is-fragment` class
-		document.documentElement.classList.remove('is-fragment-visit');
+		document.documentElement.classList.remove('is-fragment');
 
 		// Reset the current rule
 		this.currentRule = null;

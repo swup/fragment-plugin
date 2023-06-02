@@ -49,20 +49,20 @@ const swup = new Swup({
 /*
 * The default transition (for visits without fragment)
 */
-html:not(.is-fragment-visit) .transition-main {
+html:not(.is-fragment) .transition-main {
   transition: opacity 250ms;
   opacity: 1;
 }
-html:not(.is-fragment-visit).is-animating .transition-main {
+html:not(.is-fragment).is-animating .transition-main {
   opacity: 0;
 }
 /*
 * The transition for a fragment
 */
-html.is-fragment-visit .transition-my-fragment {
+html.is-fragment .transition-my-fragment {
   transition: opacity 250ms;
 }
-html.is-fragment-visit.is-animating .transition-my-fragment {
+html.is-fragment.is-animating .transition-my-fragment {
   opacity: 0;
 }
 ```
