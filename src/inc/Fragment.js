@@ -9,12 +9,12 @@ export default class Route {
 	to = '';
 	fromRegEx = '';
 	toRegEx = '';
-	fragments = [];
+	selectors = [];
 
-	constructor(from = '', to = '', fragments = []) {
+	constructor(from = '', to = '', selectors = []) {
 		this.from = from;
 		this.to = to;
-		this.fragments = fragments;
+		this.selectors = selectors;
 
 		this.fromRegEx = this.isRegex(from) ? from : this.convertToRegexp(from);
 		this.toRegEx = this.isRegex(to) ? to : this.convertToRegexp(to);

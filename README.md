@@ -22,7 +22,7 @@ This is a quick example on how to replace only the element `#items` when filteri
 const swup = new Swup({
   plugins: [
     new SwupFragmentPlugin({
-      routes: [
+      fragments: [
         {
           between: "/items/",
           and: "/items/filter/:filter",
@@ -38,6 +38,8 @@ const swup = new Swup({
   ],
 });
 ```
+
+The last fragment that matches the current route wins.
 
 ## Animations for fragments
 
