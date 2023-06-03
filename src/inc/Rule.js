@@ -4,21 +4,21 @@ import { pathToRegexp } from 'path-to-regexp';
  * Represents a route
  */
 export default class Route {
-
 	from = '';
 	to = '';
-	selectors = [];
+	fragments = [];
 	name = '';
+	matchedDirection = '';
 
 	fromRegEx = '';
 	toRegEx = '';
 
-	constructor(from = '', to = '', selectors = [], name = '') {
+	constructor(from = '', to = '', fragments = [], name = '') {
 		this.from = from;
 		this.to = to;
 		this.name = name;
 
-		this.selectors = selectors.map(selector => selector.trim());
+		this.fragments = fragments.map((selector) => selector.trim());
 
 		this.fromRegEx = this.isRegex(from) ? from : this.convertToRegexp(from);
 		this.toRegEx = this.isRegex(to) ? to : this.convertToRegexp(to);
@@ -52,16 +52,56 @@ export default class Route {
 	}
 
 	/**
-	 * Checks if this route matches a given route
+	 * Checks if a given route matches a this rule
 	 * @param {object} route
 	 * @returns
 	 */
-	matches({ from, to }) {
-		// Return true if the route matches forwards
-		if (this.fromRegEx.test(from) && this.toRegEx.test(to)) return true;
-		// Return true if the route matches backwards
-		if (this.toRegEx.test(from) && this.fromRegEx.test(to)) return true;
-		// Finally, return false
-		return false;
+	matches(route) {
+		const forwards = this.matchesForwards(route);
+		const backwards = this.matchesBackwards(route);
+
+		// Return false if the route doesn't match in either direction
+		if (!forwards && !backwards) return false;
+
+		this.matchedDirection = this.getMatchedDirection(forwards, backwards);
+
+		return true;
+	}
+
+	/**
+	 * Detect in which direction the rule matched
+	 *
+	 * @param {boolean} matchesForwards
+	 * @param {boolean} matchesBackwards
+	 * @returns {string}
+	 */
+	getMatchedDirection(matchesForwards, matchesBackwards) {
+		// The rule matches in both directions
+		if (matchesForwards && matchesBackwards) return 'both';
+		// The rule matches forwards
+		if (matchesForwards) return 'forwards';
+		// The rule matches backwards
+		if (matchesBackwards) return 'backwards';
+		return null;
+	}
+
+	/**
+	 * Check if a given route matches this rule forwards
+	 *
+	 * @param {object} route
+	 * @returns {boolean}
+	 */
+	matchesForwards({ from, to }) {
+		return this.fromRegEx.test(from) && this.toRegEx.test(to);
+	}
+
+	/**
+	 * Check if a given route matches this rule backwards
+	 *
+	 * @param {object} route
+	 * @returns {boolean}
+	 */
+	matchesBackwards({ from, to }) {
+		return this.toRegEx.test(from) && this.fromRegEx.test(to);
 	}
 }
