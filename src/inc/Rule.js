@@ -8,6 +8,7 @@ export default class Route {
 	to = '';
 	fragments = [];
 	name = '';
+
 	matchedDirection = '';
 
 	fromRegEx = '';
