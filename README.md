@@ -42,8 +42,8 @@ const swup = new Swup({
 ```
 ### Notes
 
-- Only the first element will be matched for every entry in the `fragments` array
-- The last fragment that matches the current route wins
+- The last rule that matches the current route wins
+- For each entry in the `fragments` array, only the first matching element will be selected
 
 ## Animations for fragments
 
