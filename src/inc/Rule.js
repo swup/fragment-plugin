@@ -4,10 +4,11 @@ import { pathToRegexp } from 'path-to-regexp';
  * Represents a route
  */
 export default class Route {
+
 	from = '';
 	to = '';
 	fragments = [];
-	name = '';
+	name = 'unknown';
 
 	matchedDirection = '';
 
@@ -15,14 +16,27 @@ export default class Route {
 	toRegEx = '';
 
 	constructor(from = '', to = '', fragments = [], name = '') {
-		this.from = from;
-		this.to = to;
-		this.name = name;
+		this.from = from.trim();
+		this.to = to.trim();
+		this.name = name.trim();
 
 		this.fragments = fragments.map((selector) => selector.trim());
 
+		this.validate();
+
 		this.fromRegEx = this.isRegex(from) ? from : this.convertToRegexp(from);
 		this.toRegEx = this.isRegex(to) ? to : this.convertToRegexp(to);
+
+
+	}
+
+	/**
+	 * Validates this rule
+	 */
+	validate() {
+		if (!this.from) throw new Error(`[fragment-plugin] \`rule.from\` is required`);
+		if (!this.to) throw new Error(`[fragment-plugin] \`rule.to\` is required`);
+		if (!this.fragments.length) throw new Error(`[fragment-plugin] \`rule.fragments\` needs to contain at least one selector`);
 	}
 
 	/**
