@@ -87,11 +87,8 @@ export default class extends Plugin {
 	onTransitionStart = () => {
 		if (!this.matchingRule) return;
 
-		// Add a generic `is-fragment` class for identifying fragment visits
-		document.documentElement.classList.add('is-fragment');
-
-		// Add the transitionClass of the current rule
-		document.documentElement.classList.add(`is-fragment--${this.matchingRule.name}`);
+		// Add an attribute `[data-fragment-rule]` for scoped styling
+		document.documentElement.setAttribute('data-fragment', this.matchingRule.name);
 
 		// Add an attribute `[data-fragment-direction]` for directional styling
 		document.documentElement.setAttribute('data-fragment-direction', this.matchingRule.matchedDirection);
@@ -116,11 +113,8 @@ export default class extends Plugin {
 	onTransitionEnd = () => {
 		if (!this.matchingRule) return;
 
-		// Remove the current rule's transitionClass
-		document.documentElement.classList.remove(`is-fragment--${this.matchingRule.name}`);
-
-		// Remove the general `is-fragment` class
-		document.documentElement.classList.remove('is-fragment');
+		// Remove the current rule's attribute
+		document.documentElement.removeAttribute('data-fragment', this.matchingRule.name);
 
 		// Remove the fragment direction attribute
 		document.documentElement.removeAttribute('data-fragment-direction');

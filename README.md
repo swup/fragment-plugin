@@ -24,15 +24,15 @@ const swup = new Swup({
     new SwupFragmentPlugin({
       rules: [
         {
-          between: "/items/",
-          and: "/items/filter/:filter",
-          replace: ["#items"],
+          from: "/items/",
+          to: "/items/filter/:filter",
+          fragments: ["#items"],
           name: "items",
         },
         {
-          between: "/items/filter/:filter",
-          and: "/items/filter/:filter",
-          replace: ["#items"],
+          from: "/items/filter/:filter",
+          to: "/items/filter/:filter",
+          fragments: ["#items"],
           name: "items",
         },
       ],
@@ -42,8 +42,7 @@ const swup = new Swup({
 ```
 ### Notes
 
-- The `name` of the current rule will be added to the html as a class `is-fragment--${rule.name}`, to allow for fine-grained animation control
-- Only the first element will be matched for every entry in the `replace` array
+- Only the first element will be matched for every entry in the `fragments` array
 - The last fragment that matches the current route wins
 
 ## Animations for fragments
