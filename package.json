@@ -37,7 +37,7 @@
     "url": "https://github.com/swup/fragment-plugin.git"
   },
   "dependencies": {
-    "@swup/plugin": "^2.0.0",
+    "@swup/plugin": "^2.0.3",
     "path-to-regexp": "^6.2.1",
     "scrl": "^2.0.0"
   },
