@@ -27,6 +27,7 @@ export default class FragmentPlugin extends Plugin {
 	options: PluginOptions = {
 		rules: []
 	};
+	// @TODO use proper type
 	originalReplaceContent: any;
 
 	/**
@@ -153,7 +154,7 @@ export default class FragmentPlugin extends Plugin {
 	/**
 	 * Replace the content
 	 */
-	replaceContent = async (page) => {
+	replaceContent = async (page /* @TODO fix type */) => {
 		// If one of the rules matched, replace only the fragments from that rule
 		if (this.matchingRule != null) {
 			this.replaceFragments(page, this.matchingRule);
@@ -171,7 +172,7 @@ export default class FragmentPlugin extends Plugin {
 	 * Replace fragments from a given rule
 	 * @returns
 	 */
-	replaceFragments(page, rule: Rule): void {
+	replaceFragments(page /* @TODO fix type */, rule: Rule): void {
 		const incomingDocument = new DOMParser().parseFromString(page.originalContent, 'text/html');
 
 		rule.fragments.forEach((selector, index) => {
