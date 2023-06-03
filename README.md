@@ -51,20 +51,20 @@ const swup = new Swup({
 /*
 * The default transition (for visits without fragment)
 */
-html:not(.is-fragment) .transition-main {
+html:not([data-fragment]) .transition-main {
   transition: opacity 250ms;
   opacity: 1;
 }
-html:not(.is-fragment).is-animating .transition-main {
+html:not([data-fragment]).is-animating .transition-main {
   opacity: 0;
 }
 /*
 * The transition for a fragment with the name `items`
 */
-html.is-fragment--items .transition-items {
+html[data-fragment=items] .transition-items {
   transition: opacity 250ms;
 }
-html.is-fragment--items.is-animating .transition-items {
+html[data-fragment=items].is-animating .transition-items {
   opacity: 0;
 }
 ```
