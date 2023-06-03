@@ -1,26 +1,43 @@
 import Plugin from '@swup/plugin';
 import { Location } from 'swup';
 import Rule from './Rule.js';
+import type { Handler } from 'swup';
 
-export default class extends Plugin {
+export type Route = {
+	from: string;
+	to: string;
+}
+
+type RuleOptions = {
+	from: string;
+	to: string;
+	fragments: string[];
+	name: string;
+};
+
+type PluginOptions = {
+	rules: RuleOptions[];
+};
+
+export default class FragmentPlugin extends Plugin {
 	name = 'FragmentPlugin';
 
-	matchingRule = undefined;
-	rules = [];
+	matchingRule: Rule | undefined = undefined;
+	rules: Rule[] = [];
+	options: PluginOptions = {
+		rules: []
+	};
+	originalReplaceContent: any;
 
 	/**
 	 * Constructor
 	 * @param {?object} options the plugin options
 	 */
-	constructor(options = {}) {
+	constructor(options: Partial<PluginOptions> = {}) {
 		super();
 
-		const defaultOptions = {
-			rules: []
-		};
-
 		this.options = {
-			...defaultOptions,
+			...this.options,
 			...options
 		};
 
@@ -71,12 +88,11 @@ export default class extends Plugin {
 
 	/**
 	 * Set the current fragment when clicking a link
-	 * @param {PointerEvent} event
 	 */
-	onClickLink = (event) => {
+	onClickLink: Handler<"clickLink"> = (event) => {
 		this.matchingRule = this.findMatchingRule({
 			from: this.swup.getCurrentUrl(),
-			to: Location.fromElement(event.delegateTarget).url
+			to: Location.fromElement((event.delegateTarget as HTMLAnchorElement)).url
 		});
 	};
 
@@ -90,7 +106,12 @@ export default class extends Plugin {
 		document.documentElement.setAttribute('data-fragment', this.matchingRule.name);
 
 		// Add an attribute `[data-fragment-direction]` for directional styling
-		document.documentElement.setAttribute('data-fragment-direction', this.matchingRule.matchedDirection);
+		if (this.matchingRule.matchedDirection) {
+			document.documentElement.setAttribute(
+				'data-fragment-direction',
+				this.matchingRule.matchedDirection
+			);
+		}
 
 		this.disableScrollPluginForCurrentVisit();
 	};
@@ -102,7 +123,7 @@ export default class extends Plugin {
 		// We still want scrolling if there is a hash in the target link
 		if (this.swup.scrollToElement) return;
 
-		const scrollPlugin = this.swup.findPlugin('ScrollPlugin');
+		const scrollPlugin = this.swup.findPlugin('ScrollPlugin') as any;
 		if (scrollPlugin) scrollPlugin.ignorePageVisit = true;
 	}
 
@@ -113,30 +134,24 @@ export default class extends Plugin {
 		if (!this.matchingRule) return;
 
 		// Remove the current rule's attribute
-		document.documentElement.removeAttribute('data-fragment', this.matchingRule.name);
+		document.documentElement.removeAttribute('data-fragment');
 
 		// Remove the fragment direction attribute
 		document.documentElement.removeAttribute('data-fragment-direction');
 
 		// Reset the current rule
-		this.matchingRule = null;
+		this.matchingRule = undefined;
 	};
 
 	/**
 	 * Set the current Rule if any matches
-	 *
-	 * @param {object} A route in the shape of {from: string;, to: string;}
-	 * @returns {Rule|undefined}
 	 */
-	findMatchingRule(route) {
+	findMatchingRule(route: Route): Rule | undefined {
 		return this.rules.findLast((fragment) => fragment.matches(route));
 	}
 
 	/**
 	 * Replace the content
-	 *
-	 * @param {object} page
-	 * @returns
 	 */
 	replaceContent = async (page) => {
 		// If one of the rules matched, replace only the fragments from that rule
@@ -154,12 +169,9 @@ export default class extends Plugin {
 
 	/**
 	 * Replace fragments from a given rule
-	 *
-	 * @param {object} page
-	 * @param {Rule}
 	 * @returns
 	 */
-	replaceFragments(page, rule) {
+	replaceFragments(page, rule: Rule): void {
 		const incomingDocument = new DOMParser().parseFromString(page.originalContent, 'text/html');
 
 		rule.fragments.forEach((selector, index) => {

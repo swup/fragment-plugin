@@ -1,22 +1,21 @@
 import { pathToRegexp } from 'path-to-regexp';
+import type { Route } from './FragmentPlugin.js';
 
 /**
  * Represents a route
  */
-export default class Route {
-
+export default class Rule {
 	from = '';
 	to = '';
-	fragments = [];
+	fragments: string[] = [];
 	name = 'unknown';
 
 	matchedDirection = '';
 
-	fromRegEx = '';
-	toRegEx = '';
+	fromRegEx: RegExp;
+	toRegEx: RegExp;
 
-	constructor(from = '', to = '', fragments = [], name = '') {
-
+	constructor(from: string, to: string, fragments: string[], name: string) {
 		this.validate(from, to, fragments);
 
 		this.from = from.trim();
@@ -25,64 +24,46 @@ export default class Route {
 
 		this.fragments = fragments.map((selector) => selector.trim());
 
-		this.fromRegEx = this.isRegex(from) ? from : this.convertToRegexp(from);
-		this.toRegEx = this.isRegex(to) ? to : this.convertToRegexp(to);
-
-
+		this.fromRegEx = this.convertToRegexp(from);
+		this.toRegEx = this.convertToRegexp(to);
 	}
 
 	/**
 	 * Validates this rule
 	 */
-	validate(from, to, fragments) {
+	validate(from: unknown, to: unknown, fragments: unknown) {
 		if (!from) this.logError(`rule.from is required`);
 		if (!to) this.logError(`rule.to is required`);
-		if (!fragments.length) this.logError(`rule.fragments needs to contain at least one selector`);
-		if (!typeof this.from === 'string') this.logError(`rule.from needs to be a path string`);
-		if (!typeof this.to === 'string') this.logError(`rule.to needs to be a path string`);
+		if (!fragments) this.logError(`rule.fragments needs to contain at least one selector`);
+		if (typeof from !== 'string') this.logError(`rule.from needs to be a path string`);
+		if (typeof to !== 'string') this.logError(`rule.to needs to be a path string`);
 	}
 
 	/**
 	 * Throw an error with a prefix
-	 * @param {string} message
 	 */
-	logError(message) {
-		console.error(`[fragment-plugin] ${message}`);
+	logError(message: string, ...args: any): void {
+		console.error(`[fragment-plugin] ${message}`, ...args);
 	}
-
-	/**
-	 * Tests if the given value is a regex
-	 *
-	 * @param {unknown} x
-	 * @returns
-	 */
-	isRegex = (x) => x instanceof RegExp;
 
 	/**
 	 * Convert a string to a regex, with error handling
 	 *
 	 * @see https://github.com/pillarjs/path-to-regexp
-	 *
-	 * @param {string}
-	 * @returns {RegExp}
 	 */
-	convertToRegexp(string) {
+	convertToRegexp(string: string): RegExp {
 		try {
-			return pathToRegexp(string);
+			return pathToRegexp(string) as RegExp;
 		} catch (error) {
-			console.warn(`Something went wrong while trying to convert ${string} to a regex:`);
-			console.warn(error);
+			this.logError(`Something went wrong while trying to convert ${string} to a regex`);
+			throw new Error(error as string);
 		}
-
-		return string;
 	}
 
 	/**
 	 * Checks if a given route matches a this rule
-	 * @param {object} route
-	 * @returns
 	 */
-	matches(route) {
+	matches(route: Route): boolean {
 		const forwards = this.matchesForwards(route);
 		const backwards = this.matchesBackwards(route);
 
@@ -96,38 +77,29 @@ export default class Route {
 
 	/**
 	 * Detect in which direction the rule matched
-	 *
-	 * @param {boolean} matchesForwards
-	 * @param {boolean} matchesBackwards
-	 * @returns {string}
 	 */
-	getMatchedDirection(matchesForwards, matchesBackwards) {
+	getMatchedDirection(matchesForwards: boolean, matchesBackwards: boolean): string {
 		// The rule matches in both directions
 		if (matchesForwards && matchesBackwards) return '';
 		// The rule matches forwards
 		if (matchesForwards) return 'forwards';
 		// The rule matches backwards
 		if (matchesBackwards) return 'backwards';
-		return null;
+		// nothing matched
+		return '';
 	}
 
 	/**
 	 * Check if a given route matches this rule forwards
-	 *
-	 * @param {object} route
-	 * @returns {boolean}
 	 */
-	matchesForwards({ from, to }) {
-		return this.fromRegEx.test(from) && this.toRegEx.test(to);
+	matchesForwards({ from, to }: Route): boolean {
+		return this.fromRegEx!.test(from) && this.toRegEx!.test(to);
 	}
 
 	/**
 	 * Check if a given route matches this rule backwards
-	 *
-	 * @param {object} route
-	 * @returns {boolean}
 	 */
-	matchesBackwards({ from, to }) {
+	matchesBackwards({ from, to }: Route): boolean {
 		return this.toRegEx.test(from) && this.fromRegEx.test(to);
 	}
 }
