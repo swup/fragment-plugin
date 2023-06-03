@@ -16,13 +16,14 @@ export default class Route {
 	toRegEx = '';
 
 	constructor(from = '', to = '', fragments = [], name = '') {
+
+		this.validate(from, to, fragments);
+
 		this.from = from.trim();
 		this.to = to.trim();
 		this.name = name.trim();
 
 		this.fragments = fragments.map((selector) => selector.trim());
-
-		this.validate();
 
 		this.fromRegEx = this.isRegex(from) ? from : this.convertToRegexp(from);
 		this.toRegEx = this.isRegex(to) ? to : this.convertToRegexp(to);
@@ -33,10 +34,20 @@ export default class Route {
 	/**
 	 * Validates this rule
 	 */
-	validate() {
-		if (!this.from) throw new Error(`[fragment-plugin] \`rule.from\` is required`);
-		if (!this.to) throw new Error(`[fragment-plugin] \`rule.to\` is required`);
-		if (!this.fragments.length) throw new Error(`[fragment-plugin] \`rule.fragments\` needs to contain at least one selector`);
+	validate(from, to, fragments) {
+		if (!from) this.logError(`rule.from is required`);
+		if (!to) this.logError(`rule.to is required`);
+		if (!fragments.length) this.logError(`rule.fragments needs to contain at least one selector`);
+		if (!typeof this.from === 'string') this.logError(`rule.from needs to be a path string`);
+		if (!typeof this.to === 'string') this.logError(`rule.to needs to be a path string`);
+	}
+
+	/**
+	 * Throw an error with a prefix
+	 * @param {string} message
+	 */
+	logError(message) {
+		console.error(`[fragment-plugin] ${message}`);
 	}
 
 	/**
