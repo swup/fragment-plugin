@@ -103,7 +103,7 @@ export default class Route {
 	 */
 	getMatchedDirection(matchesForwards, matchesBackwards) {
 		// The rule matches in both directions
-		if (matchesForwards && matchesBackwards) return 'both';
+		if (matchesForwards && matchesBackwards) return '';
 		// The rule matches forwards
 		if (matchesForwards) return 'forwards';
 		// The rule matches backwards
