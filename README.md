@@ -10,8 +10,8 @@ https://swup.fragment-plugin.rassohilber.com/
 
 ## Installation
 
-```bash
-npm i swup/fragment-plugin
+```shell
+npm i swup/fragment-plugin --save
 ```
 
 ## Plugin API
