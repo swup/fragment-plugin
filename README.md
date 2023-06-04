@@ -51,7 +51,7 @@ const swup = new Swup({
           from: "/user/:user", // can also be a string for simple cases
           to: "/user/:user",
           fragments: [".user-overlay__content"],
-          // if we omit the name, this rule won't be animatable using CSS
+          // if we omit the name, this rule be applied immediately, without animation
         },
         // ...
       ],
