@@ -14,7 +14,7 @@ https://swup.fragment-plugin.rassohilber.com/
 npm i swup/fragment-plugin --save
 ```
 
-## Plugin API
+## Example
 
 The following code will replace **only** the element `#users-list` when filtering a list of users and **only** the element `#user-profile` when clicking on one of the users in the list:
 
@@ -53,6 +53,7 @@ const swup = new Swup({
   ],
 });
 ```
+
 ### Notes
 
 - Both the current and the incoming `DOM` **must** contain the fragment you want to replace for a route
