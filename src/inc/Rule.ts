@@ -2,11 +2,19 @@ import { pathToRegexp } from 'path-to-regexp';
 import type { Route } from './FragmentPlugin.js';
 
 /**
+ * A union type for pathToRegexp. It accepts strings,
+ * arrays of strings or regular expressions.
+ * @see https://github.com/pillarjs/path-to-regexp#path-to-regexp-1
+ */
+type Path = string | string[] | RegExp;
+
+/**
  * Represents a route
  */
 export default class Rule {
-	from = '';
-	to = '';
+
+	from: Path = '';
+	to: Path = '';
 	fragments: string[] = [];
 	name = 'unknown';
 
@@ -15,12 +23,12 @@ export default class Rule {
 	fromRegEx: RegExp;
 	toRegEx: RegExp;
 
-	constructor(from: string, to: string, fragments: string[], name: string) {
+	constructor(from: Path, to: Path, fragments: string[], name: string) {
 		this.validate(from, to, fragments);
 
-		this.from = from.trim();
-		this.to = to.trim();
-		this.name = name.trim();
+		this.from = from;
+		this.to = to;
+		this.name = name;
 
 		this.fragments = fragments.map((selector) => selector.trim());
 
@@ -48,14 +56,12 @@ export default class Rule {
 
 	/**
 	 * Convert a string to a regex, with error handling
-	 *
-	 * @see https://github.com/pillarjs/path-to-regexp
 	 */
-	convertToRegexp(string: string): RegExp {
+	convertToRegexp(path: Path): RegExp {
 		try {
-			return pathToRegexp(string) as RegExp;
+			return pathToRegexp(path) as RegExp;
 		} catch (error) {
-			this.logError(`Something went wrong while trying to convert ${string} to a regex`);
+			this.logError(`Something went wrong while trying to convert ${path} to a regex`);
 			throw new Error(error as string);
 		}
 	}
