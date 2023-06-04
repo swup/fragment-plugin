@@ -16,25 +16,38 @@ npm i swup/fragment-plugin --save
 
 ## Plugin API
 
-This is a quick example on how to replace only the element `#items` when filtering a list of items:
+The following code will replace **only** the element `#users-list` when filtering a list of users and **only** the element `#user-profile` when clicking on one of the users in the list:
 
 ```js
 const swup = new Swup({
   plugins: [
     new SwupFragmentPlugin({
+      // The plugin expects an array of rules
       rules: [
         {
-          from: "/items/",
-          to: "/items/filter/:filter",
-          fragments: ["#items"],
-          name: "items",
+          // Between either the root or any filtered state... (required)
+          from: [
+            "/users/",
+            "/users/filter/:filter"
+          ],
+          // ...and any filtered state... (required)
+          to: "/users/filter/:filter",
+          // ...replace the following elements... (required)
+          fragments: ["#users-list"],
+          // ...and add an attribute [data-fragment="users-list"]
+          // to the html tag during the transition (optional).
+          name: "users-list",
         },
         {
-          from: "/items/filter/:filter",
-          to: "/items/filter/:filter",
-          fragments: ["#items"],
-          name: "items",
+          from: [
+            "/users/",
+            "/users/filter/:filter"
+          ],
+          to: "/user/:user",
+          fragments: ["#user-profile"],
+          name: "user-profile",
         },
+        // ...
       ],
     }),
   ],
@@ -42,6 +55,7 @@ const swup = new Swup({
 ```
 ### Notes
 
+- Both the current and the incoming `DOM` **must** contain the fragment you want to replace for a route
 - The last rule that matches the current route wins
 - For each entry in the `fragments` array, only the first matching element will be selected
 
