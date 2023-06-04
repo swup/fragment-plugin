@@ -36,7 +36,7 @@ const swup = new Swup({
           fragments: ["#users-list"],
           // ...and add an attribute [data-fragment="users-list"]
           // to the html tag during the transition (optional).
-          name: "users-list",
+          name: "users",
         },
         {
           from: [
@@ -45,19 +45,55 @@ const swup = new Swup({
           ],
           to: "/user/:user",
           fragments: ["#user-overlay"],
-          name: "user-overlay",
+          name: "overlay",
         },
         {
           from: "/user/:user", // can also be a string for simple cases
           to: "/user/:user",
           fragments: [".user-overlay__content"],
-          name: "user",
+          // if we omit the name, this rule won't be animatable using CSS
         },
         // ...
       ],
     }),
   ],
 });
+```
+
+```css
+/*
+* The default transition (for visits without fragment)
+*/
+html:not([data-fragment]) .transition-main {
+  transition: opacity 250ms;
+  opacity: 1;
+}
+html:not([data-fragment]).is-animating .transition-main {
+  opacity: 0;
+}
+/*
+* The transition for the named rule "users"
+*/
+html[data-fragment=users] .transition-items {
+  transition: opacity 250ms;
+}
+html[data-fragment=users].is-animating .transition-items {
+  opacity: 0;
+}
+/*
+* The transition for the named rule "overlay"
+*/
+html[data-fragment=overlay] .transition-overlay {
+  transition: opacity 250ms;
+}
+html[data-fragment=overlay].is-animating .transition-overlay {
+  opacity: 0;
+}
+/* Special case for opening an overlay, making use of data-fragment-direction */
+html[data-fragment=overlay][data-fragment-direction=forwards].is-leaving .transition-overlay {
+  transition-duration: 10ms;
+}
+
 ```
 
 ## Notes
@@ -78,25 +114,3 @@ During fragment visits, the attribute `[data-fragment]` will be added to the `ht
 - If the selected rule has a `name` (e.g. "my-route"), it will be reflected as `[data-fragment="my-route"]`
 - If the selected rule matches only in one direction, that will be reflected in the attribute `[data-fragment-direction=forwards]` or `[data-fragment-direction=backwards]`
 - If the selected rute matches in both directions, `[data-fragment-direction]` will not be set
-
-```css
-/*
-* The default transition (for visits without fragment)
-*/
-html:not([data-fragment]) .transition-main {
-  transition: opacity 250ms;
-  opacity: 1;
-}
-html:not([data-fragment]).is-animating .transition-main {
-  opacity: 0;
-}
-/*
-* The transition for a fragment with the name `items`
-*/
-html[data-fragment=items] .transition-items {
-  transition: opacity 250ms;
-}
-html[data-fragment=items].is-animating .transition-items {
-  opacity: 0;
-}
-```
