@@ -16,7 +16,10 @@ npm i swup/fragment-plugin --save
 
 ## Example
 
-The following code will replace **only** the element `#users-list` when filtering a list of users and **only** the element `#user-profile` when clicking on one of the users in the list:
+The following code will replace:
+ 1. **only** the element `#users-list` when filtering a list of users and
+ 2. **only** the element `#user-profile` when clicking on one of the users in the list
+ 3. **only** the element `#user-overlay__content` when navigating between users
 
 ```js
 const swup = new Swup({
@@ -25,7 +28,7 @@ const swup = new Swup({
       // The plugin expects an array of rules
       rules: [
         {
-          // Between either the root or any filtered state... (required)
+          // Rule 1: Between either the root or any filtered state... (required)
           from: [
             "/users/",
             "/users/filter/:filter"
@@ -39,6 +42,7 @@ const swup = new Swup({
           name: "users",
         },
         {
+          // Rule 2: Between the root or any filtered state and a user detail page
           from: [
             "/users/",
             "/users/filter/:filter"
@@ -48,9 +52,10 @@ const swup = new Swup({
           name: "overlay",
         },
         {
-          from: "/user/:user", // can also be a string for simple cases
+          // Rule 3: Between user detail pages
+          from: "/user/:user", // can also be a string for simple cases like this
           to: "/user/:user",
-          fragments: [".user-overlay__content"],
+          fragments: ["#user-overlay__content"],
           // if we omit the name, this rule be applied immediately, without animation
         },
         // ...
