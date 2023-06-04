@@ -17,7 +17,6 @@ export default class Rule {
 	toRegEx: RegExp;
 
 	constructor(from: Path, to: Path, fragments: string[], name: string | undefined) {
-		this.validate(from, to, fragments);
 
 		this.from = from;
 		this.to = to;
@@ -27,17 +26,6 @@ export default class Rule {
 
 		this.fromRegEx = this.convertToRegexp(from);
 		this.toRegEx = this.convertToRegexp(to);
-	}
-
-	/**
-	 * Validates this rule
-	 */
-	validate(from: unknown, to: unknown, fragments: unknown) {
-		if (!from) this.logError(`rule.from is required`);
-		if (!to) this.logError(`rule.to is required`);
-		if (!fragments) this.logError(`rule.fragments needs to contain at least one selector`);
-		if (typeof from !== 'string') this.logError(`rule.from needs to be a path string`);
-		if (typeof to !== 'string') this.logError(`rule.to needs to be a path string`);
 	}
 
 	/**
@@ -54,7 +42,9 @@ export default class Rule {
 		try {
 			return pathToRegexp(path) as RegExp;
 		} catch (error) {
-			this.logError(`Something went wrong while trying to convert ${path} to a regex`);
+			this.logError(`Couldn't convert path to RegExp`, {
+				path,
+			});
 			throw new Error(error as string);
 		}
 	}
