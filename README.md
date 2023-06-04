@@ -4,7 +4,7 @@ Define fragments that should be replaced between selected page visits instead of
 
 ⚠️ **Please Note**: This plugin is not stable yet and should not be used in production.
 
-## Preview site
+## Demo
 
 https://swup.fragment-plugin.rassohilber.com/
 
