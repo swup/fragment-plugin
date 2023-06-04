@@ -30,7 +30,7 @@ type PluginOptions = {
 export default class FragmentPlugin extends Plugin {
 	name = 'FragmentPlugin';
 
-	matchingRule: Rule | undefined = undefined;
+	selectedRule: Rule | undefined = undefined;
 	rules: Rule[] = [];
 	options: PluginOptions = {
 		rules: []
@@ -89,7 +89,7 @@ export default class FragmentPlugin extends Plugin {
 	 * The browser URL has already changed during PopState
 	 */
 	onPopState = () => {
-		this.matchingRule = this.findMatchingRule({
+		this.selectedRule = this.findSelectedRule({
 			from: this.swup.currentPageUrl,
 			to: this.swup.getCurrentUrl()
 		});
@@ -99,7 +99,7 @@ export default class FragmentPlugin extends Plugin {
 	 * Set the current fragment when clicking a link
 	 */
 	onClickLink: Handler<"clickLink"> = (event) => {
-		this.matchingRule = this.findMatchingRule({
+		this.selectedRule = this.findSelectedRule({
 			from: this.swup.getCurrentUrl(),
 			to: Location.fromElement((event.delegateTarget as HTMLAnchorElement)).url
 		});
@@ -109,16 +109,16 @@ export default class FragmentPlugin extends Plugin {
 	 * Do special things if this is a fragment visit
 	 */
 	onTransitionStart = () => {
-		if (!this.matchingRule) return;
+		if (!this.selectedRule) return;
 
 		// Add an attribute `[data-fragment="my-rule-name"]` for scoped styling
-		document.documentElement.setAttribute('data-fragment', this.matchingRule.name || '');
+		document.documentElement.setAttribute('data-fragment', this.selectedRule.name || '');
 
 		// Add an attribute `[data-fragment-direction]` for directional styling
-		if (this.matchingRule.matchedDirection) {
+		if (this.selectedRule.matchedDirection) {
 			document.documentElement.setAttribute(
 				'data-fragment-direction',
-				this.matchingRule.matchedDirection
+				this.selectedRule.matchedDirection
 			);
 		}
 
@@ -140,7 +140,7 @@ export default class FragmentPlugin extends Plugin {
 	 * Reset everything after each transition
 	 */
 	onTransitionEnd = () => {
-		if (!this.matchingRule) return;
+		if (!this.selectedRule) return;
 
 		// Remove the current rule's attribute
 		document.documentElement.removeAttribute('data-fragment');
@@ -149,23 +149,23 @@ export default class FragmentPlugin extends Plugin {
 		document.documentElement.removeAttribute('data-fragment-direction');
 
 		// Reset the current rule
-		this.matchingRule = undefined;
+		this.selectedRule = undefined;
 	};
 
 	/**
 	 * Set the current Rule if any matches
 	 */
-	findMatchingRule(route: Route): Rule | undefined {
+	findSelectedRule(route: Route): Rule | undefined {
 		return this.rules.findLast((fragment) => fragment.matches(route));
 	}
 
 	/**
 	 * Replace the content
 	 */
-	replaceContent = async (page /* @TODO fix type */) => {
+	replaceContent = async (page: any /* @TODO fix type */) => {
 		// If one of the rules matched, replace only the fragments from that rule
-		if (this.matchingRule != null) {
-			this.replaceFragments(page, this.matchingRule);
+		if (this.selectedRule != null) {
+			this.replaceFragments(page, this.selectedRule);
 			// Update the browser title
 			document.title = page.title;
 			return Promise.resolve();
@@ -180,7 +180,7 @@ export default class FragmentPlugin extends Plugin {
 	 * Replace fragments from a given rule
 	 * @returns
 	 */
-	replaceFragments(page /* @TODO fix type */, rule: Rule): void {
+	replaceFragments(page: any /* @TODO fix type */, rule: Rule): void {
 		const incomingDocument = new DOMParser().parseFromString(page.originalContent, 'text/html');
 
 		rule.fragments.forEach((selector, index) => {
