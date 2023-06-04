@@ -69,14 +69,15 @@ const swup = new Swup({
 
 ### Fragments
 
-- Both the current and the incoming DOM **must** contain all the fragments you have defind in the matching rule
-- For each entry in the `fragments` array, **only the first** matching element will be selected
+- The fragments from the selected rule need to be present in **both the current and the incoming document**
+- For each `fragments` entry, the first matching element in the DOM will be selected
 
 ## Animations for fragments
 
-During fragment visits, the atrribute `data-fragment` will be added to the `html` tag.
-- If the current rule has a `name`, that name (e.g. "my-route") will be reflected as `data-fragment="my-route"`
-- If the current rule matched in a distinct direction, that will be reflected using the attribute `[data-fragment-direction=forwards]` or `[data-fragment-direction=backwards]`
+During fragment visits, the attribute `[data-fragment]` will be added to the `html` tag
+- If the selected rule has a `name` (e.g. "my-route"), it will be reflected as `[data-fragment="my-route"]`
+- If the selected rule matches only in one direction, that will be reflected in the attribute `[data-fragment-direction=forwards]` or `[data-fragment-direction=backwards]`
+- If the selected rute matches in both directions, `[data-fragment-direction]` will not be set
 
 ```css
 /*
