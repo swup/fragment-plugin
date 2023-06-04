@@ -44,8 +44,14 @@ const swup = new Swup({
             "/users/filter/:filter"
           ],
           to: "/user/:user",
-          fragments: ["#user-profile"],
-          name: "user-profile",
+          fragments: ["#user-overlay"],
+          name: "user-overlay",
+        },
+        {
+          from: "/user/:user", // can also be a string for simple cases
+          to: "/user/:user",
+          fragments: [".user-overlay__content"],
+          name: "user",
         },
         // ...
       ],
@@ -57,7 +63,11 @@ const swup = new Swup({
 ### Notes
 
 - Both the current and the incoming `DOM` **must** contain the fragment you want to replace for a route
+- Rules are being matched in **both** directions, forwards as well as backwards
 - The last rule that matches the current route wins
+- During fragment visits, the atrribute `data-fragment` will be added to the `html` tag.
+  - If the current rule has a `name`, it will be `data-fragment="route-name"`
+  - If the current rule matched in a distinct direction, that will be reflected using the attribute `[data-fragment-direction=forwards]` or `[data-fragment-direction=backwards]`
 - For each entry in the `fragments` array, only the first matching element will be selected
 
 ## Animations for fragments
