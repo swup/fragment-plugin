@@ -60,17 +60,23 @@ const swup = new Swup({
 });
 ```
 
-### Notes
+## Notes
 
-- Both the current and the incoming `DOM` **must** contain the fragment you want to replace for a route
+### Rule Matching
+
 - Rules are being matched in **both** directions, forwards as well as backwards
-- The last rule that matches the current route wins
-- During fragment visits, the atrribute `data-fragment` will be added to the `html` tag.
-  - If the current rule has a `name`, it will be `data-fragment="route-name"`
-  - If the current rule matched in a distinct direction, that will be reflected using the attribute `[data-fragment-direction=forwards]` or `[data-fragment-direction=backwards]`
-- For each entry in the `fragments` array, only the first matching element will be selected
+- The last matching rule in your rules array will be selected for the current transition
+
+### Fragments
+
+- Both the current and the incoming DOM **must** contain all the fragments you have defind in the matching rule
+- For each entry in the `fragments` array, **only the first** matching element will be selected
 
 ## Animations for fragments
+
+During fragment visits, the atrribute `data-fragment` will be added to the `html` tag.
+- If the current rule has a `name`, that name (e.g. "my-route") will be reflected as `data-fragment="my-route"`
+- If the current rule matched in a distinct direction, that will be reflected using the attribute `[data-fragment-direction=forwards]` or `[data-fragment-direction=backwards]`
 
 ```css
 /*
