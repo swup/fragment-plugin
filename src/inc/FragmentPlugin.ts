@@ -20,7 +20,7 @@ type RuleOptions = {
 	from: Path;
 	to: Path;
 	fragments: string[];
-	name: string;
+	name?: string;
 };
 
 type PluginOptions = {
@@ -111,8 +111,8 @@ export default class FragmentPlugin extends Plugin {
 	onTransitionStart = () => {
 		if (!this.matchingRule) return;
 
-		// Add an attribute `[data-fragment-rule]` for scoped styling
-		document.documentElement.setAttribute('data-fragment', this.matchingRule.name);
+		// Add an attribute `[data-fragment="my-rule-name"]` for scoped styling
+		document.documentElement.setAttribute('data-fragment', this.matchingRule.name || '');
 
 		// Add an attribute `[data-fragment-direction]` for directional styling
 		if (this.matchingRule.matchedDirection) {

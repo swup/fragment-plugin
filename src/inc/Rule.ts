@@ -9,19 +9,19 @@ export default class Rule {
 	from: Path = '';
 	to: Path = '';
 	fragments: string[] = [];
-	name = 'unknown';
+	name: string | undefined;
 
 	matchedDirection = '';
 
 	fromRegEx: RegExp;
 	toRegEx: RegExp;
 
-	constructor(from: Path, to: Path, fragments: string[], name: string) {
+	constructor(from: Path, to: Path, fragments: string[], name: string | undefined) {
 		this.validate(from, to, fragments);
 
 		this.from = from;
 		this.to = to;
-		this.name = name;
+		if (name) this.name = name;
 
 		this.fragments = fragments.map((selector) => selector.trim());
 
