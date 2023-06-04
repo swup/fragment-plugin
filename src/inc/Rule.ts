@@ -1,12 +1,5 @@
 import { pathToRegexp } from 'path-to-regexp';
-import type { Route } from './FragmentPlugin.js';
-
-/**
- * A union type for pathToRegexp. It accepts strings,
- * arrays of strings or regular expressions.
- * @see https://github.com/pillarjs/path-to-regexp#path-to-regexp-1
- */
-type Path = string | string[] | RegExp;
+import type { Route, Path } from './FragmentPlugin.js';
 
 /**
  * Represents a route

@@ -3,14 +3,22 @@ import { Location } from 'swup';
 import Rule from './Rule.js';
 import type { Handler } from 'swup';
 
+/**
+ * A union type for pathToRegexp. It accepts strings,
+ * arrays of strings or regular expressions.
+ * @see https://github.com/pillarjs/path-to-regexp#path-to-regexp-1
+ */
+export type Path = string | string[] | RegExp;
+
+
 export type Route = {
 	from: string;
 	to: string;
 }
 
 type RuleOptions = {
-	from: string;
-	to: string;
+	from: Path;
+	to: Path;
 	fragments: string[];
 	name: string;
 };
