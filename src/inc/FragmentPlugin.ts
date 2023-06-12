@@ -156,7 +156,7 @@ export default class FragmentPlugin extends Plugin {
 	 * Set the current Rule if any matches
 	 */
 	findSelectedRule(route: Route): Rule | undefined {
-		return this.rules.findLast((fragment) => fragment.matches(route));
+		return this.rules.find((rule) => rule.matches(route));
 	}
 
 	/**
