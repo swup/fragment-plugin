@@ -1,5 +1,5 @@
 import { pathToRegexp } from 'path-to-regexp';
-import type { Route, Path } from './FragmentPlugin.js';
+import type { Route, Path, Direction } from './FragmentPlugin.js';
 
 /**
  * Represents a route
@@ -10,17 +10,18 @@ export default class Rule {
 	to: Path = '';
 	fragments: string[] = [];
 	name: string | undefined;
-
-	matchedDirection = '';
+	direction: Direction | undefined;
+	matchedDirection: Direction | undefined;
 
 	fromRegEx: RegExp;
 	toRegEx: RegExp;
 
-	constructor(from: Path, to: Path, fragments: string[], name: string | undefined) {
+	constructor(from: Path, to: Path, direction: Direction | undefined, fragments: string[], name: string | undefined) {
 
 		this.from = from;
 		this.to = to;
-		if (name) this.name = name;
+		this.direction = direction;
+		this.name = name;
 
 		this.fragments = fragments.map((selector) => selector.trim());
 
@@ -53,29 +54,31 @@ export default class Rule {
 	 * Checks if a given route matches a this rule
 	 */
 	matches(route: Route): boolean {
-		const forwards = this.matchesForwards(route);
-		const backwards = this.matchesBackwards(route);
+		const matchesForwards = this.matchesForwards(route);
+		const matchesBackwards = this.matchesBackwards(route);
 
-		// Return false if the route doesn't match in either direction
-		if (!forwards && !backwards) return false;
+		this.matchedDirection = this.getMatchedDirection(matchesForwards, matchesBackwards);
 
-		this.matchedDirection = this.getMatchedDirection(forwards, backwards);
+		// Only match forwards
+		if (this.direction === 'forwards') return this.matchedDirection === 'forwards';
 
-		return true;
+		// Only match backwards
+		if (this.direction === 'backwards') return this.matchedDirection === 'backwards';
+
+		// Match either direction
+		return matchesForwards || matchesBackwards;
 	}
 
 	/**
 	 * Detect in which direction the rule matched
 	 */
-	getMatchedDirection(matchesForwards: boolean, matchesBackwards: boolean): string {
-		// The rule matches in both directions
-		if (matchesForwards && matchesBackwards) return '';
+	getMatchedDirection(matchesForwards: boolean, matchesBackwards: boolean): Direction | undefined {
 		// The rule matches forwards
-		if (matchesForwards) return 'forwards';
+		if (matchesForwards && !matchesBackwards) return 'forwards';
 		// The rule matches backwards
-		if (matchesBackwards) return 'backwards';
+		if (matchesBackwards && !matchesForwards) return 'backwards';
 		// nothing matched
-		return '';
+		return undefined;
 	}
 
 	/**

@@ -10,6 +10,7 @@ import type { Handler } from 'swup';
  */
 export type Path = string | string[] | RegExp;
 
+export type Direction = 'forwards' | 'backwards';
 
 export type Route = {
 	from: string;
@@ -19,6 +20,7 @@ export type Route = {
 type RuleOptions = {
 	from: Path;
 	to: Path;
+	direction?: Direction;
 	fragments: string[];
 	name?: string;
 };
@@ -51,7 +53,7 @@ export default class FragmentPlugin extends Plugin {
 		};
 
 		this.rules = this.options.rules.map(
-			({ from, to, fragments, name }) => new Rule(from, to, fragments, name)
+			({ from, to, direction, fragments, name }) => new Rule(from, to, direction, fragments, name)
 		);
 	}
 
@@ -178,7 +180,6 @@ export default class FragmentPlugin extends Plugin {
 
 	/**
 	 * Replace fragments from a given rule
-	 * @returns
 	 */
 	replaceFragments(page: any /* @TODO fix type */, rule: Rule): void {
 		const incomingDocument = new DOMParser().parseFromString(page.originalContent, 'text/html');
@@ -198,3 +199,9 @@ export default class FragmentPlugin extends Plugin {
 		});
 	}
 }
+
+
+/**
+ * - Allow one-directional routes
+ * - Ignore fragments where [data-fragment-hash] is the same
+ */
