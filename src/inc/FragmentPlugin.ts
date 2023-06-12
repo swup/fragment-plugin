@@ -42,9 +42,8 @@ export default class FragmentPlugin extends Plugin {
 
 	/**
 	 * Constructor
-	 * @param {?object} options the plugin options
 	 */
-	constructor(options: Partial<PluginOptions> = {}) {
+	constructor(options: PluginOptions) {
 		super();
 
 		this.options = {
@@ -112,21 +111,27 @@ export default class FragmentPlugin extends Plugin {
 	 * Do special things if this is a fragment visit
 	 */
 	onTransitionStart = () => {
-		if (!this.selectedRule) return;
+		if (this.selectedRule) {
+			this.setAnimationAttributes(this.selectedRule);
+			this.disableScrollPluginForCurrentVisit();
+		}
+	};
 
+	/**
+	 * Set the animation attributes for a rule
+	 */
+	setAnimationAttributes(rule: Rule) {
 		// Add an attribute `[data-fragment-visit="my-rule-name"]` for scoped styling
-		document.documentElement.setAttribute('data-fragment-visit', this.selectedRule.name || '');
+		document.documentElement.setAttribute('data-fragment-visit', rule.name || '');
 
 		// Add an attribute `[data-fragment-direction]` for directional styling
-		if (this.selectedRule.matchedDirection) {
+		if (rule.matchedDirection) {
 			document.documentElement.setAttribute(
 				'data-fragment-direction',
-				this.selectedRule.matchedDirection
+				rule.matchedDirection
 			);
 		}
-
-		this.disableScrollPluginForCurrentVisit();
-	};
+	}
 
 	/**
 	 * Disable the scroll plugin for fragment visits
@@ -143,17 +148,21 @@ export default class FragmentPlugin extends Plugin {
 	 * Reset everything after each transition
 	 */
 	onTransitionEnd = () => {
-		if (!this.selectedRule) return;
+		this.cleanupAnimationAttributes();
+		// Reset the current rule
+		this.selectedRule = undefined;
+	};
 
+	/**
+	 * Removes all fragment-related animation attributes from the `html` element
+	 */
+	cleanupAnimationAttributes() {
 		// Remove the current rule's attribute
 		document.documentElement.removeAttribute('data-fragment-visit');
 
 		// Remove the fragment direction attribute
 		document.documentElement.removeAttribute('data-fragment-direction');
-
-		// Reset the current rule
-		this.selectedRule = undefined;
-	};
+	}
 
 	/**
 	 * Set the current Rule if any matches
