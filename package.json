@@ -1,7 +1,7 @@
 {
   "name": "@swup/fragment-plugin",
   "amdName": "SwupFragmentPlugin",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "Allow for swup to replace fragments instead of the default containers between selected page visits",
   "type": "module",
   "source": "src/index.js",
