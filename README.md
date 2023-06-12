@@ -17,8 +17,8 @@ npm i swup/fragment-plugin --save
 ## Example
 
 The following code will replace:
- 1. **only** the element `#users-list` when filtering a list of users and
- 2. **only** the element `#user-profile` when clicking on one of the users in the list
+ 1. **only** the element `#users-list` when filtering a list of users
+ 2. **only** the element `#user-overlay` when clicking on one of the users in the list
  3. **only** the element `#user-overlay__content` when navigating between users
 
 ```js
@@ -28,7 +28,7 @@ const swup = new Swup({
       // The plugin expects an array of rules
       rules: [
         {
-          // Rule 1: Between either the root or any filtered state... (required)
+          // Rule 1: Between either all users or any filtered state... (required)
           from: [
             "/users/",
             "/users/filter/:filter"
@@ -105,13 +105,14 @@ html[data-fragment-visit=overlay][data-fragment-direction=forwards].is-leaving .
 
 ### Rule Matching
 
-- Rules are being matched in **both** directions, forwards as well as backwards
-- The last matching rule in your rules array will be selected for the current transition
+- By default, rules are being matched in **both** directions, forwards as well as backwards. This can be customized by adding an option `direction` with either `forwards` or `backwards`
+- The first matching rule in your rules array will be used for the current transition
 
 ### Fragments
 
 - The fragments from the selected rule need to be present in **both the current and the incoming document**
 - For each `fragments` entry, the first matching element in the DOM will be selected
+- You can opt-out from replacing a fragment by giving both the incoming and current fragment the same `data-fragment-hash`
 
 ## Animations for fragments
 
