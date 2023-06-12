@@ -15,7 +15,7 @@ export type Direction = 'forwards' | 'backwards';
 export type Route = {
 	from: string;
 	to: string;
-}
+};
 
 type RuleOptions = {
 	from: Path;
@@ -53,7 +53,8 @@ export default class FragmentPlugin extends Plugin {
 		};
 
 		this.rules = this.options.rules.map(
-			({ from, to, direction, fragments, name }) => new Rule(from, to, direction, fragments, name)
+			({ from, to, direction, fragments, name }) =>
+				new Rule(from, to, direction, fragments, name)
 		);
 	}
 
@@ -100,10 +101,10 @@ export default class FragmentPlugin extends Plugin {
 	/**
 	 * Set the current fragment when clicking a link
 	 */
-	onClickLink: Handler<"clickLink"> = (event) => {
+	onClickLink: Handler<'clickLink'> = (event) => {
 		this.selectedRule = this.findSelectedRule({
 			from: this.swup.getCurrentUrl(),
-			to: Location.fromElement((event.delegateTarget as HTMLAnchorElement)).url
+			to: Location.fromElement(event.delegateTarget as HTMLAnchorElement).url
 		});
 	};
 
@@ -195,11 +196,22 @@ export default class FragmentPlugin extends Plugin {
 				console.warn('[swup] Container missing in current document:', selector);
 				return;
 			}
+
+			// Bail early if the two fragments have identical attribute values 'data-fragment-hash'
+			if (this.isSameFragmentHash(currentElement, incomingElement)) return;
+
 			currentElement.replaceWith(incomingElement);
 		});
 	}
+	/**
+	 * Check if two elements have an identical attribute `data-fragment-hash`
+	 */
+	isSameFragmentHash(el1: Element, el2: Element) {
+		const hash1 = el1.getAttribute('data-fragment-hash');
+		const hash2 = el2.getAttribute('data-fragment-hash');
+		return hash1 && hash2 && hash1 === hash2;
+	}
 }
-
 
 /**
  * - Allow one-directional routes
