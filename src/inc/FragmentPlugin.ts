@@ -114,8 +114,8 @@ export default class FragmentPlugin extends Plugin {
 	onTransitionStart = () => {
 		if (!this.selectedRule) return;
 
-		// Add an attribute `[data-fragment="my-rule-name"]` for scoped styling
-		document.documentElement.setAttribute('data-fragment', this.selectedRule.name || '');
+		// Add an attribute `[data-fragment-visit="my-rule-name"]` for scoped styling
+		document.documentElement.setAttribute('data-fragment-visit', this.selectedRule.name || '');
 
 		// Add an attribute `[data-fragment-direction]` for directional styling
 		if (this.selectedRule.matchedDirection) {
@@ -146,7 +146,7 @@ export default class FragmentPlugin extends Plugin {
 		if (!this.selectedRule) return;
 
 		// Remove the current rule's attribute
-		document.documentElement.removeAttribute('data-fragment');
+		document.documentElement.removeAttribute('data-fragment-visit');
 
 		// Remove the fragment direction attribute
 		document.documentElement.removeAttribute('data-fragment-direction');
