@@ -1,7 +1,7 @@
 import Plugin from '@swup/plugin';
 import { Location } from 'swup';
 import Rule from './Rule.js';
-import type { Handler } from 'swup';
+import Swup, { Handler } from 'swup';
 
 /**
  * A union type for pathToRegexp. It accepts strings,
@@ -37,8 +37,7 @@ export default class FragmentPlugin extends Plugin {
 	options: PluginOptions = {
 		rules: []
 	};
-	// @TODO use proper type
-	originalReplaceContent: any;
+	originalReplaceContent: Swup["replaceContent"] | undefined;
 
 	/**
 	 * Constructor
@@ -78,7 +77,8 @@ export default class FragmentPlugin extends Plugin {
 	unmount() {
 		const { swup } = this;
 
-		swup.replaceContent = this.originalReplaceContent;
+		swup.replaceContent = this.originalReplaceContent!;
+		this.originalReplaceContent = undefined;
 
 		swup.off('popState', this.onPopState);
 		swup.off('clickLink', this.onClickLink);
@@ -184,7 +184,7 @@ export default class FragmentPlugin extends Plugin {
 		}
 
 		// No rule matched. Run the default replaceContent
-		await this.originalReplaceContent(page);
+		await this.originalReplaceContent!(page);
 		return Promise.resolve();
 	};
 
@@ -221,8 +221,3 @@ export default class FragmentPlugin extends Plugin {
 		return hash1 && hash2 && hash1 === hash2;
 	}
 }
-
-/**
- * - Allow one-directional routes
- * - Ignore fragments where [data-fragment-hash] is the same
- */
