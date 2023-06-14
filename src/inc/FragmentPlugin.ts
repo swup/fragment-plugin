@@ -227,10 +227,15 @@ export default class FragmentPlugin extends Plugin {
 			};
 		});
 
+		const regexForCurrentUrl = rule.fromRegEx.test(this.swup.getCurrentUrl()) ? rule.fromRegEx : rule.toRegEx;
+
 		const invalidFragments = (
 			[...window.document.querySelectorAll('[data-fragment]')] as FragmentElement[]
 		)
-			.filter((oldFragment) => oldFragment.__fragmentInfo.url !== this.swup.getCurrentUrl())
+			.filter((oldFragment) => {
+				const { url: fragmentUrl } = oldFragment.__fragmentInfo;
+				return regexForCurrentUrl.test(fragmentUrl) && fragmentUrl !== this.swup.getCurrentUrl();
+			})
 			.filter((oldFragment) => !newFragments.includes(oldFragment));
 
 		console.log('new:', newFragments);
