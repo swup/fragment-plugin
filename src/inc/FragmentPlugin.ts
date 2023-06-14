@@ -12,6 +12,13 @@ export type Path = string | string[] | RegExp;
 
 export type Direction = 'forwards' | 'backwards';
 
+interface FragmentElement extends Element {
+	__fragmentInfo: {
+		url: string;
+		selector: string;
+	};
+}
+
 export type Route = {
 	from: string;
 	to: string;
@@ -126,10 +133,7 @@ export default class FragmentPlugin extends Plugin {
 
 		// Add an attribute `[data-fragment-direction]` for directional styling
 		if (rule.matchedDirection) {
-			document.documentElement.setAttribute(
-				'data-fragment-direction',
-				rule.matchedDirection
-			);
+			document.documentElement.setAttribute('data-fragment-direction', rule.matchedDirection);
 		}
 	}
 
@@ -194,31 +198,43 @@ export default class FragmentPlugin extends Plugin {
 	replaceFragments(page: any /* @TODO fix type */, rule: Rule): void {
 		const incomingDocument = new DOMParser().parseFromString(page.originalContent, 'text/html');
 
+		const newFragments: FragmentElement[] = [];
+
 		rule.fragments.forEach((selector, index) => {
-			const incomingElement = incomingDocument.querySelector(selector);
+			const incomingElement = incomingDocument.querySelector(
+				selector
+			) as FragmentElement | null;
 			if (!incomingElement) {
 				console.warn('[swup] Container missing in incoming document:', selector);
 				return;
 			}
-			const currentElement = window.document.querySelector(selector);
+			const currentElement = window.document.querySelector(
+				selector
+			) as FragmentElement | null;
 			if (!currentElement) {
 				console.warn('[swup] Container missing in current document:', selector);
 				return;
 			}
 
-			// Bail early if the two fragments have identical attribute values 'data-fragment-hash'
-			if (this.isSameFragmentHash(currentElement, incomingElement)) return;
+			newFragments.push(incomingElement);
 
 			currentElement.replaceWith(incomingElement);
+
+			incomingElement.setAttribute('data-fragment', '');
+			incomingElement.__fragmentInfo = {
+				url: this.swup.getCurrentUrl(),
+				selector
+			};
 		});
-	}
-	/**
-	 * Check if two elements have an identical attribute `data-fragment-hash`
-	 */
-	isSameFragmentHash(el1: Element, el2: Element) {
-		const hash1 = el1.getAttribute('data-fragment-hash');
-		const hash2 = el2.getAttribute('data-fragment-hash');
-		return hash1 && hash2 && hash1 === hash2;
+
+		const invalidFragments = (
+			[...window.document.querySelectorAll('[data-fragment]')] as FragmentElement[]
+		)
+			.filter((oldFragment) => oldFragment.__fragmentInfo.url !== this.swup.getCurrentUrl())
+			.filter((oldFragment) => !newFragments.includes(oldFragment));
+
+		console.log('new:', newFragments);
+		console.log('invalidated:', invalidFragments);
 	}
 }
 
