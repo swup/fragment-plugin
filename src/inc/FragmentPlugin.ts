@@ -193,57 +193,103 @@ export default class FragmentPlugin extends Plugin {
 	};
 
 	/**
-	 * Replace fragments from a given rule
+	 * Replace fragments for a given rule
 	 */
 	replaceFragments(page: any /* @TODO fix type */, rule: Rule): void {
 		const incomingDocument = new DOMParser().parseFromString(page.originalContent, 'text/html');
+		const replacedElements: FragmentElement[] = [];
 
-		const newFragments: FragmentElement[] = [];
+		// Mark existing fragments as stale
+		document
+			.querySelectorAll('[data-fragment]:not([data-stale-fragment])')
+			.forEach((el) => el.setAttribute('data-stale-fragment', ''));
 
+		// Step 1: replace all fragments from the rule
 		rule.fragments.forEach((selector, index) => {
-			const incomingElement = incomingDocument.querySelector(
+			const currentFragment = window.document.querySelector(
 				selector
 			) as FragmentElement | null;
-			if (!incomingElement) {
-				console.warn('[swup] Container missing in incoming document:', selector);
-				return;
-			}
-			const currentElement = window.document.querySelector(
-				selector
-			) as FragmentElement | null;
-			if (!currentElement) {
+
+			// Bail early if there is no match for the selector in the current dom
+			if (!currentFragment) {
 				console.warn('[swup] Container missing in current document:', selector);
 				return;
 			}
 
-			newFragments.push(incomingElement);
-
-			currentElement.replaceWith(incomingElement);
-
-			incomingElement.setAttribute('data-fragment', '');
-			incomingElement.__fragmentInfo = {
-				url: this.swup.getCurrentUrl(),
-				selector
-			};
+			const newFragment = this.replaceFragment(incomingDocument, currentFragment, selector);
+			if (newFragment) replacedElements.push(newFragment);
 		});
 
-		const regexForCurrentUrl = rule.fromRegEx.test(this.swup.getCurrentUrl()) ? rule.fromRegEx : rule.toRegEx;
+		// Step 2: Replace all invalid stale fragments
+		this.getInvalidStaleFragments(rule).forEach((fragment) => {
+			const newFragment = this.replaceFragment(incomingDocument, fragment, fragment.__fragmentInfo.selector);
+			if (newFragment) replacedElements.push(newFragment);
+		});
 
-		const invalidFragments = (
-			[...window.document.querySelectorAll('[data-fragment]')] as FragmentElement[]
-		)
-			.filter((oldFragment) => {
-				const { url: fragmentUrl } = oldFragment.__fragmentInfo;
-				return regexForCurrentUrl.test(fragmentUrl) && fragmentUrl !== this.swup.getCurrentUrl();
-			})
-			.filter((oldFragment) => !newFragments.includes(oldFragment));
+		console.log('replaced fragments:', replacedElements);
+	}
 
-		console.log('new:', newFragments);
-		console.log('invalidated:', invalidFragments);
+	/**
+	 * Replace a fragment from an incoming document
+	 */
+	replaceFragment(
+		incomingDocument: Document,
+		fragment: FragmentElement,
+		selector: string
+	): FragmentElement | undefined {
+		const newFragment = incomingDocument.querySelector(selector) as FragmentElement | null;
+
+		// Bail early if there is no match for the selector in the incoming dom
+		if (!newFragment) {
+			console.warn('[swup] Container missing in incoming document:', selector);
+			return;
+		}
+
+		// Bail early if the fragment's innerHTML hasn't changed
+		if (this.isEqualInnerHTML(fragment, newFragment)) return;
+
+		newFragment.setAttribute('data-fragment', '');
+		newFragment.__fragmentInfo = {
+			url: this.swup.getCurrentUrl(),
+			selector
+		};
+		fragment.replaceWith(newFragment);
+		return newFragment;
+	}
+
+	/**
+	 * Check if two elements contain the same innerHTML
+	 */
+	isEqualInnerHTML(el1: Element, el2: Element): boolean {
+		const dummy1 = document.createElement('div');
+		dummy1.innerHTML = el1.innerHTML;
+
+		const dummy2 = document.createElement('div');
+		dummy2.innerHTML = el2.innerHTML;
+
+		return dummy1.isEqualNode(dummy2);
+	}
+
+	/**
+	 * Get invalid fragments from the current DOM.
+	 */
+	getInvalidStaleFragments(rule: Rule) {
+		const currentUrl = this.swup.getCurrentUrl();
+
+		// Get the regex from the rule that matches the current URL
+		const regexForCurrentUrl = rule.toRegEx.test(currentUrl) ? rule.toRegEx : rule.fromRegEx;
+
+		// Get all stale fragments from the DOM
+		const staleFragments = [
+			...window.document.querySelectorAll('[data-stale-fragment]')
+		] as FragmentElement[];
+
+		return staleFragments
+			// The fragment's url matches the given rule's route for the current URL
+			.filter((fragment) => regexForCurrentUrl.test(fragment.__fragmentInfo.url))
+			// The fragment's url is NOT exactly equal to the current URL
+			.filter((fragment) => fragment.__fragmentInfo.url !== currentUrl)
+			// The fragment doesn't contain another fragment
+			.filter((fragment) => !fragment.querySelector('[data-fragment]'));
 	}
 }
-
-/**
- * - Allow one-directional routes
- * - Ignore fragments where [data-fragment-hash] is the same
- */
