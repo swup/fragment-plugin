@@ -30,6 +30,7 @@ type RuleOptions = {
 	direction?: Direction;
 	fragments: string[];
 	name?: string;
+	revalidate?: string[];
 };
 
 type PluginOptions = {
@@ -59,8 +60,8 @@ export default class FragmentPlugin extends Plugin {
 		};
 
 		this.rules = this.options.rules.map(
-			({ from, to, direction, fragments, name }) =>
-				new Rule(from, to, direction, fragments, name)
+			({ from, to, direction, fragments, name, revalidate }) =>
+				new Rule(from, to, direction, fragments, name, revalidate)
 		);
 	}
 
@@ -222,7 +223,11 @@ export default class FragmentPlugin extends Plugin {
 
 		// Step 2: Replace all invalid stale fragments
 		this.getInvalidStaleFragments(rule).forEach((fragment) => {
-			const newFragment = this.replaceFragment(incomingDocument, fragment, fragment.__fragmentInfo.selector);
+			const newFragment = this.replaceFragment(
+				incomingDocument,
+				fragment,
+				fragment.__fragmentInfo.selector
+			);
 			if (newFragment) replacedElements.push(newFragment);
 		});
 
@@ -246,7 +251,7 @@ export default class FragmentPlugin extends Plugin {
 		}
 
 		// Bail early if the fragment's innerHTML hasn't changed
-		if (this.isEqualInnerHTML(fragment, newFragment)) return;
+		// if (this.isEqualInnerHTML(fragment, newFragment)) return;
 
 		newFragment.setAttribute('data-fragment', '');
 		newFragment.__fragmentInfo = {
@@ -279,17 +284,21 @@ export default class FragmentPlugin extends Plugin {
 		// Get the regex from the rule that matches the current URL
 		const regexForCurrentUrl = rule.toRegEx.test(currentUrl) ? rule.toRegEx : rule.fromRegEx;
 
-		// Get all stale fragments from the DOM
-		const staleFragments = [
-			...window.document.querySelectorAll('[data-stale-fragment]')
-		] as FragmentElement[];
+		const candidates: FragmentElement[] = [];
 
-		return staleFragments
-			// The fragment's url matches the given rule's route for the current URL
-			.filter((fragment) => regexForCurrentUrl.test(fragment.__fragmentInfo.url))
-			// The fragment's url is NOT exactly equal to the current URL
-			.filter((fragment) => fragment.__fragmentInfo.url !== currentUrl)
-			// The fragment doesn't contain another fragment
-			.filter((fragment) => !fragment.querySelector('[data-fragment]'));
+		rule.revalidate.forEach((selector) => {
+			const el = window.document.querySelector(`${selector}[data-stale-fragment]`) as FragmentElement | null;
+			if (el) candidates.push(el);
+		});
+
+		return (
+			candidates
+				// The fragment's url matches the given rule's route for the current URL
+				.filter((fragment) => regexForCurrentUrl.test(fragment.__fragmentInfo.url))
+				// The fragment's url is NOT exactly equal to the current URL
+				.filter((fragment) => fragment.__fragmentInfo.url !== currentUrl)
+				// The fragment doesn't contain another fragment
+				.filter((fragment) => !fragment.querySelector('[data-fragment]'))
+		);
 	}
 }
