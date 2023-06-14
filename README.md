@@ -48,11 +48,23 @@ const swup = new Swup({
             "/users/filter/:filter"
           ],
           to: "/user/:user",
+          direction: "forwards",
           fragments: ["#user-overlay"],
           name: "overlay",
         },
         {
-          // Rule 3: Between user detail pages
+          // Rule 3: Between the a user detail page and the root or any filtered state
+          from: [
+            "/users/",
+            "/users/filter/:filter"
+          ],
+          to: "/user/:user",
+          direction: "backwards",
+          fragments: ["#user-overlay", "#users-list"],
+          name: "overlay",
+        },
+        {
+          // Rule 4: Between user detail pages
           from: "/user/:user", // can also be a string for simple cases like this
           to: "/user/:user",
           fragments: ["#user-overlay__content"],
@@ -95,7 +107,8 @@ html[data-fragment-visit=overlay].is-animating .transition-overlay {
   opacity: 0;
 }
 /* Special case for opening an overlay, making use of data-fragment-direction */
-html[data-fragment-visit=overlay][data-fragment-direction=forwards].is-leaving .transition-overlay {
+html[data-fragment-visit=overlay][data-fragment-direction=forwards].is-leaving .transition-overlay,
+html[data-fragment-visit=overlay][data-fragment-direction=backwards].is-rendering .transition-overlay {
   transition-duration: 10ms;
 }
 
@@ -120,3 +133,20 @@ During fragment visits, the attribute `[data-fragment-visit]` will be added to t
 - If the selected rule has a `name` (e.g. "my-route"), it will be reflected as `[data-fragment-visit="my-route"]`
 - If the selected rule matches only in one direction, that will be reflected in the attribute `[data-fragment-direction=forwards]` or `[data-fragment-direction=backwards]`
 - If the selected rute matches in both directions, `[data-fragment-direction]` will not be set
+
+## Advanced
+
+#### Persisting unchanged fragments
+
+In more complex scenarios, the rules might not be enough to describe all possible navigation paths.
+
+Rule 3, for example, will always replace both the overlay as well as the list.
+To persist the list if it hasn't changed, we can add a globally unique attribute `data-fragment-hash` to the element.
+
+You could, for example, use a hash of the page's URL where the fragment is being rendered. In PHP, this could look something like this:
+
+```php
+<div id="characters" data-fragment-hash="<?= md5($_SERVER['REQUEST_URI']) ?>"><!-- ... --></div>
+```
+
+The plugin will check for `data-fragment-hash` on both the incoming as well as the current fragment, and if they are identical, ignore the keep the current version of the fragment unchanged.
