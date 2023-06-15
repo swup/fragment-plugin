@@ -10,7 +10,6 @@ export default class Rule {
 	to: Path = '';
 	fragments: string[] = [];
 	name: string | undefined;
-	matchedDirection: Direction | undefined;
 
 	fromRegEx: RegExp;
 	toRegEx: RegExp;

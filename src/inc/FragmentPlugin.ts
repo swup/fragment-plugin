@@ -32,7 +32,7 @@ type PluginOptions = {
 export default class FragmentPlugin extends Plugin {
 	name = 'FragmentPlugin';
 
-	selectedRule: Rule | undefined = undefined;
+	currentRule: Rule | undefined;
 	rules: Rule[] = [];
 	options: PluginOptions = {
 		rules: []
@@ -40,7 +40,7 @@ export default class FragmentPlugin extends Plugin {
 	originalReplaceContent: Swup['replaceContent'] | undefined;
 
 	/**
-	 * Constructor
+	 * Constructor. The options are NOT optional
 	 */
 	constructor(options: PluginOptions) {
 		super();
@@ -94,7 +94,7 @@ export default class FragmentPlugin extends Plugin {
 	 * The browser URL has already changed during PopState
 	 */
 	onPopState = () => {
-		this.selectedRule = this.findSelectedRule({
+		this.currentRule = this.findSelectedRule({
 			from: this.swup.currentPageUrl,
 			to: this.swup.getCurrentUrl()
 		});
@@ -104,7 +104,7 @@ export default class FragmentPlugin extends Plugin {
 	 * Set the current fragment when clicking a link
 	 */
 	onClickLink: Handler<'clickLink'> = (event) => {
-		this.selectedRule = this.findSelectedRule({
+		this.currentRule = this.findSelectedRule({
 			from: this.swup.getCurrentUrl(),
 			to: Location.fromElement(event.delegateTarget as HTMLAnchorElement).url
 		});
@@ -114,8 +114,8 @@ export default class FragmentPlugin extends Plugin {
 	 * Do special things if this is a fragment visit
 	 */
 	onTransitionStart = () => {
-		if (this.selectedRule) {
-			this.setAnimationAttributes(this.selectedRule);
+		if (this.currentRule) {
+			this.setAnimationAttributes(this.currentRule);
 			this.disableScrollPluginForCurrentVisit();
 		}
 	};
@@ -145,7 +145,7 @@ export default class FragmentPlugin extends Plugin {
 	onTransitionEnd = () => {
 		this.cleanupAnimationAttributes();
 		// Reset the current rule
-		this.selectedRule = undefined;
+		this.currentRule = undefined;
 	};
 
 	/**
@@ -167,8 +167,8 @@ export default class FragmentPlugin extends Plugin {
 	 */
 	replaceContent = async (page: any /* @TODO fix type */) => {
 		// If one of the rules matched, replace only the fragments from that rule
-		if (this.selectedRule != null) {
-			this.replaceFragments(page, this.selectedRule);
+		if (this.currentRule != null) {
+			this.replaceFragments(page, this.currentRule);
 			// Update the browser title
 			document.title = page.title;
 			return Promise.resolve();
