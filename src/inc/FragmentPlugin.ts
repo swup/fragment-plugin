@@ -36,7 +36,7 @@ export default class FragmentPlugin extends Plugin {
 	options: PluginOptions = {
 		rules: []
 	};
-	originalReplaceContent: Swup["replaceContent"] | undefined;
+	originalReplaceContent: Swup['replaceContent'] | undefined;
 
 	/**
 	 * Constructor
@@ -67,6 +67,8 @@ export default class FragmentPlugin extends Plugin {
 		swup.on('clickLink', this.onClickLink);
 		swup.on('transitionStart', this.onTransitionStart);
 		swup.on('transitionEnd', this.onTransitionEnd);
+
+		this.prefillFragmentUrls();
 	}
 
 	/**
@@ -82,6 +84,8 @@ export default class FragmentPlugin extends Plugin {
 		swup.off('clickLink', this.onClickLink);
 		swup.off('transitionStart', this.onTransitionStart);
 		swup.off('transitionEnd', this.onTransitionEnd);
+
+		this.cleanupFragmentUrls();
 	}
 
 	/**
@@ -178,6 +182,7 @@ export default class FragmentPlugin extends Plugin {
 	 * Replace fragments for a given rule
 	 */
 	replaceFragments(page: any /* @TODO fix type */, rule: Rule): void {
+		const currentUrl = this.swup.getCurrentUrl();
 		const incomingDocument = new DOMParser().parseFromString(page.originalContent, 'text/html');
 		const replacedElements: Element[] = [];
 
@@ -187,7 +192,10 @@ export default class FragmentPlugin extends Plugin {
 
 			// Bail early if there is no match for the selector in the current dom
 			if (!currentFragment) {
-				console.warn('[swup] Container missing in current document:', selector);
+				console.warn(
+					'[swup-fragment-plugin] Container missing in current document:',
+					selector
+				);
 				return;
 			}
 
@@ -202,12 +210,19 @@ export default class FragmentPlugin extends Plugin {
 				return;
 			}
 
-			// Bail early if the fragment hasn't changed
-			if (currentFragment.isEqualNode(newFragment)) {
-				console.log('[swup-fragment-plugin] Fragment unchanged:', currentFragment);
+			// Bail early if the URL of the current fragment is equal to the current browser URL
+			if (currentFragment.getAttribute('data-fragment-url') === currentUrl) {
+				console.log('[swup-fragment-plugin] Fragment URL unchanged:', currentFragment);
 				return;
 			}
 
+			// Bail early if the fragment hasn't changed
+			// if (currentFragment.isEqualNode(newFragment)) {
+			// 	console.log('[swup-fragment-plugin] Fragment unchanged:', currentFragment);
+			// 	return;
+			// }
+
+			newFragment.setAttribute('data-fragment-url', currentUrl);
 			currentFragment.replaceWith(newFragment);
 			replacedElements.push(newFragment);
 		});
@@ -226,5 +241,26 @@ export default class FragmentPlugin extends Plugin {
 		dummy2.innerHTML = el2.innerHTML;
 
 		return dummy1.isEqualNode(dummy2);
+	}
+
+	/**
+	 * Adds [data-fragment-url] to all fragments
+	 */
+	prefillFragmentUrls() {
+		this.rules.forEach(({ replace: selectors }) => {
+			selectors.forEach(selector => {
+				const fragment = document.querySelector(selector);
+				if (fragment) fragment.setAttribute('data-fragment-url', this.swup.getCurrentUrl());
+			})
+		});
+	}
+
+	/**
+	 * Removes [data-fragment-url] from all elements
+	 */
+	cleanupFragmentUrls() {
+		document.querySelectorAll('[data-fragment-url]').forEach((el) => {
+			el.removeAttribute('data-fragment-url');
+		})
 	}
 }
