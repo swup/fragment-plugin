@@ -31,61 +31,99 @@ attribute to disable your default transitions.
 
 If the current rule has a `name` (e.g. "myRoute"), that will be reflected as `[data-fragment-visit=myRoute]`. Using this attribute, you can scope your custom animation for only that visit.
 
-## Example
+## Simple Example
 
-The following code will replace:
- 1. **only** the element `#users-list` when filtering a list of users
- 2. **only** the element `#user-overlay` when clicking on one of the users in the list
- 3. **only** the element `#user-overlay__content` when navigating between users
+Imagine you have two pages:
+
+1. A page that lists a bunch of users:
+
+```html
+<!-- Page URL: /users/ -->
+<!-- The main content on the users list page: -->
+<main>
+  <ul>
+    <li><a href="/user/user1/">User 1</a></li>
+    <li><a href="/user/user2/">User 2</a></li>
+    <li><a href="/user/user3/">User 3</a></li>
+  </ul>
+</main>
+<!-- The overlay (empty on overview pages) -->
+<div id="overlay"></div>
+```
+
+2. A page that shows a user's details in an overlay
+
+```html
+<!-- Page URL: /user/user1/ -->
+<!-- The main content on the user detail page: -->
+<div id="overlay">
+  <main id="overlay__content">
+    <h1>User 1</h1>
+    <p>This is the detail page for User 1</p>
+  </main>
+</div>
+<!-- The list of users is also there on the detail page: -->
+<ul>
+  <li><a href="/user/user1/">User 1</a></li>
+  <li><a href="/user/user2/">User 2</a></li>
+  <li><a href="/user/user3/">User 3</a></li>
+</ul>
+```
+
+Now you can tell FragmentPlugin to **only** replace selected elements when navigating the site:
 
 ```js
 const swup = new Swup({
   plugins: [
     new SwupFragmentPlugin({
-      // The plugin expects an array of rules
+      // The plugin expects an array of rules:
       rules: [
+        /**
+         * When navigating from the list to a single user:
+         * - replace only that user's #overlay
+         * - name the route "openOverlay" for styling
+         */
         {
-          // Rule 1: Between either all users or any filtered state... (required)
-          from: ["/users/", "/users/filter/:filter"],
-          to: ["/users/", "/users/filter/:filter"],
-          // ...replace the following elements... (required)
-          replace: ["#users-list"],
-          // ...and add an attribute [data-fragment-visit="switchUsers"]
-          // to the html tag during the transition (optional).
-          name: "switchUsers",
+          from: '/users/',
+          to: '/user/:user/',
+          replace: ['#overlay'],
+          name: 'openOverlay'
         },
+        /**
+         * When navigating from a single user back to the list:
+         * - replcae only the user's #overlay
+         * - name the route "closeOverlay" for styling
+         */
         {
-          // Rule 2: Opening an overlay (after clicking one of the users)
-          from: ["/users/", "/users/filter/:filter"],
-          to: "/user/:user",
-          replace: ["#user-overlay"],
-          name: "openOverlay",
+          from: '/user/:user/',
+          to: '/users/',
+          replace: ['#overlay'],
+          name: 'closeOverlay'
         },
+        /**
+         * When navigating between users:
+         * - replace only the #overlay__content
+         * - name the route "switchUser" for styling
+         */
         {
-          // Rule 3: Closing an overlay. Note that in some scenarios, you might
-          // also want to replace #users
-          from: "/user/:user",
-          to: ["/users/", "/users/filter/:filter"],
-          replace: ["#user-overlay", "#users"],
-          name: "closeOverlay",
-        },
-        {
-          // Rule 3: Between user detail pages
-          from: "/user/:user",
-          to: "/user/:user",
-          replace: ["#user-overlay__content"],
-          name: "switchUser"
-        },
-        // ...
+          from: '/user/:user/',
+          to: '/user/:user/',
+          replace: ['#overlay__content'],
+          name: 'switchUser'
+        }
+        // ... more complex scenarios are possible!
       ],
     }),
   ],
 });
 ```
 
+By giving your rules names, you are now able to defining scoped transitions for each of your rules,
+making use of swup's powerful animation system:
+
 ```css
 /*
-* The default transition (for visits without fragment)
+* The default transition, for visits without a matching rule
 */
 html:not([data-fragment-visit]) .transition-main {
   transition: opacity 250ms;
@@ -95,16 +133,7 @@ html:not([data-fragment-visit]).is-animating .transition-main {
   opacity: 0;
 }
 /*
-* The transition for the named rule "switchUsers"
-*/
-html[data-fragment-visit=switchUsers] .transition-items {
-  transition: opacity 250ms;
-}
-html[data-fragment-visit=switchUsers].is-animating .transition-items {
-  opacity: 0;
-}
-/*
-* The transition for the named rule "overlay"
+* The transitions for the named rules "openOverlay" and "closeOverlay"
 */
 html[data-fragment-visit=openOverlay] .transition-overlay,
 html[data-fragment-visit=closeOverlay] .transition-overlay {
@@ -114,9 +143,27 @@ html[data-fragment-visit=openOverlay].is-animating .transition-overlay,
 html[data-fragment-visit=closeOverlay].is-animating .transition-overlay {
   opacity: 0;
 }
+/*
+* Based on the name of the roule, we can make either the leaving or
+* the rendering transition really short:
+*/
 html[data-fragment-visit=openOverlay].is-leaving .transition-overlay,
 html[data-fragment-visit=closeOverlay].is-rendering .transition-overlay {
   transition-duration: 10ms;
+}
+/*
+* The transition between single users
+*/
+html[data-fragment-visit=switchUser] .transition-user {
+  transition: opacity 200ms, transform 200ms;
+}
+html[data-fragment-visit=switchUser].is-animating .transition-user {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+html[data-fragment-visit=switchUser].is-leaving .transition-user {
+  opacity: 0;
+  transform: translateY(20px);
 }
 
 ```
