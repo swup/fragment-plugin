@@ -69,7 +69,7 @@ export default class FragmentPlugin extends Plugin {
 		swup.on('transitionStart', this.onTransitionStart);
 		swup.on('transitionEnd', this.onTransitionEnd);
 
-		this.prefillFragmentUrls();
+		this.setFragmentUrls();
 	}
 
 	/**
@@ -176,6 +176,8 @@ export default class FragmentPlugin extends Plugin {
 
 		// No rule matched. Run the default replaceContent
 		await this.originalReplaceContent!(page);
+		// Save the current URL for all fragments
+		this.setFragmentUrls();
 		return Promise.resolve();
 	};
 
@@ -188,7 +190,7 @@ export default class FragmentPlugin extends Plugin {
 		const replacedElements: Element[] = [];
 
 		// Step 1: replace all fragments from the rule
-		rule.replace.forEach((selector, index) => {
+		rule.fragments.forEach((selector, index) => {
 			const currentFragment = window.document.querySelector(selector);
 
 			// Bail early if there is no match for the selector in the current dom
@@ -243,8 +245,8 @@ export default class FragmentPlugin extends Plugin {
 	/**
 	 * Adds [data-fragment-url] to all fragments
 	 */
-	prefillFragmentUrls() {
-		this.rules.forEach(({ replace: selectors }) => {
+	setFragmentUrls() {
+		this.rules.forEach(({ fragments: selectors }) => {
 			selectors.forEach((selector) => {
 				const fragment = document.querySelector(selector);
 				if (fragment) fragment.setAttribute('data-fragment-url', this.swup.getCurrentUrl());

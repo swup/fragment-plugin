@@ -8,19 +8,19 @@ import { log } from './utils.js';
 export default class Rule {
 	from: Path = '';
 	to: Path = '';
-	replace: string[] = [];
+	fragments: string[] = [];
 	name: string | undefined;
 	matchedDirection: Direction | undefined;
 
 	fromRegEx: RegExp;
 	toRegEx: RegExp;
 
-	constructor(from: Path, to: Path, replace: string[], name: string | undefined) {
+	constructor(from: Path, to: Path, fragments: string[], name: string | undefined) {
 		this.from = from;
 		this.to = to;
 		this.name = name;
 
-		this.replace = replace.map((selector) => selector.trim());
+		this.fragments = fragments.map((selector) => selector.trim());
 
 		this.fromRegEx = this.convertToRegexp(from);
 		this.toRegEx = this.convertToRegexp(to);
