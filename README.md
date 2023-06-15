@@ -14,23 +14,6 @@ https://swup.fragment-plugin.rassohilber.com/
 npm i swup/fragment-plugin --save
 ```
 
-## Rule Matching
-
-- The first matching rule in your rules array will be used for the current visit
-
-## Fragments
-
-- The fragments from the selected rule need to be present in **both the current and the incoming document**
-- For each `replace` entry, the first matching element in the DOM will be selected
-- The plugin will check if a fragment has actually changed before replacing it
-
-## Animations for fragments
-
-During fragment visits, the attribute `[data-fragment-visit]` will be added to the `html` tag. You can use that
-attribute to disable your default transitions.
-
-If the current rule has a `name` (e.g. "myRoute"), that will be reflected as `[data-fragment-visit=myRoute]`. Using this attribute, you can scope your custom animation for only that visit.
-
 ## Simple Example
 
 Imagine you have two pages:
@@ -118,8 +101,44 @@ const swup = new Swup({
 });
 ```
 
-By giving your rules names, you are now able to defining scoped transitions for each of your rules,
-making use of swup's powerful animation system:
+## Rules
+
+Each rule consist of these properties:
+
+### `from: string | string[]`
+
+The path before the current visit. Will be converted to a RegExp.
+
+### `to: string | string[]`
+
+The new path of the current visit. Will be converted to a RegExp.
+
+### `replace: string[]`
+
+An array of selectors, that should be replaced if the rule matches
+
+### `name: string` (optional)
+
+A name for the rule, for scoped styling
+
+## Rule matching logic
+
+- The first matching rule in your rules array will be used for the current visit
+- If no `rule` matches the current visist, the default `swup.containers` will be replaced
+- `rule.from` and `rule.to` are converted to a regular expression by [pathToRegexp](https://github.com/pillarjs/path-to-regexp). If you want to create an either/or-regex, you can use an array, for example `['/users/', '/users/filter/:filter']`
+
+## Fragments
+
+- The `rule.replace` selectors from the current `rule` need to be present in **both the current and the incoming document**
+- For each `rule.replace` entry, the first matching element in the DOM will be selected
+- The plugin will check if a fragment has actually changed before replacing it
+
+## Animations for fragments
+
+During fragment visits, the attribute `[data-fragment-visit]` will be added to the `html` tag. You can use that
+attribute to disable your default transitions for fragment visits.
+
+If the current `rule` has a `name` (e.g. "myRoute"), that will be reflected as `[data-fragment-visit=myRoute]`. Using this attribute, you can scope your custom animation for only that visit:
 
 ```css
 /*
@@ -144,7 +163,7 @@ html[data-fragment-visit=closeOverlay].is-animating .transition-overlay {
   opacity: 0;
 }
 /*
-* Based on the name of the roule, we can make either the leaving or
+* Based on the name of the rule, we can make either the leaving or
 * the rendering transition really short:
 */
 html[data-fragment-visit=openOverlay].is-leaving .transition-overlay,
