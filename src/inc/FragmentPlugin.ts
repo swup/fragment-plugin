@@ -192,10 +192,7 @@ export default class FragmentPlugin extends Plugin {
 
 			// Bail early if there is no match for the selector in the current dom
 			if (!currentFragment) {
-				console.warn(
-					'[swup-fragment-plugin] Container missing in current document:',
-					selector
-				);
+				this.log('Container missing in current document:', selector, 'warn');
 				return;
 			}
 
@@ -203,31 +200,32 @@ export default class FragmentPlugin extends Plugin {
 
 			// Bail early if there is no match for the selector in the incoming dom
 			if (!newFragment) {
-				console.warn(
-					'[swup-fragment-plugin] Container missing in incoming document:',
-					selector
-				);
+				this.log('Container missing in incoming document:', selector, 'warn');
 				return;
 			}
 
 			// Bail early if the URL of the current fragment is equal to the current browser URL
 			if (currentFragment.getAttribute('data-fragment-url') === currentUrl) {
-				console.log('[swup-fragment-plugin] Fragment URL unchanged:', currentFragment);
+				this.log('URL unchanged:', currentFragment);
 				return;
 			}
 
 			// Bail early if the fragment hasn't changed
-			// if (currentFragment.isEqualNode(newFragment)) {
-			// 	console.log('[swup-fragment-plugin] Fragment unchanged:', currentFragment);
-			// 	return;
-			// }
+			if (currentFragment.isEqualNode(newFragment)) {
+				this.log('Element unchanged:', currentFragment);
+				return;
+			}
 
 			newFragment.setAttribute('data-fragment-url', currentUrl);
 			currentFragment.replaceWith(newFragment);
 			replacedElements.push(newFragment);
 		});
 
-		console.log('replaced:', replacedElements);
+		this.log('replaced:', replacedElements);
+	}
+
+	log(message: string, context: any, type: 'log' | 'warn' | 'error' = 'log') {
+		console[type](`[swup-fragment-plugin] ${message}`, context);
 	}
 
 	/**
@@ -248,10 +246,10 @@ export default class FragmentPlugin extends Plugin {
 	 */
 	prefillFragmentUrls() {
 		this.rules.forEach(({ replace: selectors }) => {
-			selectors.forEach(selector => {
+			selectors.forEach((selector) => {
 				const fragment = document.querySelector(selector);
 				if (fragment) fragment.setAttribute('data-fragment-url', this.swup.getCurrentUrl());
-			})
+			});
 		});
 	}
 
@@ -261,6 +259,6 @@ export default class FragmentPlugin extends Plugin {
 	cleanupFragmentUrls() {
 		document.querySelectorAll('[data-fragment-url]').forEach((el) => {
 			el.removeAttribute('data-fragment-url');
-		})
+		});
 	}
 }
