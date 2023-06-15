@@ -94,7 +94,7 @@ export default class FragmentPlugin extends Plugin {
 	 * The browser URL has already changed during PopState
 	 */
 	onPopState = () => {
-		this.currentRule = this.findSelectedRule({
+		this.currentRule = this.getFirstMatchingRule({
 			from: this.swup.currentPageUrl,
 			to: this.swup.getCurrentUrl()
 		});
@@ -104,7 +104,7 @@ export default class FragmentPlugin extends Plugin {
 	 * Set the current fragment when clicking a link
 	 */
 	onClickLink: Handler<'clickLink'> = (event) => {
-		this.currentRule = this.findSelectedRule({
+		this.currentRule = this.getFirstMatchingRule({
 			from: this.swup.getCurrentUrl(),
 			to: Location.fromElement(event.delegateTarget as HTMLAnchorElement).url
 		});
@@ -158,7 +158,7 @@ export default class FragmentPlugin extends Plugin {
 	/**
 	 * Set the current Rule if any matches
 	 */
-	findSelectedRule(route: Route): Rule | undefined {
+	getFirstMatchingRule(route: Route): Rule | undefined {
 		return this.rules.find((rule) => rule.matches(route));
 	}
 
