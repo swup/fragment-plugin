@@ -20,8 +20,7 @@ export type Route = {
 type RuleOptions = {
 	from: Path;
 	to: Path;
-	direction?: Direction;
-	fragments: string[];
+	replace: string[];
 	name?: string;
 };
 
@@ -51,8 +50,7 @@ export default class FragmentPlugin extends Plugin {
 		};
 
 		this.rules = this.options.rules.map(
-			({ from, to, direction, fragments, name }) =>
-				new Rule(from, to, direction, fragments, name)
+			({ from, to, replace, name }) => new Rule(from, to, replace, name)
 		);
 	}
 
@@ -123,14 +121,6 @@ export default class FragmentPlugin extends Plugin {
 	setAnimationAttributes(rule: Rule) {
 		// Add an attribute `[data-fragment-visit="my-rule-name"]` for scoped styling
 		document.documentElement.setAttribute('data-fragment-visit', rule.name || '');
-
-		// Add an attribute `[data-fragment-direction]` for directional styling
-		if (rule.matchedDirection) {
-			document.documentElement.setAttribute(
-				'data-fragment-direction',
-				rule.matchedDirection
-			);
-		}
 	}
 
 	/**
@@ -157,11 +147,7 @@ export default class FragmentPlugin extends Plugin {
 	 * Removes all fragment-related animation attributes from the `html` element
 	 */
 	cleanupAnimationAttributes() {
-		// Remove the current rule's attribute
 		document.documentElement.removeAttribute('data-fragment-visit');
-
-		// Remove the fragment direction attribute
-		document.documentElement.removeAttribute('data-fragment-direction');
 	}
 
 	/**
@@ -189,35 +175,56 @@ export default class FragmentPlugin extends Plugin {
 	};
 
 	/**
-	 * Replace fragments from a given rule
+	 * Replace fragments for a given rule
 	 */
 	replaceFragments(page: any /* @TODO fix type */, rule: Rule): void {
 		const incomingDocument = new DOMParser().parseFromString(page.originalContent, 'text/html');
+		const replacedElements: Element[] = [];
 
-		rule.fragments.forEach((selector, index) => {
-			const incomingElement = incomingDocument.querySelector(selector);
-			if (!incomingElement) {
-				console.warn('[swup] Container missing in incoming document:', selector);
-				return;
-			}
-			const currentElement = window.document.querySelector(selector);
-			if (!currentElement) {
+		// Step 1: replace all fragments from the rule
+		rule.replace.forEach((selector, index) => {
+			const currentFragment = window.document.querySelector(selector);
+
+			// Bail early if there is no match for the selector in the current dom
+			if (!currentFragment) {
 				console.warn('[swup] Container missing in current document:', selector);
 				return;
 			}
 
-			// Bail early if the two fragments have identical attribute values 'data-fragment-hash'
-			if (this.isSameFragmentHash(currentElement, incomingElement)) return;
+			const newFragment = incomingDocument.querySelector(selector);
 
-			currentElement.replaceWith(incomingElement);
+			// Bail early if there is no match for the selector in the incoming dom
+			if (!newFragment) {
+				console.warn(
+					'[swup-fragment-plugin] Container missing in incoming document:',
+					selector
+				);
+				return;
+			}
+
+			// Bail early if the fragment hasn't changed
+			if (currentFragment.isEqualNode(newFragment)) {
+				console.log('[swup-fragment-plugin] Fragment unchanged:', currentFragment);
+				return;
+			}
+
+			currentFragment.replaceWith(newFragment);
+			replacedElements.push(newFragment);
 		});
+
+		console.log('replaced:', replacedElements);
 	}
+
 	/**
-	 * Check if two elements have an identical attribute `data-fragment-hash`
+	 * Check if two elements contain the same innerHTML
 	 */
-	isSameFragmentHash(el1: Element, el2: Element) {
-		const hash1 = el1.getAttribute('data-fragment-hash');
-		const hash2 = el2.getAttribute('data-fragment-hash');
-		return hash1 && hash2 && hash1 === hash2;
+	isEqualInnerHTML(el1: Element, el2: Element): boolean {
+		const dummy1 = document.createElement('div');
+		dummy1.innerHTML = el1.innerHTML;
+
+		const dummy2 = document.createElement('div');
+		dummy2.innerHTML = el2.innerHTML;
+
+		return dummy1.isEqualNode(dummy2);
 	}
 }
