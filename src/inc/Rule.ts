@@ -1,5 +1,6 @@
 import { pathToRegexp } from 'path-to-regexp';
 import type { Route, Path, Direction } from './FragmentPlugin.js';
+import { log } from './utils.js';
 
 /**
  * Represents a route
@@ -14,12 +15,7 @@ export default class Rule {
 	fromRegEx: RegExp;
 	toRegEx: RegExp;
 
-	constructor(
-		from: Path,
-		to: Path,
-		replace: string[],
-		name: string | undefined,
-	) {
+	constructor(from: Path, to: Path, replace: string[], name: string | undefined) {
 		this.from = from;
 		this.to = to;
 		this.name = name;
@@ -31,22 +27,13 @@ export default class Rule {
 	}
 
 	/**
-	 * Throw an error with a prefix
-	 */
-	logError(message: string, ...args: any): void {
-		console.error(`[fragment-plugin] ${message}`, ...args);
-	}
-
-	/**
 	 * Convert a string to a regex, with error handling
 	 */
 	convertToRegexp(path: Path): RegExp {
 		try {
 			return pathToRegexp(path) as RegExp;
 		} catch (error) {
-			this.logError(`Couldn't convert path to RegExp`, {
-				path
-			});
+			log('Error converting to RegExp:', path, 'error');
 			throw new Error(error as string);
 		}
 	}

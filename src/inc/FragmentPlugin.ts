@@ -2,6 +2,7 @@ import Plugin from '@swup/plugin';
 import { Location } from 'swup';
 import Rule from './Rule.js';
 import Swup, { Handler } from 'swup';
+import { log } from './utils.js';
 
 /**
  * A union type for pathToRegexp. It accepts strings,
@@ -192,7 +193,7 @@ export default class FragmentPlugin extends Plugin {
 
 			// Bail early if there is no match for the selector in the current dom
 			if (!currentFragment) {
-				this.log('Container missing in current document:', selector, 'warn');
+				log('Container missing in current document:', selector, 'warn');
 				return;
 			}
 
@@ -200,19 +201,19 @@ export default class FragmentPlugin extends Plugin {
 
 			// Bail early if there is no match for the selector in the incoming dom
 			if (!newFragment) {
-				this.log('Container missing in incoming document:', selector, 'warn');
+				log('Container missing in incoming document:', selector, 'warn');
 				return;
 			}
 
 			// Bail early if the URL of the current fragment is equal to the current browser URL
 			if (currentFragment.getAttribute('data-fragment-url') === currentUrl) {
-				this.log('URL unchanged:', currentFragment);
+				log('URL unchanged:', currentFragment);
 				return;
 			}
 
 			// Bail early if the fragment hasn't changed
 			if (currentFragment.isEqualNode(newFragment)) {
-				this.log('Element unchanged:', currentFragment);
+				log('Element unchanged:', currentFragment);
 				return;
 			}
 
@@ -221,12 +222,10 @@ export default class FragmentPlugin extends Plugin {
 			replacedElements.push(newFragment);
 		});
 
-		this.log('replaced:', replacedElements);
+		log('replaced:', replacedElements);
 	}
 
-	log(message: string, context: any, type: 'log' | 'warn' | 'error' = 'log') {
-		console[type](`[swup-fragment-plugin] ${message}`, context);
-	}
+
 
 	/**
 	 * Check if two elements contain the same innerHTML
