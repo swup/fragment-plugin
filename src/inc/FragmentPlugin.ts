@@ -156,7 +156,7 @@ export default class FragmentPlugin extends Plugin {
 	}
 
 	/**
-	 * Set the current Rule if any matches
+	 * Get the first matching rule for a given route
 	 */
 	getFirstMatchingRule(route: Route): Rule | undefined {
 		return this.rules.find((rule) => rule.matches(route));
