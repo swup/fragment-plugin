@@ -12,13 +12,6 @@ export type Path = string | string[] | RegExp;
 
 export type Direction = 'forwards' | 'backwards';
 
-interface FragmentElement extends Element {
-	__fragmentInfo: {
-		url: string;
-		selector: string;
-	};
-}
-
 export type Route = {
 	from: string;
 	to: string;
@@ -27,10 +20,8 @@ export type Route = {
 type RuleOptions = {
 	from: Path;
 	to: Path;
-	direction?: Direction;
-	fragments: string[];
+	replace: string[];
 	name?: string;
-	revalidate?: string[];
 };
 
 type PluginOptions = {
@@ -60,8 +51,7 @@ export default class FragmentPlugin extends Plugin {
 		};
 
 		this.rules = this.options.rules.map(
-			({ from, to, direction, fragments, name, revalidate }) =>
-				new Rule(from, to, direction, fragments, name, revalidate)
+			({ from, to, replace, name }) => new Rule(from, to, replace, name)
 		);
 	}
 
@@ -131,11 +121,6 @@ export default class FragmentPlugin extends Plugin {
 	setAnimationAttributes(rule: Rule) {
 		// Add an attribute `[data-fragment-visit="my-rule-name"]` for scoped styling
 		document.documentElement.setAttribute('data-fragment-visit', rule.name || '');
-
-		// Add an attribute `[data-fragment-direction]` for directional styling
-		if (rule.matchedDirection) {
-			document.documentElement.setAttribute('data-fragment-direction', rule.matchedDirection);
-		}
 	}
 
 	/**
@@ -162,11 +147,7 @@ export default class FragmentPlugin extends Plugin {
 	 * Removes all fragment-related animation attributes from the `html` element
 	 */
 	cleanupAnimationAttributes() {
-		// Remove the current rule's attribute
 		document.documentElement.removeAttribute('data-fragment-visit');
-
-		// Remove the fragment direction attribute
-		document.documentElement.removeAttribute('data-fragment-direction');
 	}
 
 	/**
@@ -198,18 +179,11 @@ export default class FragmentPlugin extends Plugin {
 	 */
 	replaceFragments(page: any /* @TODO fix type */, rule: Rule): void {
 		const incomingDocument = new DOMParser().parseFromString(page.originalContent, 'text/html');
-		const replacedElements: FragmentElement[] = [];
-
-		// Mark existing fragments as stale
-		document
-			.querySelectorAll('[data-fragment]:not([data-stale-fragment])')
-			.forEach((el) => el.setAttribute('data-stale-fragment', ''));
+		const replacedElements: Element[] = [];
 
 		// Step 1: replace all fragments from the rule
-		rule.fragments.forEach((selector, index) => {
-			const currentFragment = window.document.querySelector(
-				selector
-			) as FragmentElement | null;
+		rule.replace.forEach((selector, index) => {
+			const currentFragment = window.document.querySelector(selector);
 
 			// Bail early if there is no match for the selector in the current dom
 			if (!currentFragment) {
@@ -217,49 +191,28 @@ export default class FragmentPlugin extends Plugin {
 				return;
 			}
 
-			const newFragment = this.replaceFragment(incomingDocument, currentFragment, selector);
-			if (newFragment) replacedElements.push(newFragment);
+			const newFragment = incomingDocument.querySelector(selector);
+
+			// Bail early if there is no match for the selector in the incoming dom
+			if (!newFragment) {
+				console.warn(
+					'[swup-fragment-plugin] Container missing in incoming document:',
+					selector
+				);
+				return;
+			}
+
+			// Bail early if the fragment hasn't changed
+			if (currentFragment.isEqualNode(newFragment)) {
+				console.log('[swup-fragment-plugin] Fragment unchanged:', currentFragment);
+				return;
+			}
+
+			currentFragment.replaceWith(newFragment);
+			replacedElements.push(newFragment);
 		});
 
-		// Step 2: Replace all invalid stale fragments
-		this.getInvalidStaleFragments(rule).forEach((fragment) => {
-			const newFragment = this.replaceFragment(
-				incomingDocument,
-				fragment,
-				fragment.__fragmentInfo.selector
-			);
-			if (newFragment) replacedElements.push(newFragment);
-		});
-
-		console.log('replaced fragments:', replacedElements);
-	}
-
-	/**
-	 * Replace a fragment from an incoming document
-	 */
-	replaceFragment(
-		incomingDocument: Document,
-		fragment: FragmentElement,
-		selector: string
-	): FragmentElement | undefined {
-		const newFragment = incomingDocument.querySelector(selector) as FragmentElement | null;
-
-		// Bail early if there is no match for the selector in the incoming dom
-		if (!newFragment) {
-			console.warn('[swup] Container missing in incoming document:', selector);
-			return;
-		}
-
-		// Bail early if the fragment's innerHTML hasn't changed
-		// if (this.isEqualInnerHTML(fragment, newFragment)) return;
-
-		newFragment.setAttribute('data-fragment', '');
-		newFragment.__fragmentInfo = {
-			url: this.swup.getCurrentUrl(),
-			selector
-		};
-		fragment.replaceWith(newFragment);
-		return newFragment;
+		console.log('replaced:', replacedElements);
 	}
 
 	/**
@@ -273,32 +226,5 @@ export default class FragmentPlugin extends Plugin {
 		dummy2.innerHTML = el2.innerHTML;
 
 		return dummy1.isEqualNode(dummy2);
-	}
-
-	/**
-	 * Get invalid fragments from the current DOM.
-	 */
-	getInvalidStaleFragments(rule: Rule) {
-		const currentUrl = this.swup.getCurrentUrl();
-
-		// Get the regex from the rule that matches the current URL
-		const regexForCurrentUrl = rule.toRegEx.test(currentUrl) ? rule.toRegEx : rule.fromRegEx;
-
-		const candidates: FragmentElement[] = [];
-
-		rule.revalidate.forEach((selector) => {
-			const el = window.document.querySelector(`${selector}[data-stale-fragment]`) as FragmentElement | null;
-			if (el) candidates.push(el);
-		});
-
-		return (
-			candidates
-				// The fragment's url matches the given rule's route for the current URL
-				.filter((fragment) => regexForCurrentUrl.test(fragment.__fragmentInfo.url))
-				// The fragment's url is NOT exactly equal to the current URL
-				.filter((fragment) => fragment.__fragmentInfo.url !== currentUrl)
-				// The fragment doesn't contain another fragment
-				.filter((fragment) => !fragment.querySelector('[data-fragment]'))
-		);
 	}
 }
