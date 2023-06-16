@@ -125,8 +125,8 @@ export default class FragmentPlugin extends Plugin {
 	 * Do special things if this is a fragment visit
 	 */
 	onTransitionStart = () => {
-		if (this.selectedRule) {
-			this.setAnimationAttributes(this.selectedRule);
+		if (this.currentRule) {
+			this.setAnimationAttributes(this.currentRule);
 			this.disableScrollingBehavior();
 		}
 	};
