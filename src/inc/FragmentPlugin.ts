@@ -11,13 +11,17 @@ import { log } from './utils.js';
  */
 export type Path = string | string[] | RegExp;
 
-export type Direction = 'forwards' | 'backwards';
-
+/**
+ * Represents a route from one to another URL
+ */
 export type Route = {
 	from: string;
 	to: string;
 };
 
+/**
+ * This is being used in the type PluginOptions
+ */
 type RuleOptions = {
 	from: Path;
 	to: Path;
@@ -25,10 +29,16 @@ type RuleOptions = {
 	name?: string;
 };
 
+/**
+ * The Plugin Options
+ */
 type PluginOptions = {
 	rules: RuleOptions[];
 };
 
+/**
+ * The main plugin class
+ */
 export default class FragmentPlugin extends Plugin {
 	name = 'FragmentPlugin';
 
@@ -122,10 +132,9 @@ export default class FragmentPlugin extends Plugin {
 	};
 
 	/**
-	 * Set the animation attributes for a rule
+	 * Set the animation attributes for a rule, for scoped styling
 	 */
 	setAnimationAttributes(rule: Rule) {
-		// Add an attribute `[data-fragment-visit="my-rule-name"]` for scoped styling
 		document.documentElement.setAttribute('data-fragment-visit', rule.name || '');
 	}
 
@@ -147,7 +156,7 @@ export default class FragmentPlugin extends Plugin {
 		if (this.swup.scrollToElement) return;
 
 		/**
-		 * @TODO: Find a way for scroll plugin to inject it's methods
+		 * @TODO: Find a way for scroll plugin to inject it's methods' types
 		 * into the Swup type. Until then, disable type checking for swup.scrollTo
 		 */
 		// @ts-ignore
