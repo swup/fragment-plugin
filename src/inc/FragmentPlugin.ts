@@ -42,7 +42,7 @@ type PluginOptions = {
 export default class FragmentPlugin extends Plugin {
 	name = 'FragmentPlugin';
 
-	selectedRule: Rule | undefined = undefined;
+	currentRule: Rule | undefined;
 	rules: Rule[] = [];
 	options: PluginOptions = {
 		rules: []
@@ -51,7 +51,7 @@ export default class FragmentPlugin extends Plugin {
 	originalScrollTo: any;
 
 	/**
-	 * Constructor
+	 * Constructor. The options are NOT optional
 	 */
 	constructor(options: PluginOptions) {
 		super();
@@ -80,7 +80,7 @@ export default class FragmentPlugin extends Plugin {
 		swup.on('transitionStart', this.onTransitionStart);
 		swup.on('transitionEnd', this.onTransitionEnd);
 
-		this.prefillFragmentUrls();
+		this.setFragmentUrls();
 	}
 
 	/**
@@ -105,7 +105,7 @@ export default class FragmentPlugin extends Plugin {
 	 * The browser URL has already changed during PopState
 	 */
 	onPopState = () => {
-		this.selectedRule = this.findSelectedRule({
+		this.currentRule = this.getFirstMatchingRule({
 			from: this.swup.currentPageUrl,
 			to: this.swup.getCurrentUrl()
 		});
@@ -115,7 +115,7 @@ export default class FragmentPlugin extends Plugin {
 	 * Set the current fragment when clicking a link
 	 */
 	onClickLink: Handler<'clickLink'> = (event) => {
-		this.selectedRule = this.findSelectedRule({
+		this.currentRule = this.getFirstMatchingRule({
 			from: this.swup.getCurrentUrl(),
 			to: Location.fromElement(event.delegateTarget as HTMLAnchorElement).url
 		});
@@ -145,7 +145,7 @@ export default class FragmentPlugin extends Plugin {
 		this.cleanupAnimationAttributes();
 		this.restoreScrollingBehavior();
 		// Reset the current rule
-		this.selectedRule = undefined;
+		this.currentRule = undefined;
 	};
 
 	/**
@@ -182,9 +182,9 @@ export default class FragmentPlugin extends Plugin {
 	}
 
 	/**
-	 * Set the current Rule if any matches
+	 * Get the first matching rule for a given route
 	 */
-	findSelectedRule(route: Route): Rule | undefined {
+	getFirstMatchingRule(route: Route): Rule | undefined {
 		return this.rules.find((rule) => rule.matches(route));
 	}
 
@@ -193,8 +193,8 @@ export default class FragmentPlugin extends Plugin {
 	 */
 	replaceContent = async (page: any /* @TODO fix type */) => {
 		// If one of the rules matched, replace only the fragments from that rule
-		if (this.selectedRule != null) {
-			this.replaceFragments(page, this.selectedRule);
+		if (this.currentRule != null) {
+			this.replaceFragments(page, this.currentRule);
 			// Update the browser title
 			document.title = page.title;
 			return Promise.resolve();
@@ -202,6 +202,8 @@ export default class FragmentPlugin extends Plugin {
 
 		// No rule matched. Run the default replaceContent
 		await this.originalReplaceContent!(page);
+		// Save the current URL for all fragments
+		this.setFragmentUrls();
 		return Promise.resolve();
 	};
 
@@ -269,7 +271,7 @@ export default class FragmentPlugin extends Plugin {
 	/**
 	 * Adds [data-fragment-url] to all fragments
 	 */
-	prefillFragmentUrls() {
+	setFragmentUrls() {
 		this.rules.forEach(({ fragments: selectors }) => {
 			selectors.forEach((selector) => {
 				const fragment = document.querySelector(selector);
