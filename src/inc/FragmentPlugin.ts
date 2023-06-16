@@ -38,6 +38,7 @@ export default class FragmentPlugin extends Plugin {
 		rules: []
 	};
 	originalReplaceContent: Swup['replaceContent'] | undefined;
+	originalScrollTo: any;
 
 	/**
 	 * Constructor
@@ -116,7 +117,7 @@ export default class FragmentPlugin extends Plugin {
 	onTransitionStart = () => {
 		if (this.selectedRule) {
 			this.setAnimationAttributes(this.selectedRule);
-			this.disableScrollPluginForCurrentVisit();
+			this.disableScrollingBehavior();
 		}
 	};
 
@@ -129,24 +130,40 @@ export default class FragmentPlugin extends Plugin {
 	}
 
 	/**
-	 * Disable the scroll plugin for fragment visits
-	 */
-	disableScrollPluginForCurrentVisit() {
-		// We still want scrolling if there is a hash in the target link
-		if (this.swup.scrollToElement) return;
-
-		const scrollPlugin = this.swup.findPlugin('ScrollPlugin') as any;
-		if (scrollPlugin) scrollPlugin.ignorePageVisit = true;
-	}
-
-	/**
 	 * Reset everything after each transition
 	 */
 	onTransitionEnd = () => {
 		this.cleanupAnimationAttributes();
+		this.restoreScrollingBehavior();
 		// Reset the current rule
 		this.selectedRule = undefined;
 	};
+
+	/**
+	 * Disable scrolling for fragment visits
+	 */
+	disableScrollingBehavior() {
+		// We still want scrolling if there is a hash in the target link
+		if (this.swup.scrollToElement) return;
+
+		/**
+		 * @TODO: Find a way for scroll plugin to inject it's methods
+		 * into the Swup type. Until then, disable type checking for swup.scrollTo
+		 */
+		// @ts-ignore
+		this.originalScrollTo = this.swup.scrollTo;
+		// @ts-ignore
+		this.swup.scrollTo = () => {};
+	}
+
+	/**
+	 * Restore the default scrolling behavior
+	 */
+	restoreScrollingBehavior() {
+		if (!this.originalScrollTo) return;
+		// @ts-ignore
+		this.swup.scrollTo = this.originalScrollTo;
+	}
 
 	/**
 	 * Removes all fragment-related animation attributes from the `html` element
