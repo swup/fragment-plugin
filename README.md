@@ -69,7 +69,7 @@ const swup = new Swup({
         {
           from: '/users/',
           to: '/user/:user/',
-          replace: ['#overlay'],
+          fragments: ['#overlay'],
           name: 'openOverlay'
         },
         /**
@@ -80,7 +80,7 @@ const swup = new Swup({
         {
           from: '/user/:user/',
           to: '/users/',
-          replace: ['#overlay'],
+          fragments: ['#overlay'],
           name: 'closeOverlay'
         },
         /**
@@ -91,7 +91,7 @@ const swup = new Swup({
         {
           from: '/user/:user/',
           to: '/user/:user/',
-          replace: ['#overlay__content'],
+          fragments: ['#overlay__content'],
           name: 'switchUser'
         }
         // ... more complex scenarios are possible!
@@ -113,7 +113,7 @@ The path before the current visit. Will be converted to a RegExp.
 
 The new path of the current visit. Will be converted to a RegExp.
 
-### `replace: string[]`
+### `fragments: string[]`
 
 An array of selectors, that should be replaced if the rule matches
 

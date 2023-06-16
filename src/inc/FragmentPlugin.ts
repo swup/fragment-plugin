@@ -25,7 +25,7 @@ export type Route = {
 type RuleOptions = {
 	from: Path;
 	to: Path;
-	replace: string[];
+	fragments: string[];
 	name?: string;
 };
 
@@ -62,7 +62,7 @@ export default class FragmentPlugin extends Plugin {
 		};
 
 		this.rules = this.options.rules.map(
-			({ from, to, replace, name }) => new Rule(from, to, replace, name)
+			({ from, to, fragments, name }) => new Rule(from, to, fragments, name)
 		);
 	}
 
@@ -214,7 +214,7 @@ export default class FragmentPlugin extends Plugin {
 		const replacedElements: Element[] = [];
 
 		// Step 1: replace all fragments from the rule
-		rule.replace.forEach((selector, index) => {
+		rule.fragments.forEach((selector, index) => {
 			const currentFragment = window.document.querySelector(selector);
 
 			// Bail early if there is no match for the selector in the current dom
@@ -270,7 +270,7 @@ export default class FragmentPlugin extends Plugin {
 	 * Adds [data-fragment-url] to all fragments
 	 */
 	prefillFragmentUrls() {
-		this.rules.forEach(({ replace: selectors }) => {
+		this.rules.forEach(({ fragments: selectors }) => {
 			selectors.forEach((selector) => {
 				const fragment = document.querySelector(selector);
 				if (fragment) fragment.setAttribute('data-fragment-url', this.swup.getCurrentUrl());
