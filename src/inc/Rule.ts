@@ -1,5 +1,5 @@
 import { pathToRegexp } from 'path-to-regexp';
-import type { Route, Path, Direction } from './FragmentPlugin.js';
+import type { Route, Path } from './FragmentPlugin.js';
 import { log } from './utils.js';
 
 /**
@@ -10,7 +10,6 @@ export default class Rule {
 	to: Path = '';
 	fragments: string[] = [];
 	name: string | undefined;
-	matchedDirection: Direction | undefined;
 
 	fromRegEx: RegExp;
 	toRegEx: RegExp;
@@ -20,7 +19,7 @@ export default class Rule {
 		this.to = to;
 		this.name = name;
 
-		this.replace = replace.map((selector) => selector.trim());
+		this.fragments = fragments.map((selector) => selector.trim());
 
 		this.fromRegEx = this.convertToRegexp(from);
 		this.toRegEx = this.convertToRegexp(to);
