@@ -233,11 +233,8 @@ export default class FragmentPlugin extends Plugin {
 				return;
 			}
 
-			const fragmentUrl = currentFragment.getAttribute('data-fragment-url');
-			currentFragment.removeAttribute('data-fragment-url');
-
 			// Bail early if the URL of the current fragment is equal to the current browser URL
-			if (fragmentUrl && fragmentUrl === currentUrl) {
+			if (currentFragment.getAttribute('data-fragment-url') === currentUrl) {
 				log('URL unchanged:', currentFragment);
 				return;
 			}
