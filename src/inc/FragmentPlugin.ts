@@ -233,15 +233,18 @@ export default class FragmentPlugin extends Plugin {
 				return;
 			}
 
+			const fragmentUrl = currentFragment.getAttribute('data-fragment-url');
+			currentFragment.removeAttribute('data-fragment-url');
+
 			// Bail early if the URL of the current fragment is equal to the current browser URL
-			if (currentFragment.getAttribute('data-fragment-url') === currentUrl) {
+			if (fragmentUrl && fragmentUrl === currentUrl) {
 				log('URL unchanged:', currentFragment);
 				return;
 			}
 
-			// Bail early if the fragment hasn't changed
-			if (currentFragment.isEqualNode(newFragment)) {
-				log('Element unchanged:', currentFragment);
+			// Bail early if the fragment's contents are unchanged
+			if (this.isEqualInnerHTML(currentFragment, newFragment)) {
+				log('Fragment content unchanged:', currentFragment);
 				return;
 			}
 
