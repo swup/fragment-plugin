@@ -80,7 +80,7 @@ export default class FragmentPlugin extends Plugin {
 		swup.on('transitionStart', this.onTransitionStart);
 		swup.on('transitionEnd', this.onTransitionEnd);
 
-		this.setFragmentUrls();
+		this.setFragmentUrls({ leaveExistingUnchanged: true });
 	}
 
 	/**
@@ -242,8 +242,11 @@ export default class FragmentPlugin extends Plugin {
 				return;
 			}
 
+			const isEqualInnerHTML = this.isEqualInnerHTML(currentFragment, newFragment);
+			log(`${selector} is equal:`, isEqualInnerHTML);
+
 			// Bail early if the fragment's contents are unchanged
-			if (this.isEqualInnerHTML(currentFragment, newFragment)) {
+			if (isEqualInnerHTML) {
 				log('Fragment content unchanged:', currentFragment);
 				return;
 			}
@@ -255,8 +258,6 @@ export default class FragmentPlugin extends Plugin {
 
 		log('replaced:', replacedElements);
 	}
-
-
 
 	/**
 	 * Check if two elements contain the same innerHTML
@@ -272,13 +273,16 @@ export default class FragmentPlugin extends Plugin {
 	}
 
 	/**
-	 * Adds [data-fragment-url] to all fragments
+	 * Adds [data-fragment-url] to all fragments.
+	 * If `leaveExistingUnchanged` is true, fragments that already have a data-fragment-url will be ignored
 	 */
-	setFragmentUrls() {
+	setFragmentUrls({ leaveExistingUnchanged = false } = {}) {
 		this.rules.forEach(({ fragments: selectors }) => {
 			selectors.forEach((selector) => {
 				const fragment = document.querySelector(selector);
-				if (fragment) fragment.setAttribute('data-fragment-url', this.swup.getCurrentUrl());
+				if (!fragment) return;
+				if (leaveExistingUnchanged && fragment.matches('[data-fragment-url]')) return;
+				fragment.setAttribute('data-fragment-url', this.swup.getCurrentUrl());
 			});
 		});
 	}
