@@ -234,7 +234,7 @@ export default class FragmentPlugin extends Plugin {
 			}
 
 			// Bail early if the URL of the current fragment is equal to the current browser URL
-			if (currentFragment.getAttribute('data-fragment-url') === currentUrl) {
+			if (currentFragment.getAttribute('data-swup-fragment-url') === currentUrl) {
 				log('URL unchanged:', currentFragment);
 				return;
 			}
@@ -248,7 +248,7 @@ export default class FragmentPlugin extends Plugin {
 				return;
 			}
 
-			newFragment.setAttribute('data-fragment-url', currentUrl);
+			newFragment.setAttribute('data-swup-fragment-url', currentUrl);
 			currentFragment.replaceWith(newFragment);
 			replacedElements.push(newFragment);
 		});
@@ -270,26 +270,26 @@ export default class FragmentPlugin extends Plugin {
 	}
 
 	/**
-	 * Adds [data-fragment-url] to all fragments.
-	 * If `leaveExistingUnchanged` is true, fragments that already have a data-fragment-url will be ignored
+	 * Adds [data-swup-fragment-url] to all fragments.
+	 * If `leaveExistingUnchanged` is true, fragments that already have a data-swup-fragment-url will be ignored
 	 */
 	setFragmentUrls({ leaveExistingUnchanged = false } = {}) {
 		this.rules.forEach(({ fragments: selectors }) => {
 			selectors.forEach((selector) => {
 				const fragment = document.querySelector(selector);
 				if (!fragment) return;
-				if (leaveExistingUnchanged && fragment.matches('[data-fragment-url]')) return;
-				fragment.setAttribute('data-fragment-url', this.swup.getCurrentUrl());
+				if (leaveExistingUnchanged && fragment.matches('[data-swup-fragment-url]')) return;
+				fragment.setAttribute('data-swup-fragment-url', this.swup.getCurrentUrl());
 			});
 		});
 	}
 
 	/**
-	 * Removes [data-fragment-url] from all elements
+	 * Removes [data-swup-fragment-url] from all elements
 	 */
 	cleanupFragmentUrls() {
-		document.querySelectorAll('[data-fragment-url]').forEach((el) => {
-			el.removeAttribute('data-fragment-url');
+		document.querySelectorAll('[data-swup-fragment-url]').forEach((el) => {
+			el.removeAttribute('data-swup-fragment-url');
 		});
 	}
 }
