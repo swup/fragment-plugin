@@ -2,7 +2,6 @@ import Plugin from '@swup/plugin';
 import { Location } from 'swup';
 import Rule from './Rule.js';
 import Swup, { Handler } from 'swup';
-import { log } from './utils.js';
 
 /**
  * A union type for pathToRegexp. It accepts strings,
@@ -34,6 +33,7 @@ type RuleOptions = {
  */
 type PluginOptions = {
 	rules: RuleOptions[];
+	debug?: boolean;
 };
 
 /**
@@ -44,20 +44,23 @@ export default class FragmentPlugin extends Plugin {
 
 	currentRule: Rule | undefined;
 	rules: Rule[] = [];
-	options: PluginOptions = {
-		rules: []
+	defaults: PluginOptions = {
+		rules: [],
+		debug: false
 	};
+	options: PluginOptions;
 	originalReplaceContent: Swup['replaceContent'] | undefined;
 	originalScrollTo: any;
 
 	/**
-	 * Constructor. The options are NOT optional
+	 * Plugin Constructor
+	 * The options are NOT optional and need to contain at least a `rules` property
 	 */
 	constructor(options: PluginOptions) {
 		super();
 
 		this.options = {
-			...this.options,
+			...this.defaults,
 			...options
 		};
 
@@ -221,7 +224,7 @@ export default class FragmentPlugin extends Plugin {
 
 			// Bail early if there is no match for the selector in the current dom
 			if (!currentFragment) {
-				log('Container missing in current document:', selector, 'warn');
+				this.log('Container missing in current document:', selector, 'warn');
 				return;
 			}
 
@@ -229,31 +232,32 @@ export default class FragmentPlugin extends Plugin {
 
 			// Bail early if there is no match for the selector in the incoming dom
 			if (!newFragment) {
-				log('Container missing in incoming document:', selector, 'warn');
+				this.log('Container missing in incoming document:', selector, 'warn');
 				return;
 			}
 
 			// Bail early if the URL of the current fragment is equal to the current browser URL
-			if (currentFragment.getAttribute('data-fragment-url') === currentUrl) {
-				log('URL unchanged:', currentFragment);
+			if (currentFragment.getAttribute('data-swup-fragment-url') === currentUrl) {
+				this.log('URL unchanged:', currentFragment);
 				return;
 			}
 
-			// Bail early if the fragment hasn't changed
-			if (currentFragment.isEqualNode(newFragment)) {
-				log('Element unchanged:', currentFragment);
+			const isEqualInnerHTML = this.isEqualInnerHTML(currentFragment, newFragment);
+			this.log(`${selector} is equal:`, isEqualInnerHTML);
+
+			// Bail early if the fragment's contents are unchanged
+			if (isEqualInnerHTML) {
+				this.log('Fragment content unchanged:', currentFragment);
 				return;
 			}
 
-			newFragment.setAttribute('data-fragment-url', currentUrl);
+			newFragment.setAttribute('data-swup-fragment-url', currentUrl);
 			currentFragment.replaceWith(newFragment);
 			replacedElements.push(newFragment);
 		});
 
-		log('replaced:', replacedElements);
+		this.log('replaced:', replacedElements);
 	}
-
-
 
 	/**
 	 * Check if two elements contain the same innerHTML
@@ -269,23 +273,33 @@ export default class FragmentPlugin extends Plugin {
 	}
 
 	/**
-	 * Adds [data-fragment-url] to all fragments
+	 * Adds [data-swup-fragment-url] to all fragments that don't already contain that attribute
 	 */
 	setFragmentUrls() {
 		this.rules.forEach(({ fragments: selectors }) => {
 			selectors.forEach((selector) => {
 				const fragment = document.querySelector(selector);
-				if (fragment) fragment.setAttribute('data-fragment-url', this.swup.getCurrentUrl());
+				if (!fragment) return;
+				if (fragment.matches('[data-swup-fragment-url]')) return;
+				fragment.setAttribute('data-swup-fragment-url', this.swup.getCurrentUrl());
 			});
 		});
 	}
 
 	/**
-	 * Removes [data-fragment-url] from all elements
+	 * Removes [data-swup-fragment-url] from all elements
 	 */
 	cleanupFragmentUrls() {
-		document.querySelectorAll('[data-fragment-url]').forEach((el) => {
-			el.removeAttribute('data-fragment-url');
+		document.querySelectorAll('[data-swup-fragment-url]').forEach((el) => {
+			el.removeAttribute('data-swup-fragment-url');
 		});
+	}
+
+	/**
+	 * Log to console, if debug is `true`
+	 */
+	log(message: string, context: any, type: 'log' | 'warn' | 'error' = 'log') {
+		if (!this.options.debug) return;
+		console[type](`[@swup/fragment-plugin] ${message}`, context);
 	}
 }

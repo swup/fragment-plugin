@@ -1,6 +1,5 @@
 import { pathToRegexp } from 'path-to-regexp';
 import type { Route, Path } from './FragmentPlugin.js';
-import { log } from './utils.js';
 
 /**
  * Represents a route
@@ -28,12 +27,12 @@ export default class Rule {
 	/**
 	 * Convert a string to a regex, with error handling
 	 */
-	convertToRegexp(path: Path): RegExp {
+	convertToRegexp(path: Path) {
 		try {
-			return pathToRegexp(path) as RegExp;
+			return pathToRegexp(path);
 		} catch (error) {
-			log('Error converting to RegExp:', path, 'error');
-			throw new Error(error as string);
+			console.error('[swup-fragment-plugin] Error converting to RegExp:', path);
+			throw new Error(String(error));
 		}
 	}
 
