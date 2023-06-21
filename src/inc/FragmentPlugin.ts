@@ -82,6 +82,7 @@ export default class FragmentPlugin extends PluginBase {
 		swup.on('clickLink', this.onClickLink);
 		swup.on('transitionStart', this.onTransitionStart);
 		swup.on('transitionEnd', this.onTransitionEnd);
+		swup.on('contentReplaced', this.onContentReplaced);
 
 		this.setFragmentUrls();
 	}
@@ -99,6 +100,7 @@ export default class FragmentPlugin extends PluginBase {
 		swup.off('clickLink', this.onClickLink);
 		swup.off('transitionStart', this.onTransitionStart);
 		swup.off('transitionEnd', this.onTransitionEnd);
+		swup.off('contentReplaced', this.onContentReplaced);
 
 		this.cleanupFragmentUrls();
 	}
@@ -155,10 +157,7 @@ export default class FragmentPlugin extends PluginBase {
 	markUnchangedFragments = (url: string) => {
 		document.querySelectorAll<HTMLElement>('[data-swup-fragment-url]').forEach((el) => {
 			const fragmentUrl = el.getAttribute('data-swup-fragment-url');
-			el.classList.toggle(
-				'swup-fragment-unchanged',
-				fragmentUrl === url
-			);
+			el.classList.toggle('swup-fragment-unchanged', fragmentUrl === url);
 		});
 	};
 
@@ -173,6 +172,26 @@ export default class FragmentPlugin extends PluginBase {
 	};
 
 	/**
+	 * Do stuff everytime swup replaces the content
+	 */
+	onContentReplaced = () => {
+		const targetAttribute = 'data-swup-fragment-target';
+		const links = document.querySelectorAll<HTMLAnchorElement>(`a[${targetAttribute}]`);
+		links.forEach((el) => {
+			const selector = el.getAttribute(targetAttribute);
+			if (!selector) return this.log(`[${targetAttribute}] needs to contain a valid selector`, selector, 'warn');
+
+			const target = document.querySelector(selector);
+			if (!target) return this.log(`No element found for [${targetAttribute}]:`, selector, 'warn');
+
+			const fragmentUrl = target.getAttribute('data-swup-fragment-url');
+			if (!fragmentUrl) return this.log("Targeted element doesn't have a [data-swup-fragme-url]", target, 'warn');
+
+			el.href = fragmentUrl;
+		});
+	};
+
+	/**
 	 * Disable ScrollPlugin for fragment visits
 	 */
 	disableScrollPlugin() {
@@ -181,7 +200,6 @@ export default class FragmentPlugin extends PluginBase {
 
 		this.scrollPlugin = this.swup.findPlugin('ScrollPlugin');
 		if (this.scrollPlugin) this.swup.unuse(this.scrollPlugin);
-
 	}
 
 	/**
@@ -291,7 +309,7 @@ export default class FragmentPlugin extends PluginBase {
 	/**
 	 * Log to console, if debug is `true`
 	 */
-	log(message: string, context: any, type: 'log' | 'warn' | 'error' = 'log') {
+	log(message: string, context?: any, type: 'log' | 'warn' | 'error' = 'log') {
 		if (!this.options.debug) return;
 		console[type](`[@swup/fragment-plugin] ${message}`, context);
 	}
