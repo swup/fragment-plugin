@@ -257,34 +257,12 @@ export default class FragmentPlugin extends PluginBase {
 				return;
 			}
 
-			const isEqualInnerHTML = this.isEqualInnerHTML(currentFragment, newFragment);
-			this.log(`${selector} is equal:`, isEqualInnerHTML);
-
-			// Bail early if the fragment's contents are unchanged
-			if (isEqualInnerHTML) {
-				this.log('Fragment content unchanged:', currentFragment);
-				return;
-			}
-
 			newFragment.setAttribute('data-swup-fragment-url', currentUrl);
 			currentFragment.replaceWith(newFragment);
 			replacedElements.push(newFragment);
 		});
 
 		this.log('replaced:', replacedElements);
-	}
-
-	/**
-	 * Check if two elements contain the same innerHTML
-	 */
-	isEqualInnerHTML(el1: Element, el2: Element): boolean {
-		const dummy1 = document.createElement('div');
-		dummy1.innerHTML = el1.innerHTML;
-
-		const dummy2 = document.createElement('div');
-		dummy2.innerHTML = el2.innerHTML;
-
-		return dummy1.isEqualNode(dummy2);
 	}
 
 	/**
