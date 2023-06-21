@@ -1,7 +1,7 @@
-import Plugin from '@swup/plugin';
+import PluginBase from '@swup/plugin';
 import { Location } from 'swup';
 import Rule from './Rule.js';
-import Swup, { Handler } from 'swup';
+import Swup, { Handler, Plugin } from 'swup';
 
 /**
  * A union type for pathToRegexp. It accepts strings,
@@ -39,7 +39,7 @@ type PluginOptions = {
 /**
  * The main plugin class
  */
-export default class FragmentPlugin extends Plugin {
+export default class FragmentPlugin extends PluginBase {
 	name = 'FragmentPlugin';
 
 	currentRule: Rule | undefined;
@@ -50,7 +50,7 @@ export default class FragmentPlugin extends Plugin {
 	};
 	options: PluginOptions;
 	originalReplaceContent: Swup['replaceContent'] | undefined;
-	originalScrollTo: any;
+	scrollPlugin: Plugin | undefined;
 
 	/**
 	 * Plugin Constructor
@@ -138,7 +138,7 @@ export default class FragmentPlugin extends Plugin {
 	onTransitionStart = () => {
 		if (this.currentRule) {
 			this.setAnimationAttributes(this.currentRule);
-			this.disableScrollingBehavior();
+			this.disableScrollPlugin();
 		}
 	};
 
@@ -167,35 +167,29 @@ export default class FragmentPlugin extends Plugin {
 	 */
 	onTransitionEnd = () => {
 		this.cleanupAnimationAttributes();
-		this.restoreScrollingBehavior();
+		this.restoreScrollPlugin();
 		// Reset the current rule
 		this.currentRule = undefined;
 	};
 
 	/**
-	 * Disable scrolling for fragment visits
+	 * Disable ScrollPlugin for fragment visits
 	 */
-	disableScrollingBehavior() {
+	disableScrollPlugin() {
 		// We still want scrolling if there is a hash in the target link
 		if (this.swup.scrollToElement) return;
 
-		/**
-		 * @TODO: Find a way for scroll plugin to inject it's methods' types
-		 * into the Swup type. Until then, disable type checking for swup.scrollTo
-		 */
-		// @ts-ignore
-		this.originalScrollTo = this.swup.scrollTo;
-		// @ts-ignore
-		this.swup.scrollTo = () => {};
+		this.scrollPlugin = this.swup.findPlugin('ScrollPlugin');
+		if (this.scrollPlugin) this.swup.unuse(this.scrollPlugin);
+
 	}
 
 	/**
-	 * Restore the default scrolling behavior
+	 * Re-enable ScrollPlugin after each transition
 	 */
-	restoreScrollingBehavior() {
-		if (!this.originalScrollTo) return;
-		// @ts-ignore
-		this.swup.scrollTo = this.originalScrollTo;
+	restoreScrollPlugin() {
+		if (this.scrollPlugin) this.swup.use(this.scrollPlugin);
+		this.scrollPlugin = undefined;
 	}
 
 	/**
