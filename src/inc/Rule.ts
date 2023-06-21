@@ -27,12 +27,12 @@ export default class Rule {
 	/**
 	 * Convert a string to a regex, with error handling
 	 */
-	convertToRegexp(path: Path): RegExp {
+	convertToRegexp(path: Path) {
 		try {
-			return pathToRegexp(path) as RegExp;
+			return pathToRegexp(path);
 		} catch (error) {
 			console.error('Error converting to RegExp:', path);
-			throw new Error(error as string);
+			throw new Error(String(error));
 		}
 	}
 
