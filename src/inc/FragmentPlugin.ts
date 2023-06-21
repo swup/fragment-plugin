@@ -44,10 +44,11 @@ export default class FragmentPlugin extends Plugin {
 
 	currentRule: Rule | undefined;
 	rules: Rule[] = [];
-	options: PluginOptions = {
+	defaults: PluginOptions = {
 		rules: [],
 		debug: false
 	};
+	options: PluginOptions;
 	originalReplaceContent: Swup['replaceContent'] | undefined;
 	originalScrollTo: any;
 
@@ -58,7 +59,7 @@ export default class FragmentPlugin extends Plugin {
 		super();
 
 		this.options = {
-			...this.options,
+			...this.defaults,
 			...options
 		};
 
