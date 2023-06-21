@@ -1,6 +1,5 @@
 import { pathToRegexp } from 'path-to-regexp';
 import type { Route, Path } from './FragmentPlugin.js';
-import { log } from './utils.js';
 
 /**
  * Represents a route
@@ -32,7 +31,7 @@ export default class Rule {
 		try {
 			return pathToRegexp(path) as RegExp;
 		} catch (error) {
-			log('Error converting to RegExp:', path, 'error');
+			console.error('Error converting to RegExp:', path);
 			throw new Error(error as string);
 		}
 	}
