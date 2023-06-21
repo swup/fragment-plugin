@@ -127,7 +127,7 @@ export default class FragmentPlugin extends Plugin {
 	/**
 	 * Updates the current rule
 	 */
-	updateCurrentRule({ from, to }: { from: string; to: string }) {
+	updateCurrentRule({ from, to }: Route) {
 		this.currentRule = this.getFirstMatchingRule({ from, to });
 		this.markUnchangedFragments(to);
 	}
