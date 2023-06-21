@@ -108,7 +108,7 @@ export default class FragmentPlugin extends Plugin {
 	 * The browser URL has already changed during PopState
 	 */
 	onPopState = () => {
-		this.currentRule = this.getFirstMatchingRule({
+		this.updateCurrentRule({
 			from: this.swup.currentPageUrl,
 			to: this.swup.getCurrentUrl()
 		});
@@ -118,11 +118,19 @@ export default class FragmentPlugin extends Plugin {
 	 * Set the current fragment when clicking a link
 	 */
 	onClickLink: Handler<'clickLink'> = (event) => {
-		this.currentRule = this.getFirstMatchingRule({
+		this.updateCurrentRule({
 			from: this.swup.getCurrentUrl(),
 			to: Location.fromElement(event.delegateTarget as HTMLAnchorElement).url
 		});
 	};
+
+	/**
+	 * Updates the current rule
+	 */
+	updateCurrentRule({ from, to }: { from: string; to: string }) {
+		this.currentRule = this.getFirstMatchingRule({ from, to });
+		this.markUnchangedFragments(to);
+	}
 
 	/**
 	 * Do special things if this is a fragment visit
@@ -140,6 +148,19 @@ export default class FragmentPlugin extends Plugin {
 	setAnimationAttributes(rule: Rule) {
 		document.documentElement.setAttribute('data-fragment-visit', rule.name || '');
 	}
+
+	/**
+	 * Add a class to unchanged fragments
+	 */
+	markUnchangedFragments = (url: string) => {
+		document.querySelectorAll<HTMLElement>('[data-swup-fragment-url]').forEach((el) => {
+			const fragmentUrl = el.getAttribute('data-swup-fragment-url');
+			el.classList.toggle(
+				'swup-fragment-unchanged',
+				fragmentUrl === url
+			);
+		});
+	};
 
 	/**
 	 * Reset everything after each transition
