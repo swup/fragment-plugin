@@ -67,6 +67,7 @@ export default class FragmentPlugin extends PluginBase {
 		this.rules = this.options.rules.map(
 			({ from, to, fragments, name }) => new Rule(from, to, fragments, name)
 		);
+		console.log(this.isEqualUrl('', '/'));
 	}
 
 	/**
@@ -281,12 +282,8 @@ export default class FragmentPlugin extends PluginBase {
 			}
 
 			// Bail early if the URL of the current fragment is equal to the current browser URL
-			if (
-				this.isEqualUrl(
-					String(currentFragment.getAttribute('data-swup-fragment-url')),
-					currentUrl
-				)
-			) {
+			const fragmentUrl = currentFragment.getAttribute('data-swup-fragment-url') || '/';
+			if (this.isEqualUrl(fragmentUrl, currentUrl)) {
 				this.log('URL unchanged:', currentFragment);
 				return;
 			}
@@ -301,22 +298,30 @@ export default class FragmentPlugin extends PluginBase {
 
 	/**
 	 * Compare two urls for equality
+	 *
+	 * All these URLs would be considered the same:
+	 *
+	 * - /test
+	 * - /test/
+	 * - /test?foo=bar&baz=boo
+	 * - /test/?baz=boo&foo=bar
 	 */
 	isEqualUrl(url1: string, url2: string) {
-		const loc1 = Location.fromUrl(url1);
-		loc1.searchParams.sort();
-
-		const loc2 = Location.fromUrl(url2);
-		loc2.searchParams.sort();
-
-		const path1 = this.removeTrailingSlash(loc1.pathname) + loc1.search;
-		const path2 = this.removeTrailingSlash(loc2.pathname) + loc2.search;
-
-		return path1 === path2;
+		return this.normalizeUrl(url1) === this.normalizeUrl(url2);
 	}
 
-	removeTrailingSlash(str: string): string {
-		return str.endsWith('/') ? str.slice(0, -1) : str;
+	/**
+	 * Normalize a URL
+	 */
+	normalizeUrl(url: string) {
+		if (!url.trim()) return url;
+
+		const removeTrailingSlash = (str: string) => (str.endsWith('/') ? str.slice(0, -1) : str);
+
+		const location = Location.fromUrl(url);
+		location.searchParams.sort();
+
+		return removeTrailingSlash(location.pathname) + location.search;
 	}
 
 	/**
