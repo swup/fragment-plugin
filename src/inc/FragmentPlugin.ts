@@ -67,7 +67,6 @@ export default class FragmentPlugin extends PluginBase {
 		this.rules = this.options.rules.map(
 			({ from, to, fragments, name }) => new Rule(from, to, fragments, name)
 		);
-		console.log(this.isEqualUrl('', '/'));
 	}
 
 	/**
