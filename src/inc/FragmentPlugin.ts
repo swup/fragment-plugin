@@ -311,7 +311,6 @@ export default class FragmentPlugin extends PluginBase {
 
 		const path1 = this.removeTrailingSlash(loc1.pathname) + loc1.search;
 		const path2 = this.removeTrailingSlash(loc2.pathname) + loc2.search;
-		console.log(path1, path2);
 
 		return path1 === path2;
 	}
