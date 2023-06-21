@@ -31,7 +31,7 @@ export default class Rule {
 		try {
 			return pathToRegexp(path);
 		} catch (error) {
-			console.error('Error converting to RegExp:', path);
+			console.error('[swup-fragment-plugin] Error converting to RegExp:', path);
 			throw new Error(String(error));
 		}
 	}
