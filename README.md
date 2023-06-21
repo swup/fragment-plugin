@@ -6,7 +6,7 @@ Define fragments that should be replaced between selected page visits instead of
 
 ### Demo
 
-https://swup.fragment-plugin.rassohilber.com/
+https://swup-fragment-plugin.netlify.app
 
 ## Installation
 
