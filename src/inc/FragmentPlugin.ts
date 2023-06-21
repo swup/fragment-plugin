@@ -80,7 +80,7 @@ export default class FragmentPlugin extends Plugin {
 		swup.on('transitionStart', this.onTransitionStart);
 		swup.on('transitionEnd', this.onTransitionEnd);
 
-		this.setFragmentUrls({ leaveExistingUnchanged: true });
+		this.setFragmentUrls();
 	}
 
 	/**
@@ -270,15 +270,14 @@ export default class FragmentPlugin extends Plugin {
 	}
 
 	/**
-	 * Adds [data-swup-fragment-url] to all fragments.
-	 * If `leaveExistingUnchanged` is true, fragments that already have a data-swup-fragment-url will be ignored
+	 * Adds [data-swup-fragment-url] to all fragments that don't already contain that attribute
 	 */
-	setFragmentUrls({ leaveExistingUnchanged = false } = {}) {
+	setFragmentUrls() {
 		this.rules.forEach(({ fragments: selectors }) => {
 			selectors.forEach((selector) => {
 				const fragment = document.querySelector(selector);
 				if (!fragment) return;
-				if (leaveExistingUnchanged && fragment.matches('[data-swup-fragment-url]')) return;
+				if (fragment.matches('[data-swup-fragment-url]')) return;
 				fragment.setAttribute('data-swup-fragment-url', this.swup.getCurrentUrl());
 			});
 		});
