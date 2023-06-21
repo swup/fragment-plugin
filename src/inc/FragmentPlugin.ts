@@ -53,7 +53,8 @@ export default class FragmentPlugin extends Plugin {
 	originalScrollTo: any;
 
 	/**
-	 * Constructor. The options are NOT optional
+	 * Plugin Constructor
+	 * The options are NOT optional and need to contain at least a `rules` property
 	 */
 	constructor(options: PluginOptions) {
 		super();
