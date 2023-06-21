@@ -303,12 +303,19 @@ export default class FragmentPlugin extends PluginBase {
 	 * Compare two urls for equality
 	 */
 	isEqualUrl(url1: string, url2: string) {
-		return this.removeTrailingSlash(url1) === this.removeTrailingSlash(url2);
+		const loc1 = Location.fromUrl(url1);
+		loc1.searchParams.sort();
+
+		const loc2 = Location.fromUrl(url2);
+		loc2.searchParams.sort();
+
+		const path1 = this.removeTrailingSlash(loc1.pathname) + loc1.search;
+		const path2 = this.removeTrailingSlash(loc2.pathname) + loc2.search;
+		console.log(path1, path2);
+
+		return path1 === path2;
 	}
 
-	/**
-	 * Remove a trailing slash from a string
-	 */
 	removeTrailingSlash(str: string): string {
 		return str.endsWith('/') ? str.slice(0, -1) : str;
 	}
