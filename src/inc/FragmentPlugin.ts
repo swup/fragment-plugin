@@ -179,13 +179,24 @@ export default class FragmentPlugin extends PluginBase {
 		const links = document.querySelectorAll<HTMLAnchorElement>(`a[${targetAttribute}]`);
 		links.forEach((el) => {
 			const selector = el.getAttribute(targetAttribute);
-			if (!selector) return this.log(`[${targetAttribute}] needs to contain a valid selector`, selector, 'warn');
+			if (!selector)
+				return this.log(
+					`[${targetAttribute}] needs to contain a valid selector`,
+					selector,
+					'warn'
+				);
 
 			const target = document.querySelector(selector);
-			if (!target) return this.log(`No element found for [${targetAttribute}]:`, selector, 'warn');
+			if (!target)
+				return this.log(`No element found for [${targetAttribute}]:`, selector, 'warn');
 
 			const fragmentUrl = target.getAttribute('data-swup-fragment-url');
-			if (!fragmentUrl) return this.log("Targeted element doesn't have a [data-swup-fragme-url]", target, 'warn');
+			if (!fragmentUrl)
+				return this.log(
+					"Targeted element doesn't have a [data-swup-fragme-url]",
+					target,
+					'warn'
+				);
 
 			el.href = fragmentUrl;
 		});
@@ -270,7 +281,12 @@ export default class FragmentPlugin extends PluginBase {
 			}
 
 			// Bail early if the URL of the current fragment is equal to the current browser URL
-			if (currentFragment.getAttribute('data-swup-fragment-url') === currentUrl) {
+			if (
+				this.isEqualUrl(
+					String(currentFragment.getAttribute('data-swup-fragment-url')),
+					currentUrl
+				)
+			) {
 				this.log('URL unchanged:', currentFragment);
 				return;
 			}
@@ -281,6 +297,20 @@ export default class FragmentPlugin extends PluginBase {
 		});
 
 		this.log('replaced:', replacedElements);
+	}
+
+	/**
+	 * Compare two urls for equality
+	 */
+	isEqualUrl(url1: string, url2: string) {
+		return this.removeTrailingSlash(url1) === this.removeTrailingSlash(url2);
+	}
+
+	/**
+	 * Remove a trailing slash from a string
+	 */
+	removeTrailingSlash(str: string): string {
+		return str.endsWith('/') ? str.slice(0, -1) : str;
 	}
 
 	/**
