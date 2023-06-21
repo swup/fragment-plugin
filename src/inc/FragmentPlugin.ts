@@ -2,7 +2,6 @@ import Plugin from '@swup/plugin';
 import { Location } from 'swup';
 import Rule from './Rule.js';
 import Swup, { Handler } from 'swup';
-import { log } from './utils.js';
 
 /**
  * A union type for pathToRegexp. It accepts strings,
@@ -34,6 +33,7 @@ type RuleOptions = {
  */
 type PluginOptions = {
 	rules: RuleOptions[];
+	debug?: boolean;
 };
 
 /**
@@ -45,7 +45,8 @@ export default class FragmentPlugin extends Plugin {
 	currentRule: Rule | undefined;
 	rules: Rule[] = [];
 	options: PluginOptions = {
-		rules: []
+		rules: [],
+		debug: false
 	};
 	originalReplaceContent: Swup['replaceContent'] | undefined;
 	originalScrollTo: any;
@@ -221,7 +222,7 @@ export default class FragmentPlugin extends Plugin {
 
 			// Bail early if there is no match for the selector in the current dom
 			if (!currentFragment) {
-				log('Container missing in current document:', selector, 'warn');
+				this.log('Container missing in current document:', selector, 'warn');
 				return;
 			}
 
@@ -229,22 +230,22 @@ export default class FragmentPlugin extends Plugin {
 
 			// Bail early if there is no match for the selector in the incoming dom
 			if (!newFragment) {
-				log('Container missing in incoming document:', selector, 'warn');
+				this.log('Container missing in incoming document:', selector, 'warn');
 				return;
 			}
 
 			// Bail early if the URL of the current fragment is equal to the current browser URL
 			if (currentFragment.getAttribute('data-swup-fragment-url') === currentUrl) {
-				log('URL unchanged:', currentFragment);
+				this.log('URL unchanged:', currentFragment);
 				return;
 			}
 
 			const isEqualInnerHTML = this.isEqualInnerHTML(currentFragment, newFragment);
-			log(`${selector} is equal:`, isEqualInnerHTML);
+			this.log(`${selector} is equal:`, isEqualInnerHTML);
 
 			// Bail early if the fragment's contents are unchanged
 			if (isEqualInnerHTML) {
-				log('Fragment content unchanged:', currentFragment);
+				this.log('Fragment content unchanged:', currentFragment);
 				return;
 			}
 
@@ -253,7 +254,7 @@ export default class FragmentPlugin extends Plugin {
 			replacedElements.push(newFragment);
 		});
 
-		log('replaced:', replacedElements);
+		this.log('replaced:', replacedElements);
 	}
 
 	/**
@@ -290,5 +291,13 @@ export default class FragmentPlugin extends Plugin {
 		document.querySelectorAll('[data-swup-fragment-url]').forEach((el) => {
 			el.removeAttribute('data-swup-fragment-url');
 		});
+	}
+
+	/**
+	 * Log to console, if debug is `true`
+	 */
+	log(message: string, context: any, type: 'log' | 'warn' | 'error' = 'log') {
+		if (!this.options.debug) return;
+		console[type](`[@swup/fragment-plugin] ${message}`, context);
 	}
 }
