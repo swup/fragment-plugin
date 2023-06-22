@@ -21,9 +21,10 @@ Imagine you have an endpoint `/users/` on your site that lists a bunch of users:
 ```html
 <!DOCTYPE html>
 <html>
-  <!-- ... -->
+  <title>My Website</title>
 </html>
 <body>
+  <h1>My Website</h1>
   <nav><!-- ... --></nav>
   <div id="swup" class="transition-main">
     <h2>Our users</h2>
@@ -54,8 +55,8 @@ const swup = new Swup({
       // The plugin expects an array of rules:
       rules: [
         {
-          from: '/users/:filter',
-          to: '/users/:filter',
+          from: '/users/:filter?',
+          to: '/users/:filter?',
           fragments: ['#users'],
           name: 'filterUsers'
         },
