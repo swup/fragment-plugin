@@ -56,6 +56,7 @@ export default class FragmentPlugin extends PluginBase {
 	options: PluginOptions;
 	originalReplaceContent: Swup['replaceContent'] | undefined;
 	scrollPlugin: Plugin | undefined;
+	fragmentsToReplace: string[] = [];
 
 	/**
 	 * Plugin Constructor
@@ -115,7 +116,7 @@ export default class FragmentPlugin extends PluginBase {
 	 * The browser URL has already changed during PopState
 	 */
 	onPopState = () => {
-		this.updateCurrentRule({
+		this.preparePageVisit({
 			from: this.swup.currentPageUrl,
 			to: this.swup.getCurrentUrl()
 		});
@@ -125,18 +126,27 @@ export default class FragmentPlugin extends PluginBase {
 	 * Set the current fragment when clicking a link
 	 */
 	onClickLink: Handler<'clickLink'> = (event) => {
-		this.updateCurrentRule({
+		this.preparePageVisit({
 			from: this.swup.getCurrentUrl(),
 			to: Location.fromElement(event.delegateTarget as HTMLAnchorElement).url
 		});
 	};
 
 	/**
-	 * Updates the current rule
+	 * Handles a visit from a URL to another URL
 	 */
-	updateCurrentRule({ from, to }: Route) {
+	preparePageVisit({ from, to }: Route) {
+		this.fragmentsToReplace = [];
+
 		this.currentRule = this.getFirstMatchingRule({ from, to });
-		this.markUnchangedFragments(to);
+		if (!this.currentRule) return;
+
+		this.fragmentsToReplace = this.currentRule.fragments.filter((selector) =>
+			this.validateFragment(selector, to, { silent: false })
+		);
+		this.log('Fragments for current visit:', this.fragmentsToReplace);
+
+		this.addClassToUnchangedFragments(to);
 	}
 
 	/**
@@ -157,9 +167,14 @@ export default class FragmentPlugin extends PluginBase {
 	}
 
 	/**
-	 * Add a class to unchanged fragments
+	 * Add the class ".swup-fragment-unchanged" to fragments that match a given URL
 	 */
-	markUnchangedFragments = (url: string) => {
+	addClassToUnchangedFragments = (url: string) => {
+		// First, remove the class from all elements
+		document.querySelectorAll<HTMLElement>('.swup-fragment-unchanged').forEach((el) => {
+			el.classList.remove('swup-fragment-unchanged');
+		});
+		// Then, add the class to every element that matches the given URL
 		document.querySelectorAll<HTMLElement>('[data-swup-fragment-url]').forEach((el) => {
 			const fragmentUrl = el.getAttribute('data-swup-fragment-url');
 			el.classList.toggle('swup-fragment-unchanged', fragmentUrl === url);
@@ -245,8 +260,8 @@ export default class FragmentPlugin extends PluginBase {
 	 */
 	replaceContent = async (page: any /* @TODO fix type */) => {
 		// If one of the rules matched, replace only the fragments from that rule
-		if (this.currentRule != null) {
-			this.replaceFragments(page, this.currentRule);
+		if (this.fragmentsToReplace.length) {
+			this.replaceFragments(page, this.fragmentsToReplace);
 			// Update the browser title
 			document.title = page.title;
 			return Promise.resolve();
@@ -262,18 +277,18 @@ export default class FragmentPlugin extends PluginBase {
 	/**
 	 * Replace fragments for a given rule
 	 */
-	replaceFragments(page: any /* @TODO fix type */, rule: Rule): void {
+	replaceFragments(page: any /* @TODO fix type */, fragments: string[]): void {
 		const currentUrl = this.swup.getCurrentUrl();
 		const incomingDocument = new DOMParser().parseFromString(page.originalContent, 'text/html');
 		const replacedElements: Element[] = [];
 
 		// Step 1: replace all fragments from the rule
-		rule.fragments.forEach((selector, index) => {
+		fragments.forEach((selector, index) => {
 			const currentFragment = window.document.querySelector(selector);
 
 			// Bail early if there is no match for the selector in the current dom
 			if (!currentFragment) {
-				this.log('Container missing in current document:', selector, 'warn');
+				this.log('Fragment missing in current document:', selector, 'warn');
 				return;
 			}
 
@@ -281,13 +296,7 @@ export default class FragmentPlugin extends PluginBase {
 
 			// Bail early if there is no match for the selector in the incoming dom
 			if (!newFragment) {
-				this.log('Container missing in incoming document:', selector, 'warn');
-				return;
-			}
-
-			// Bail early if the URL of the current fragment is equal to the current browser URL
-			if (this.elementMatchesFragmentUrl(currentFragment, currentUrl)) {
-				this.log('URL unchanged:', currentFragment);
+				this.log('Fragment missing in incoming document:', selector, 'warn');
 				return;
 			}
 
@@ -296,7 +305,30 @@ export default class FragmentPlugin extends PluginBase {
 			replacedElements.push(newFragment);
 		});
 
-		this.log('replaced:', replacedElements);
+		this.log('Replaced:', replacedElements);
+	}
+
+	/**
+	 * Validate a fragment for a target URL
+	 */
+	validateFragment(selector: string, targetUrl: string, { silent = true } = {}): boolean {
+		const el = document.querySelector(selector);
+
+		if (!el) {
+			!silent && this.log('Fragment missing in current document:', selector, 'warn');
+			return false;
+		}
+
+		if (this.elementMatchesFragmentUrl(el, targetUrl)) {
+			!silent && this.log(`Ignoring fragment:`, {
+				reason: 'Already matches the target URL',
+				el,
+				targetUrl,
+			});
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
