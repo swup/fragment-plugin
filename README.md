@@ -111,7 +111,7 @@ The new path of the current visit. Will be converted to a `RegExp`.
 
 An array of selectors for fragments that should be replaced if the rule matches the current visit
 
-### `name: string` (optional)
+#### `name: string` (optional)
 
 A name for the rule, for scoped styling
 
