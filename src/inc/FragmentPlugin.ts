@@ -286,7 +286,7 @@ export default class FragmentPlugin extends PluginBase {
 			}
 
 			// Bail early if the URL of the current fragment is equal to the current browser URL
-			if (this.hasFragmentUrl(currentFragment, currentUrl)) {
+			if (this.elementMatchesFragmentUrl(currentFragment, currentUrl)) {
 				this.log('URL unchanged:', currentFragment);
 				return;
 			}
@@ -302,7 +302,7 @@ export default class FragmentPlugin extends PluginBase {
 	/**
 	 * Checks if an element's [data-swup-fragment-url] matches a given URL
 	 */
-	hasFragmentUrl(el: Element, url: string): boolean {
+	elementMatchesFragmentUrl(el: Element, url: string): boolean {
 		const fragmentUrl = el.getAttribute('data-swup-fragment-url');
 		return !fragmentUrl ? false : this.isEqualUrl(fragmentUrl, url);
 	}
