@@ -4,6 +4,11 @@ import Rule from './Rule.js';
 import Swup, { Handler, Plugin } from 'swup';
 
 /**
+ * Re-Export the Rule class
+ */
+export type { Rule };
+
+/**
  * A union type for pathToRegexp. It accepts strings,
  * arrays of strings or regular expressions.
  * @see https://github.com/pillarjs/path-to-regexp#path-to-regexp-1

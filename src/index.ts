@@ -1,2 +1,3 @@
-import FragmentPlugin from "./inc/FragmentPlugin.js";
+import FragmentPlugin, { Rule, Route } from "./inc/FragmentPlugin.js";
 export default FragmentPlugin;
+export { Rule, Route };

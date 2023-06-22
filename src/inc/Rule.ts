@@ -2,7 +2,7 @@ import { pathToRegexp } from 'path-to-regexp';
 import type { Route, Path } from './FragmentPlugin.js';
 
 /**
- * Represents a route
+ * Represents a Rule
  */
 export default class Rule {
 	from: Path = '';
