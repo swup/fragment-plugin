@@ -1,6 +1,6 @@
 # Swup Fragment Plugin
 
-Define fragments that should be replaced between selected page visits instead of the default swup `containers`
+Replace page fragments instead of swup's default `containers`, based on user-defined rules
 
 ⚠️ **Please Note**: This plugin is not stable yet and should not be used in production.
 
@@ -16,44 +16,36 @@ npm i swup/fragment-plugin --save
 
 ## Simple Example
 
-Imagine you have two pages:
-
-1. A page that lists a bunch of users:
+Imagine you have an endpoint `/users/` on your site that lists a bunch of users:
 
 ```html
-<!-- Page URL: /users/ -->
-<!-- The main content on the users list page: -->
-<main>
-  <ul>
-    <li><a href="/user/user1/">User 1</a></li>
-    <li><a href="/user/user2/">User 2</a></li>
-    <li><a href="/user/user3/">User 3</a></li>
-  </ul>
-</main>
-<!-- The overlay (empty on overview pages) -->
-<div id="overlay"></div>
+<!DOCTYPE html>
+<html>
+  <!-- ... -->
+</html>
+<body>
+  <nav><!-- ... --></nav>
+  <div id="swup" class="transition-main">
+    <h2>Our users</h2>
+    <main id="users" class="transition-users">
+      <!-- A list of filters for the users -->
+      <ul>
+        <a href="/users/filter1">Filter 1</a>
+        <a href="/users/filter2">Filter 2</a>
+        <a href="/users/filter3">Filter 2</a>
+      </ul>
+      <!-- The list of users, different for each filter -->
+      <ul>
+        <li><a href="/user/user1/">User 1</a></li>
+        <li><a href="/user/user2/">User 2</a></li>
+        <li><a href="/user/user3/">User 3</a></li>
+      </ul>
+    </main>
+  </div>
+</body>
 ```
 
-2. A page that shows a user's details in an overlay
-
-```html
-<!-- Page URL: /user/user1/ -->
-<!-- The main content on the user detail page: -->
-<div id="overlay">
-  <main id="overlay__content">
-    <h1>User 1</h1>
-    <p>This is the detail page for User 1</p>
-  </main>
-</div>
-<!-- The list of users is also there on the detail page: -->
-<ul>
-  <li><a href="/user/user1/">User 1</a></li>
-  <li><a href="/user/user2/">User 2</a></li>
-  <li><a href="/user/user3/">User 3</a></li>
-</ul>
-```
-
-Now you can tell FragmentPlugin to **only** replace selected elements when navigating the site:
+Now you can tell Fragment Plugin to **only** replace `#users` when clicking one of the filters:
 
 ```js
 const swup = new Swup({
@@ -61,84 +53,22 @@ const swup = new Swup({
     new SwupFragmentPlugin({
       // The plugin expects an array of rules:
       rules: [
-        /**
-         * When navigating from the list to a single user:
-         * - replace only that user's #overlay
-         * - name the route "openOverlay" for styling
-         */
         {
-          from: '/users/',
-          to: '/user/:user/',
-          fragments: ['#overlay'],
-          name: 'openOverlay'
+          from: '/users/:filter',
+          to: '/users/:filter',
+          fragments: ['#users'],
+          name: 'filterUsers'
         },
-        /**
-         * When navigating from a single user back to the list:
-         * - replcae only the user's #overlay
-         * - name the route "closeOverlay" for styling
-         */
-        {
-          from: '/user/:user/',
-          to: '/users/',
-          fragments: ['#overlay'],
-          name: 'closeOverlay'
-        },
-        /**
-         * When navigating between users:
-         * - replace only the #overlay__content
-         * - name the route "switchUser" for styling
-         */
-        {
-          from: '/user/:user/',
-          to: '/user/:user/',
-          fragments: ['#overlay__content'],
-          name: 'switchUser'
-        }
         // ... more complex scenarios are possible!
-      ],
-    }),
-  ],
+      ]
+    })
+  ]
 });
 ```
-
-## Rules
-
-Each rule consist of these properties:
-
-### `from: string | string[]`
-
-The path before the current visit. Will be converted to a RegExp.
-
-### `to: string | string[]`
-
-The new path of the current visit. Will be converted to a RegExp.
-
-### `fragments: string[]`
-
-An array of selectors, that should be replaced if the rule matches
-
-### `name: string` (optional)
-
-A name for the rule, for scoped styling
-
-## Rule matching logic
-
-- The first matching rule in your rules array will be used for the current visit
-- If no `rule` matches the current visist, the default `swup.containers` will be replaced
-- `rule.from` and `rule.to` are converted to a regular expression by [pathToRegexp](https://github.com/pillarjs/path-to-regexp). If you want to create an either/or-regex, you can use an array, for example `['/users/', '/users/filter/:filter']`
-
-## Fragments
-
-- The `rule.replace` selectors from the current `rule` need to be present in **both the current and the incoming document**
-- For each `rule.replace` entry, the first matching element in the DOM will be selected
-- The plugin will check if a fragment has actually changed before replacing it
-
-## Animations for fragments
-
 During fragment visits, the attribute `[data-fragment-visit]` will be added to the `html` tag. You can use that
 attribute to disable your default transitions for fragment visits.
 
-If the current `rule` has a `name` (e.g. "myRoute"), that will be reflected as `[data-fragment-visit=myRoute]`. Using this attribute, you can scope your custom animation for only that visit:
+If the current `rule` has a `name` (e.g. "myRoute"), that will be reflected as `[data-fragment-visit=myRoute]`. Using that attribute, you can define custom transitions for your fragment visits:
 
 ```css
 /*
@@ -152,37 +82,51 @@ html:not([data-fragment-visit]).is-animating .transition-main {
   opacity: 0;
 }
 /*
-* The transitions for the named rules "openOverlay" and "closeOverlay"
+* The transitions for the named rule "filterUsers"
 */
-html[data-fragment-visit=openOverlay] .transition-overlay,
-html[data-fragment-visit=closeOverlay] .transition-overlay {
+html[data-fragment-visit='filterUsers'] .transition-users {
   transition: opacity 250ms;
 }
-html[data-fragment-visit=openOverlay].is-animating .transition-overlay,
-html[data-fragment-visit=closeOverlay].is-animating .transition-overlay {
+html[data-fragment-visit='filterUsers'].is-animating .transition-users {
   opacity: 0;
 }
-/*
-* Based on the name of the rule, we can make either the leaving or
-* the rendering transition really short:
-*/
-html[data-fragment-visit=openOverlay].is-leaving .transition-overlay,
-html[data-fragment-visit=closeOverlay].is-rendering .transition-overlay {
-  transition-duration: 10ms;
-}
-/*
-* The transition between single users
-*/
-html[data-fragment-visit=switchUser] .transition-user {
-  transition: opacity 200ms, transform 200ms;
-}
-html[data-fragment-visit=switchUser].is-animating .transition-user {
-  opacity: 0;
-  transform: translateY(-20px);
-}
-html[data-fragment-visit=switchUser].is-leaving .transition-user {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
 ```
+
+## JavaScript API
+
+### Rules
+
+Each rule consist of these properties:
+
+#### `from: string | string[]`
+
+The path before the current visit. Will be converted to a `RegExp`.
+
+#### `to: string | string[]`
+
+The new path of the current visit. Will be converted to a `RegExp`.
+
+#### `fragments: string[]`
+
+An array of selectors for fragments that should be replaced if the rule matches the current visit
+
+### `name: string` (optional)
+
+A name for the rule, for scoped styling
+
+### Rule matching logic
+
+- The first matching rule in your `rules` array will be used for the current visit
+- If no `rule` matches the current visist, the default `swup.containers` will be replaced
+- `rule.from` and `rule.to` are converted to a regular expression by [pathToRegexp](https://github.com/pillarjs/path-to-regexp). If you want to create an either/or-regex, you can also provide an array of paths, for example `['/users/', '/users/filter/:filter']`
+
+### Fragments
+
+- The `rule.fragments` selectors from the matching `rule` need to be present in **both the current and the incoming document**
+- For each `rule.fragments` entry, the **first** matching element in the DOM will be selected
+- The plugin will check if a fragment already matches the new URL before replacing it
+
+## DOM API
+
+- `[data-swup-fragment-url]` @TODO
+- `.swup-fragment-unchanged` @TODO
