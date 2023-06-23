@@ -69,25 +69,16 @@ export const cleanupAnimationAttributes = () => {
 export const validateFragment = (
 	selector: string,
 	targetUrl: string
-): {
-	valid: boolean;
-	message?: string;
-} => {
+): true | string => {
 	const el = document.querySelector(selector);
 
 	if (!el)
-		return {
-			valid: false,
-			message: 'Fragment missing in current document'
-		};
+		return 'Fragment missing in current document';
 
 	if (elementMatchesFragmentUrl(el, targetUrl))
-		return {
-			valid: false,
-			message: `Ignoring fragment as it already matches the URL`
-		};
+		return `Ignoring fragment as it already matches the URL`
 
-	return { valid: true };
+	return true;
 };
 
 /**
@@ -134,20 +125,15 @@ export const setAnimationAttributes = (rule: Rule) => {
 };
 
 /**
- * Get the first matching rule for a given route
- */
-export const getFirstMatchingRule = (rules: Rule[], route: Route): Rule | undefined => {
-	return rules.find((rule) => rule.matches(route));
-};
-
-/**
  * Replace fragments for a given rule
  */
 export function replaceFragments(
 	page: any /* @TODO fix type */,
-	fragments: string[],
+	fragments?: string[],
 	logger?: Logger
 ): Element[] {
+	if (!fragments) return [];
+
 	const incomingDocument = new DOMParser().parseFromString(page.originalContent, 'text/html');
 	const replacedFragments: Element[] = [];
 
@@ -172,6 +158,8 @@ export function replaceFragments(
 		currentFragment.replaceWith(newFragment);
 		replacedFragments.push(newFragment);
 	});
+
+	logger?.log('Replaced:', replacedFragments);
 
 	return replacedFragments;
 }

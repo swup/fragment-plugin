@@ -7,13 +7,12 @@ import {
 	addClassToUnchangedFragments,
 	cleanupAnimationAttributes,
 	cleanupFragmentUrls,
-	getFirstMatchingRule,
 	handleDynamicFragmentLinks,
 	replaceFragments,
 	setAnimationAttributes,
 	updateFragmentUrlAttributes,
 	validateFragment
-} from './internal.js';
+} from './functions.js';
 
 /**
  * Re-Export the Rule class
@@ -59,7 +58,7 @@ type PluginOptions = {
 type Context = {
 	route?: Route;
 	matchedRule?: Rule;
-	validFragments: string[];
+	fragments?: string[];
 };
 
 /**
@@ -74,14 +73,11 @@ export default class FragmentPlugin extends PluginBase {
 	originalReplaceContent?: Swup['replaceContent'];
 	scrollPlugin?: Plugin;
 
-	context: Context = {
-		validFragments: []
-	};
+	context: Context = {};
 
 	logger: Logger;
 
 	// Make selected functions public
-	getFirstMatchingRule = getFirstMatchingRule;
 	validateFragment = validateFragment;
 
 	/**
@@ -178,25 +174,33 @@ export default class FragmentPlugin extends PluginBase {
 	/**
 	 * Handles a visit from a URL to another URL
 	 */
-	createContext({ from, to }: Route): Context {
+	createContext(route: Route, logger?: Logger): Context {
 		const context: Context = {
-			route: { from, to },
-			matchedRule: getFirstMatchingRule(this.rules, { from, to }),
-			validFragments: []
+			route,
+			matchedRule: this.getFirstMatchingRule(route)
 		};
 
 		if (!context.matchedRule) return context;
 
-		context.validFragments = context.matchedRule.fragments.filter((selector) => {
-			const { valid, message } = validateFragment(selector, to);
-			if (!valid) this.logger.log(message);
-			return valid;
+		context.fragments = context.matchedRule.fragments.filter((selector) => {
+			const result = validateFragment(selector, route.to);
+			if (result === true) return true;
+
+			if (logger) logger.log(result);
+			return false;
 		});
 
-		this.logger.log('Context:', context);
+		if (logger) logger.log('Context:', context);
 
 		return context;
 	}
+
+	/**
+	 * Get the first matching rule for a given route
+	 */
+	getFirstMatchingRule = (route: Route): Rule | undefined => {
+		return this.rules.find((rule) => rule.matches(route));
+	};
 
 	/**
 	 * Do special things if this is a fragment visit
@@ -246,14 +250,9 @@ export default class FragmentPlugin extends PluginBase {
 	 * Replace the content
 	 */
 	replaceContent = async (page: any /* @TODO fix type */) => {
-		const replacedFragments = replaceFragments(
-			page,
-			this.context.validFragments,
-			this.logger
-		);
+		const replacedFragments = replaceFragments(page, this.context.fragments, this.logger);
 
 		if (replacedFragments.length) {
-			this.logger.log('Replaced:', replacedFragments);
 			document.title = page.title;
 			return Promise.resolve();
 		}
