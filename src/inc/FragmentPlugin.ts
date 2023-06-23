@@ -42,21 +42,27 @@ type PluginOptions = {
 };
 
 /**
+ * The context, available throughout every transition
+ */
+type Context = {
+	route?: Route;
+	matchedRule?: Rule;
+	validFragments?: string[];
+};
+
+/**
  * The main plugin class
  */
 export default class FragmentPlugin extends PluginBase {
 	name = 'FragmentPlugin';
 
-	currentRule: Rule | undefined;
 	rules: Rule[] = [];
-	defaults: PluginOptions = {
-		rules: [],
-		debug: false
-	};
+
 	options: PluginOptions;
-	originalReplaceContent: Swup['replaceContent'] | undefined;
-	scrollPlugin: Plugin | undefined;
-	fragmentsToReplace: string[] = [];
+	originalReplaceContent?: Swup['replaceContent'];
+	scrollPlugin?: Plugin;
+
+	context: Context = {};
 
 	/**
 	 * Plugin Constructor
@@ -65,8 +71,13 @@ export default class FragmentPlugin extends PluginBase {
 	constructor(options: PluginOptions) {
 		super();
 
+		const defaults: PluginOptions = {
+			rules: [],
+			debug: false
+		};
+
 		this.options = {
-			...this.defaults,
+			...defaults,
 			...options
 		};
 
@@ -90,7 +101,7 @@ export default class FragmentPlugin extends PluginBase {
 		swup.on('transitionEnd', this.onTransitionEnd);
 		swup.on('contentReplaced', this.onContentReplaced);
 
-		this.setFragmentUrls();
+		this.updateFragmentUrlAttributes();
 	}
 
 	/**
@@ -133,28 +144,40 @@ export default class FragmentPlugin extends PluginBase {
 	};
 
 	/**
+	 * Prepares a page visit
+	 */
+	preparePageVisit({ from, to }: Route): void {
+		this.context = Object.freeze(this.createContext({ from, to }));
+		this.addClassToUnchangedFragments(to);
+	}
+
+	/**
 	 * Handles a visit from a URL to another URL
 	 */
-	preparePageVisit({ from, to }: Route) {
-		this.fragmentsToReplace = [];
+	createContext({ from, to }: Route): Context {
+		const context: Context = {
+			route: { from, to },
+			matchedRule: this.getFirstMatchingRule({ from, to }),
+			validFragments: []
+		};
 
-		this.currentRule = this.getFirstMatchingRule({ from, to });
-		if (!this.currentRule) return;
+		if (!context.matchedRule) return context;
 
-		this.fragmentsToReplace = this.currentRule.fragments.filter((selector) =>
+		context.validFragments = context.matchedRule.fragments.filter((selector) =>
 			this.validateFragment(selector, to, { silent: false })
 		);
-		this.log('Fragments for current visit:', this.fragmentsToReplace);
 
-		this.addClassToUnchangedFragments(to);
+		this.log('Context:', context);
+
+		return context;
 	}
 
 	/**
 	 * Do special things if this is a fragment visit
 	 */
 	onTransitionStart = () => {
-		if (this.currentRule) {
-			this.setAnimationAttributes(this.currentRule);
+		if (this.context.matchedRule) {
+			this.setAnimationAttributes(this.context.matchedRule);
 			this.disableScrollPlugin();
 		}
 	};
@@ -187,8 +210,6 @@ export default class FragmentPlugin extends PluginBase {
 	onTransitionEnd = () => {
 		this.cleanupAnimationAttributes();
 		this.restoreScrollPlugin();
-		// Reset the current rule
-		this.currentRule = undefined;
 	};
 
 	/**
@@ -259,10 +280,9 @@ export default class FragmentPlugin extends PluginBase {
 	 * Replace the content
 	 */
 	replaceContent = async (page: any /* @TODO fix type */) => {
-		// If one of the rules matched, replace only the fragments from that rule
-		if (this.fragmentsToReplace.length) {
-			this.replaceFragments(page, this.fragmentsToReplace);
-			// Update the browser title
+		// If there are fragments to replace
+		if (this.context.validFragments?.length) {
+			this.replaceFragments(page, this.context.validFragments);
 			document.title = page.title;
 			return Promise.resolve();
 		}
@@ -270,7 +290,7 @@ export default class FragmentPlugin extends PluginBase {
 		// No rule matched. Run the default replaceContent
 		await this.originalReplaceContent!(page);
 		// Save the current URL for all fragments
-		this.setFragmentUrls();
+		this.updateFragmentUrlAttributes();
 		return Promise.resolve();
 	};
 
@@ -320,11 +340,12 @@ export default class FragmentPlugin extends PluginBase {
 		}
 
 		if (this.elementMatchesFragmentUrl(el, targetUrl)) {
-			!silent && this.log(`Ignoring fragment:`, {
-				reason: 'Already matches the target URL',
-				el,
-				targetUrl,
-			});
+			!silent &&
+				this.log(`Ignoring fragment:`, {
+					reason: 'Already matches the target URL',
+					el,
+					targetUrl
+				});
 			return false;
 		}
 
@@ -370,7 +391,7 @@ export default class FragmentPlugin extends PluginBase {
 	/**
 	 * Adds [data-swup-fragment-url] to all fragments that don't already contain that attribute
 	 */
-	setFragmentUrls() {
+	updateFragmentUrlAttributes() {
 		this.rules.forEach(({ fragments: selectors }) => {
 			selectors.forEach((selector) => {
 				const fragment = document.querySelector(selector);
