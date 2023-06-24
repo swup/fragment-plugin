@@ -105,6 +105,9 @@ const isEqualUrl = (url1: string, url2: string) => {
 
 /**
  * Normalize a URL
+ *
+ * - removes the trailing slash
+ * - sorts query params
  */
 const normalizeUrl = (url: string) => {
 	if (!url.trim()) return url;
