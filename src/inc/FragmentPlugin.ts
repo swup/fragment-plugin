@@ -1,6 +1,6 @@
 import PluginBase from '@swup/plugin';
 import { Location } from 'swup';
-import Rule from './Rule.js';
+import Rule, { Path } from './Rule.js';
 import Swup, { Handler, Plugin } from 'swup';
 import Logger from './Logger.js';
 import {
@@ -18,13 +18,6 @@ import {
  * Re-Export the Rule class
  */
 export type { Rule };
-
-/**
- * A union type for pathToRegexp. It accepts strings,
- * arrays of strings or regular expressions.
- * @see https://github.com/pillarjs/path-to-regexp#path-to-regexp-1
- */
-export type Path = string | string[] | RegExp;
 
 /**
  * Represents a route from one to another URL
@@ -47,7 +40,7 @@ type RuleOptions = {
 /**
  * The Plugin Options
  */
-type PluginOptions = {
+export type PluginOptions = {
 	rules: RuleOptions[];
 	debug?: boolean;
 };
