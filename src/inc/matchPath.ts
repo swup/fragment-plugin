@@ -21,6 +21,3 @@ export const matchPath = <P extends object = object>(
 		throw error;
 	}
 };
-
-// const matchesFrom = matchPath(['/users/', '/users/\\?filter=:filter']);
-// const m = matchesFrom('/users/');
