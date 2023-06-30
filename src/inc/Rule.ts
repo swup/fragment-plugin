@@ -7,7 +7,6 @@ export type { Path };
  * Represents a Rule
  */
 export default class Rule {
-
 	protected matchesFrom;
 	protected matchesTo;
 
