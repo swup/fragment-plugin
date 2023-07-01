@@ -49,7 +49,7 @@
     "scrl": "^2.0.0"
   },
   "devDependencies": {
-    "swup": "^3.0.0"
+    "swup": "github:swup/swup#next"
   },
   "peerDependencies": {
     "swup": "^3.0.0"
