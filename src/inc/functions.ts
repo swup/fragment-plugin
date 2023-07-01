@@ -137,7 +137,7 @@ export function replaceFragments(
 ): Element[] {
 	if (!fragments) return [];
 
-	const incomingDocument = new DOMParser().parseFromString(page.originalContent, 'text/html');
+	const incomingDocument = new DOMParser().parseFromString(page.html, 'text/html');
 	const replacedFragments: Element[] = [];
 
 	// Step 1: replace all fragments from the rule
