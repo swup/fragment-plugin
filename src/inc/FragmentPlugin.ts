@@ -110,11 +110,9 @@ export default class SwupFragmentPlugin extends PluginBase {
 		this.originalReplaceContent = swup.replaceContent;
 		swup.replaceContent = this.replaceContent;
 
-		swup.on('popState', this.onPopState);
-		swup.on('clickLink', this.onClickLink);
-		swup.on('transitionStart', this.onTransitionStart);
-		swup.on('transitionEnd', this.onTransitionEnd);
-		swup.on('contentReplaced', this.onContentReplaced);
+		swup.hooks.on('transitionStart', this.onTransitionStart);
+		swup.hooks.on('transitionEnd', this.onTransitionEnd);
+		swup.hooks.on('replaceContent', this.onContentReplaced);
 
 		updateFragmentUrlAttributes(this.rules, this.swup.getCurrentUrl());
 	}
@@ -128,41 +126,19 @@ export default class SwupFragmentPlugin extends PluginBase {
 		swup.replaceContent = this.originalReplaceContent!;
 		this.originalReplaceContent = undefined;
 
-		swup.off('popState', this.onPopState);
-		swup.off('clickLink', this.onClickLink);
-		swup.off('transitionStart', this.onTransitionStart);
-		swup.off('transitionEnd', this.onTransitionEnd);
-		swup.off('contentReplaced', this.onContentReplaced);
+		swup.hooks.off('transitionStart', this.onTransitionStart);
+		swup.hooks.off('transitionEnd', this.onTransitionEnd);
+		swup.hooks.off('replaceContent', this.onContentReplaced);
 
 		cleanupFragmentUrls();
 	}
-
-	/**
-	 * Set the current fragment on PopState.
-	 * The browser URL has already changed during PopState
-	 */
-	onPopState = () => {
-		this.preparePageVisit({
-			from: this.swup.currentPageUrl,
-			to: this.swup.getCurrentUrl()
-		});
-	};
-
-	/**
-	 * Set the current fragment when clicking a link
-	 */
-	onClickLink: Handler<'clickLink'> = (event) => {
-		this.preparePageVisit({
-			from: this.swup.getCurrentUrl(),
-			to: Location.fromElement(event.delegateTarget as HTMLAnchorElement).url
-		});
-	};
 
 	/**
 	 * Prepares a page visit
 	 */
 	preparePageVisit({ from, to }: Route): void {
 		this.context = Object.freeze(this.createContext({ from, to }));
+		if (this.context.matchedRule) this.swup.context.scroll.reset = false;
 		addClassToUnchangedFragments(to);
 	}
 
@@ -200,10 +176,22 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Do special things if this is a fragment visit
 	 */
-	onTransitionStart = () => {
+	onTransitionStart: Handler<'transitionStart'> = (context) => {
+		const currentRoute = {
+			from: context.from.url,
+			to: context.to!.url
+		};
+		// Create an immutable context for the current transition
+		this.context = Object.freeze(this.createContext(currentRoute));
+
+		// Add classes to fragments
+		addClassToUnchangedFragments(currentRoute.to);
+
 		if (!this.context.matchedRule) return;
+
+		// Disable scrolling for this transition
+		this.swup.context.scroll.reset = false;
 		setAnimationAttributes(this.context.matchedRule);
-		this.disableScrollPlugin();
 	};
 
 	/**
@@ -211,7 +199,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 */
 	onTransitionEnd = () => {
 		cleanupAnimationAttributes();
-		this.restoreScrollPlugin();
 	};
 
 	/**
@@ -221,25 +208,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 		updateFragmentUrlAttributes(this.rules, this.swup.getCurrentUrl());
 		handleDynamicFragmentLinks(this.logger);
 	};
-
-	/**
-	 * Disable ScrollPlugin for fragment visits
-	 */
-	disableScrollPlugin() {
-		// We still want scrolling if there is a hash in the target link
-		if (this.swup.scrollToElement) return;
-
-		this.scrollPlugin = this.swup.findPlugin('ScrollPlugin');
-		if (this.scrollPlugin) this.swup.unuse(this.scrollPlugin);
-	}
-
-	/**
-	 * Re-enable ScrollPlugin after each transition
-	 */
-	restoreScrollPlugin() {
-		if (this.scrollPlugin) this.swup.use(this.scrollPlugin);
-		this.scrollPlugin = undefined;
-	}
 
 	/**
 	 * Replace the content
