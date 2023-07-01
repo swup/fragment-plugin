@@ -57,8 +57,8 @@ type Context = {
 /**
  * The main plugin class
  */
-export default class FragmentPlugin extends PluginBase {
-	name = 'FragmentPlugin';
+export default class SwupFragmentPlugin extends PluginBase {
+	name = 'SwupFragmentPlugin';
 
 	rules: Rule[] = [];
 
