@@ -1,8 +1,7 @@
 import PluginBase from '@swup/plugin';
-import { Location } from 'swup';
-import Rule, { Path } from './Rule.js';
+import Rule, { Path } from './inc/Rule.js';
 import Swup, { Handler, Plugin } from 'swup';
-import Logger from './Logger.js';
+import Logger from './inc/Logger.js';
 import {
 	addClassToUnchangedFragments,
 	cleanupAnimationAttributes,
@@ -12,7 +11,7 @@ import {
 	setAnimationAttributes,
 	updateFragmentUrlAttributes,
 	validateFragment
-} from './functions.js';
+} from './inc/functions.js';
 
 /**
  * Re-Export the Rule class
@@ -60,7 +59,7 @@ type Context = {
 export default class SwupFragmentPlugin extends PluginBase {
 	name = 'SwupFragmentPlugin';
 
-	requires = { swup: '>=4' };
+	// requires = { swup: '>=4' };
 
 	rules: Rule[] = [];
 
@@ -221,7 +220,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		}
 
 		// No rule matched. Run the default replaceContent
-		await this.originalReplaceContent!(page);
+		await this.originalReplaceContent!.call(this.swup, page);
 		return Promise.resolve();
 	};
 }
