@@ -49,10 +49,10 @@
     "scrl": "^2.0.0"
   },
   "devDependencies": {
-    "swup": "github:swup/swup#next"
+    "swup": "github:swup/swup#3f113bd72987f967794f12c87d843c5444350091"
   },
   "peerDependencies": {
-    "swup": "^3.0.0"
+    "swup": "^4.0.0"
   },
   "browserslist": [
     "extends @swup/browserslist-config"
