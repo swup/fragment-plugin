@@ -60,6 +60,8 @@ type Context = {
 export default class SwupFragmentPlugin extends PluginBase {
 	name = 'SwupFragmentPlugin';
 
+	requires = { swup: '>=4' };
+
 	rules: Rule[] = [];
 
 	options: PluginOptions;
