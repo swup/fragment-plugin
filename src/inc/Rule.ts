@@ -1,5 +1,5 @@
-import { matchPath, type Path } from './matchPath.js';
-import type { Route } from './FragmentPlugin.js';
+import { matchPath, type Path } from 'swup';
+import type { Route } from '../SwupFragmentPlugin.js';
 
 export type { Path };
 

@@ -1,5 +1,5 @@
 import { Location } from 'swup';
-import type { Rule } from './FragmentPlugin.js';
+import type { Rule } from '../SwupFragmentPlugin.js';
 import Logger from './Logger.js';
 
 /**
