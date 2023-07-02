@@ -66,17 +66,13 @@ export const cleanupAnimationAttributes = () => {
 /**
  * Validate a fragment for a target URL. Returns either true or a string with the reason
  */
-export const validateFragment = (
-	selector: string,
-	targetUrl: string
-): true | string => {
+export const validateFragment = (selector: string, targetUrl: string): true | string => {
 	const el = document.querySelector(selector);
 
-	if (!el)
-		return 'Fragment missing in current document';
+	if (!el) return 'Fragment missing in current document';
 
 	if (elementMatchesFragmentUrl(el, targetUrl))
-		return `Ignoring fragment as it already matches the URL`
+		return `Ignoring fragment as it already matches the URL`;
 
 	return true;
 };
