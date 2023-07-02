@@ -127,13 +127,13 @@ export const setAnimationAttributes = (rule: Rule) => {
  * Replace fragments for a given rule
  */
 export function replaceFragments(
-	page: any /* @TODO fix type */,
+	html: string,
 	fragments?: string[],
 	logger?: Logger
 ): Element[] {
 	if (!fragments) return [];
 
-	const incomingDocument = new DOMParser().parseFromString(page.html, 'text/html');
+	const incomingDocument = new DOMParser().parseFromString(html, 'text/html');
 	const replacedFragments: Element[] = [];
 
 	// Step 1: replace all fragments from the rule
