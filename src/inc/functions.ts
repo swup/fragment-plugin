@@ -124,13 +124,31 @@ export const setAnimationAttributes = (rule: Rule) => {
 };
 
 /**
+ * Sleep for a given amount of milliseconds
+ */
+export const sleep = (ms: number) => {
+	return new Promise(res => setTimeout(res, ms));
+}
+
+/**
+ * Get fragments for an array of selectors
+ */
+export function getFragments(selectors?: string[]): HTMLElement[] {
+	if (!selectors?.length) return [];
+
+	const fragments: HTMLElement[] = [];
+	selectors.forEach((selector) => {
+		const fragment = document.querySelector(selector);
+		if (fragment) fragments.push(fragment as HTMLElement);
+	});
+
+	return fragments;
+}
+
+/**
  * Replace fragments for a given rule
  */
-export function replaceFragments(
-	html: string,
-	fragments?: string[],
-	logger?: Logger
-): Element[] {
+export function replaceFragments(html: string, fragments?: string[], logger?: Logger): Element[] {
 	if (!fragments) return [];
 
 	const incomingDocument = new DOMParser().parseFromString(html, 'text/html');
@@ -154,7 +172,10 @@ export function replaceFragments(
 			return;
 		}
 
+		newFragment.classList.add('is-animating', 'is-entering');
+
 		currentFragment.replaceWith(newFragment);
+
 		replacedFragments.push(newFragment);
 	});
 

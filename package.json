@@ -44,12 +44,12 @@
     "url": "https://github.com/swup/fragment-plugin.git"
   },
   "dependencies": {
-    "@swup/plugin": "^2.0.3",
+    "@swup/plugin": "^3.0.0-rc.1",
     "path-to-regexp": "^6.2.1",
     "scrl": "^2.0.0"
   },
   "devDependencies": {
-    "swup": "github:swup/swup#e31aa2067746d62aa64a68df40f358084156096d"
+    "swup": "^4.0.0-rc.14"
   },
   "peerDependencies": {
     "swup": "^4.0.0"
