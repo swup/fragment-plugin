@@ -132,15 +132,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 	}
 
 	/**
-	 * Prepares a page visit
-	 */
-	preparePageVisit({ from, to }: Route): void {
-		this.privateContext = Object.freeze(this.createContext({ from, to }));
-		if (this.privateContext.matchedRule) this.getSwup().context.scroll.reset = false;
-		addClassToUnchangedFragments(to);
-	}
-
-	/**
 	 * Handles a visit from a URL to another URL
 	 */
 	createContext(route: Route, logger?: Logger): PluginContext {
