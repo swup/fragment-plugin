@@ -101,11 +101,15 @@ export default class SwupFragmentPlugin extends PluginBase {
 		);
 	}
 
+	getSwup() {
+		return this.swup as Swup;
+	}
+
 	/**
 	 * Runs when the plugin is being mounted
 	 */
 	mount() {
-		const { swup } = this;
+		const swup = this.getSwup();
 
 		swup.hooks.on('transitionStart', this.onTransitionStart);
 		swup.hooks.on('transitionEnd', this.onTransitionEnd);
@@ -118,7 +122,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * Runs when the plugin is being unmounted
 	 */
 	unmount() {
-		const { swup } = this;
+		const swup = this.getSwup();
 
 		swup.hooks.off('transitionStart', this.onTransitionStart);
 		swup.hooks.off('transitionEnd', this.onTransitionEnd);
@@ -132,7 +136,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 */
 	preparePageVisit({ from, to }: Route): void {
 		this.privateContext = Object.freeze(this.createContext({ from, to }));
-		if (this.privateContext.matchedRule) this.swup.context.scroll.reset = false;
+		if (this.privateContext.matchedRule) this.getSwup().context.scroll.reset = false;
 		addClassToUnchangedFragments(to);
 	}
 
@@ -184,7 +188,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		if (!this.privateContext.matchedRule || !this.privateContext.fragments?.length) return;
 
 		// Disable scrolling for this transition
-		this.swup.context.scroll.reset = false;
+		this.getSwup().context.scroll.reset = false;
 		setAnimationAttributes(this.privateContext.matchedRule);
 	};
 
