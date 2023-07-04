@@ -99,13 +99,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		swup.hooks.on('transitionStart', this.onTransitionStart);
 		swup.hooks.on('transitionEnd', this.onTransitionEnd);
-		// swup.hooks.before('replaceContent', this.beforeReplaceContent);
 		swup.hooks.on('replaceContent', this.afterReplaceContent);
-
-		// swup.hooks.on('animationOutStart', async (context) => {
-		// 	console.log(context.transition.targets)
-		// 	await sleep(3000);
-		// })
 
 		updateFragmentUrlAttributes(this.rules, this.swup.getCurrentUrl());
 	}
@@ -118,7 +112,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		swup.hooks.off('transitionStart', this.onTransitionStart);
 		swup.hooks.off('transitionEnd', this.onTransitionEnd);
-		// swup.hooks.off('replaceContent', this.beforeReplaceContent);
 		swup.hooks.on('replaceContent', this.afterReplaceContent);
 
 		cleanupFragmentUrls();
@@ -191,19 +184,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 	onTransitionEnd = () => {
 		cleanupAnimationAttributes();
 	};
-
-	/**
-	 * Runs before replacing the content
-	 */
-	// beforeReplaceContent: Handler<'replaceContent'> = (_context, args) => {
-	// 	const replacedFragments = replaceFragments(
-	// 		args.page.html,
-	// 		this.privateContext.fragments,
-	// 		this.logger
-	// 	);
-
-	// 	if (replacedFragments.length) args.containers = [];
-	// };
 
 	/**
 	 * Runs after the content was replaced
