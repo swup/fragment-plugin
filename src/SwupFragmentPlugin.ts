@@ -172,7 +172,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		swup.context.transition.name = matchedRule.name;
 
 		// Add the transition classes directly to the fragments for this visit
-		swup.context.transition.targets = fragments;
+		swup.context.transition.scope = 'containers';
 
 		// Overwrite the containers for this visit
 		swup.context.containers = fragments;
