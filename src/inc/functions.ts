@@ -1,4 +1,4 @@
-import { Location } from '../SwupFragmentPlugin.js';
+import { Location } from 'swup';
 import type { Rule, Route } from '../SwupFragmentPlugin.js';
 import Logger from './Logger.js';
 

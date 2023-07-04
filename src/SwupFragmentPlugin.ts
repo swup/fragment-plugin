@@ -1,7 +1,7 @@
-import PluginBase from '../../swup-plugin/src/index.js';
+import PluginBase from '@swup/plugin';
 import Rule from './inc/Rule.js';
-import { matchPath, Location } from '../../swup/src/index.js';
-import type { Path, Handler } from '../../swup/src/index.js';
+
+import type { Path, Handler } from 'swup';
 import Logger from './inc/Logger.js';
 import {
 	addClassToUnchangedFragments,
@@ -49,7 +49,6 @@ type PluginContext = {
 /**
  * Re-exports
  */
-export { matchPath, Location };
 export type { Route, Path, Rule };
 
 /**

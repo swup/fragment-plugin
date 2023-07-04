@@ -1,5 +1,5 @@
-import { matchPath } from '../SwupFragmentPlugin.js';
-import type { Route, Path } from '../SwupFragmentPlugin.js';
+import { matchPath, type Path } from 'swup';
+import type { Route } from '../SwupFragmentPlugin.js';
 
 /**
  * Represents a Rule
