@@ -1,29 +1,21 @@
-import PluginBase from '@swup/plugin';
-import Rule, { Path } from './inc/Rule.js';
-import Swup, { Handler, Plugin, Context, nextTick } from 'swup';
+import PluginBase from '../../swup-plugin/src/index.js';
+import Rule from './inc/Rule.js';
+import { matchPath, Location } from '../../swup/src/index.js';
+import type { Path, Handler } from '../../swup/src/index.js';
 import Logger from './inc/Logger.js';
 import {
 	addClassToUnchangedFragments,
 	cleanupAnimationAttributes,
 	cleanupFragmentUrls,
 	handleDynamicFragmentLinks,
-	replaceFragments,
-	setAnimationAttributes,
 	updateFragmentUrlAttributes,
-	validateFragment,
-	getFragments,
-	sleep
+	getValidFragments,
 } from './inc/functions.js';
-
-/**
- * Re-Export the Rule class
- */
-export type { Rule };
 
 /**
  * Represents a route from one to another URL
  */
-export type Route = {
+type Route = {
 	from: string;
 	to: string;
 };
@@ -50,10 +42,15 @@ export type PluginOptions = {
  * The context, available throughout every transition
  */
 type PluginContext = {
-	route?: Route;
 	matchedRule?: Rule;
 	fragments?: string[];
 };
+
+/**
+ * Re-exports
+ */
+export { matchPath, Location };
+export type { Route, Path, Rule };
 
 /**
  * The main plugin class
@@ -61,13 +58,11 @@ type PluginContext = {
 export default class SwupFragmentPlugin extends PluginBase {
 	name = 'SwupFragmentPlugin';
 
-	// requires = { swup: '>=4' };
+	requires = { swup: '>=4' };
 
 	rules: Rule[] = [];
 
 	options: PluginOptions;
-
-	privateContext: PluginContext = {};
 
 	logger: Logger;
 
@@ -97,20 +92,21 @@ export default class SwupFragmentPlugin extends PluginBase {
 		);
 	}
 
-	getSwup() {
-		return this.swup as Swup;
-	}
-
 	/**
 	 * Runs when the plugin is being mounted
 	 */
 	mount() {
-		const swup = this.getSwup();
+		const swup = this.swup;
 
 		swup.hooks.on('transitionStart', this.onTransitionStart);
 		swup.hooks.on('transitionEnd', this.onTransitionEnd);
-		swup.hooks.before('replaceContent', this.beforeReplaceContent);
+		// swup.hooks.before('replaceContent', this.beforeReplaceContent);
 		swup.hooks.on('replaceContent', this.afterReplaceContent);
+
+		// swup.hooks.on('animationOutStart', async (context) => {
+		// 	console.log(context.transition.targets)
+		// 	await sleep(3000);
+		// })
 
 		updateFragmentUrlAttributes(this.rules, this.swup.getCurrentUrl());
 	}
@@ -119,11 +115,11 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * Runs when the plugin is being unmounted
 	 */
 	unmount() {
-		const swup = this.getSwup();
+		const swup = this.swup;
 
 		swup.hooks.off('transitionStart', this.onTransitionStart);
 		swup.hooks.off('transitionEnd', this.onTransitionEnd);
-		swup.hooks.off('replaceContent', this.beforeReplaceContent);
+		// swup.hooks.off('replaceContent', this.beforeReplaceContent);
 		swup.hooks.on('replaceContent', this.afterReplaceContent);
 
 		cleanupFragmentUrls();
@@ -132,21 +128,16 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Handles a visit from a URL to another URL
 	 */
-	createContext(route: Route, logger?: Logger): PluginContext {
-		const context: PluginContext = {
-			route,
-			matchedRule: this.getFirstMatchingRule(route)
-		};
+	getContext(route: Route, logger?: Logger): PluginContext {
+		const matchedRule = this.getFirstMatchingRule(route);
 
-		if (!context.matchedRule) return context;
+		// Bail early if no rule matched
+		if (!matchedRule) return {};
 
-		context.fragments = context.matchedRule.fragments.filter((selector) => {
-			const result = validateFragment(selector, route.to);
-			if (result === true) return true;
+		// Validate the fragments from the matched rule
+		const fragments = getValidFragments(route, matchedRule.fragments, logger);
 
-			if (logger) logger.log(result);
-			return false;
-		});
+		const context = { matchedRule, fragments };
 
 		if (logger) logger.log('Context:', context);
 
@@ -163,62 +154,36 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Do special things if this is a fragment visit
 	 */
-	onTransitionStart: Handler<'transitionStart'> = (context) => {
-		const swup = this.getSwup();
+	onTransitionStart: Handler<'transitionStart'> = async (context) => {
+		const swup = this.swup;
 
 		const currentRoute = {
 			from: context.from.url,
 			to: context.to!.url
 		};
-		// Create an immutable context for the current transition
-		this.privateContext = Object.freeze(this.createContext(currentRoute, this.logger));
+
+		const { matchedRule, fragments } = this.getContext(currentRoute, this.logger);
 
 		// Add classes to fragments
 		addClassToUnchangedFragments(currentRoute.to);
 
 		// Bail early if the current route doesn't match any rule
-		if (!this.privateContext.matchedRule) return;
+		if (!matchedRule) return;
 
 		// Bail early if no fragments would be replaced for the current rule
-		if (!this.privateContext.fragments?.length) return;
-
-		// Disable the default animations
-		// context.transition.animate = false;
-
-		// swup.hooks.once('animationSkipped', async () => {
-		// 	const fragments = getFragments(this.privateContext.fragments);
-		// 	fragments.forEach((el) => el.classList.add('is-animating', 'is-leaving', 'is-changing'));
-
-		// 	await nextTick();
-		// 	await Promise.all(
-		// 		swup.getAnimationPromises({
-		// 			selector: swup.options.animationSelector,
-		// 			elements: fragments
-		// 		})
-		// 	);
-		// 	// await sleep(5000);
-		// });
-
-		// this.getSwup().hooks.once('replaceContent', async () => {
-		// 	const fragments = getFragments(this.privateContext.fragments);
-		// 	await nextTick();
-		// 	fragments.forEach((el) => el.classList.remove('is-animating'));
-		// 	await Promise.all(
-		// 		swup.getAnimationPromises({
-		// 			selector: swup.options.animationSelector,
-		// 			elements: fragments
-		// 		})
-		// 	);
-		// });
-
-		// this.getSwup().hooks.once('transitionEnd', () => {
-		// 	const fragments = getFragments(this.privateContext.fragments);
-		// 	fragments.forEach((el) => el.classList.remove('is-rendering'));
-		// });
+		if (!fragments?.length) return;
 
 		// Disable scrolling for this transition
-		this.getSwup().context.scroll.reset = false;
-		setAnimationAttributes(this.privateContext.matchedRule);
+		swup.context.scroll.reset = false;
+
+		// Add a suffix to all transition classes, e.g. .is-animating--fragment, .is-leaving--fragment, ...
+		swup.context.transition.name = matchedRule.name;
+
+		// Add the transition classes directly to the fragments for this visit
+		swup.context.transition.targets = fragments;
+
+		// Overwrite the containers for this visit
+		swup.context.containers = fragments;
 	};
 
 	/**
@@ -231,21 +196,21 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Runs before replacing the content
 	 */
-	beforeReplaceContent: Handler<'replaceContent'> = (_context, args) => {
-		const replacedFragments = replaceFragments(
-			args.page.html,
-			this.privateContext.fragments,
-			this.logger
-		);
+	// beforeReplaceContent: Handler<'replaceContent'> = (_context, args) => {
+	// 	const replacedFragments = replaceFragments(
+	// 		args.page.html,
+	// 		this.privateContext.fragments,
+	// 		this.logger
+	// 	);
 
-		if (replacedFragments.length) args.containers = [];
-	};
+	// 	if (replacedFragments.length) args.containers = [];
+	// };
 
 	/**
-	 * Runs after replacing the content
+	 * Runs after the content was replaced
 	 */
 	afterReplaceContent: Handler<'replaceContent'> = () => {
 		updateFragmentUrlAttributes(this.rules, this.swup.getCurrentUrl());
 		handleDynamicFragmentLinks(this.logger);
-	}
+	};
 }

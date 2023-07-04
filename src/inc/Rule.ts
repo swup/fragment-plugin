@@ -1,7 +1,5 @@
-import { matchPath, type Path } from 'swup';
-import type { Route } from '../SwupFragmentPlugin.js';
-
-export type { Path };
+import { matchPath } from '../SwupFragmentPlugin.js';
+import type { Route, Path } from '../SwupFragmentPlugin.js';
 
 /**
  * Represents a Rule
@@ -14,11 +12,11 @@ export default class Rule {
 		public from: Path,
 		public to: Path,
 		public fragments: string[],
-		public name: string | undefined
+		public name: string | undefined = 'fragment'
 	) {
 		this.matchesFrom = matchPath(from);
 		this.matchesTo = matchPath(to);
-		this.fragments = fragments.map((selector) => selector.trim());
+		this.fragments = this.fragments.map((selector) => selector.trim());
 	}
 
 	/**

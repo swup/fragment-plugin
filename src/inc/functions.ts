@@ -1,5 +1,5 @@
-import { Location } from 'swup';
-import type { Rule } from '../SwupFragmentPlugin.js';
+import { Location } from '../SwupFragmentPlugin.js';
+import type { Rule, Route } from '../SwupFragmentPlugin.js';
 import Logger from './Logger.js';
 
 /**
@@ -18,10 +18,10 @@ export const addClassToUnchangedFragments = (url: string) => {
 };
 
 /**
- * Updates the `href` of links matching [data-swup-fragment-link="#my-fragment"]
+ * Updates the `href` of links matching [data-swup-link-to-fragment="#my-fragment"]
  */
 export function handleDynamicFragmentLinks(logger?: Logger): void {
-	const targetAttribute = 'data-swup-fragment-link';
+	const targetAttribute = 'data-swup-link-to-fragment';
 	const links = document.querySelectorAll<HTMLAnchorElement>(`a[${targetAttribute}]`);
 
 	links.forEach((el) => {
@@ -63,6 +63,20 @@ export const cleanupAnimationAttributes = () => {
 	document.documentElement.removeAttribute('data-fragment-visit');
 };
 
+export const getValidFragments = (
+	route: Route,
+	fragments: string[],
+	logger: Logger | undefined
+): string[] => {
+	return fragments.filter((selector) => {
+		const result = validateFragment(selector, route.to);
+		if (result === true) return true;
+
+		if (logger) logger.log(result);
+		return false;
+	});
+};
+
 /**
  * Validate a fragment for a target URL. Returns either true or a string with the reason
  */
@@ -72,7 +86,7 @@ export const validateFragment = (selector: string, targetUrl: string): true | st
 	if (!el) return 'Fragment missing in current document';
 
 	if (elementMatchesFragmentUrl(el, targetUrl))
-		return `Ignoring fragment as it already matches the URL`;
+		return `Ignoring fragment as it already matches the current URL`;
 
 	return true;
 };
@@ -115,35 +129,6 @@ const normalizeUrl = (url: string) => {
 
 	return removeTrailingSlash(location.pathname) + location.search;
 };
-
-/**
- * Set the animation attributes for a rule, for scoped styling
- */
-export const setAnimationAttributes = (rule: Rule) => {
-	document.documentElement.setAttribute('data-fragment-visit', rule.name || '');
-};
-
-/**
- * Sleep for a given amount of milliseconds
- */
-export const sleep = (ms: number) => {
-	return new Promise(res => setTimeout(res, ms));
-}
-
-/**
- * Get fragments for an array of selectors
- */
-export function getFragments(selectors?: string[]): HTMLElement[] {
-	if (!selectors?.length) return [];
-
-	const fragments: HTMLElement[] = [];
-	selectors.forEach((selector) => {
-		const fragment = document.querySelector(selector);
-		if (fragment) fragments.push(fragment as HTMLElement);
-	});
-
-	return fragments;
-}
 
 /**
  * Replace fragments for a given rule

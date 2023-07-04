@@ -113,7 +113,7 @@ An array of selectors for fragments that should be replaced if the rule matches 
 
 #### `name: string` (optional)
 
-A name for the rule, for scoped styling
+A name for the rule, for scoped styling.
 
 ### Rule matching logic
 
