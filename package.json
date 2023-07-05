@@ -49,10 +49,10 @@
     "scrl": "^2.0.0"
   },
   "devDependencies": {
-    "swup": "^4.0.0-rc.14"
+    "swup": "npm:@daun/swup@^4.0.0-rc.16"
   },
   "peerDependencies": {
-    "swup": "^4.0.0"
+    "swup": "npm:@daun/swup@^4.0.0-rc.16"
   },
   "browserslist": [
     "extends @swup/browserslist-config"

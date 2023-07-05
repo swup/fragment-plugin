@@ -1,4 +1,4 @@
-import { matchPath, type Path } from '../../../swup/src/index.js';
+import { matchPath, type Path } from 'swup';
 import type { Route } from '../SwupFragmentPlugin.js';
 
 /**

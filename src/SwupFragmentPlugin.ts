@@ -1,7 +1,7 @@
 import PluginBase from '@swup/plugin';
 import Rule from './inc/Rule.js';
 
-import type { Path, Handler } from '../../swup/src/index.js';
+import type { Path, Handler } from 'swup';
 import Logger from './inc/Logger.js';
 import {
 	addClassToUnchangedFragments,
