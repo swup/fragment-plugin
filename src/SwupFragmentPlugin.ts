@@ -9,7 +9,7 @@ import {
 	cleanupFragmentUrls,
 	handleDynamicFragmentLinks,
 	updateFragmentUrlAttributes,
-	getValidFragments,
+	getValidFragments
 } from './inc/functions.js';
 
 /**
