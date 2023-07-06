@@ -39,9 +39,9 @@ export type PluginOptions = {
 /**
  * The context, available throughout every transition
  */
-type RouteInfo = {
-	rule?: Rule;
-	fragments?: string[];
+type State = {
+	rule: Rule;
+	fragments: string[];
 };
 
 /**
@@ -116,23 +116,23 @@ export default class SwupFragmentPlugin extends PluginBase {
 	}
 
 	/**
-	 * Get info about a given route. This function can also be
-	 * called from the outside.
+	 * Get the state for a given route
 	 */
-	getRouteInfo(route: Route, logger?: Logger): RouteInfo {
+	getState(route: Route, logger?: Logger): State | undefined {
 		const rule = this.getFirstMatchingRule(route);
 
 		// Bail early if no rule matched
-		if (!rule) return {};
+		if (!rule) return;
 
 		// Validate the fragments from the matched rule
 		const fragments = getValidFragments(route, rule.fragments, logger);
 
-		const info = { rule, fragments };
+		// Bail early if there are no valid fragments for the rule
+		if (!fragments.length) return;
 
-		if (logger) logger.log('Info:', info);
+		const state = { rule, fragments };
 
-		return info;
+		return state;
 	}
 
 	/**
@@ -164,27 +164,27 @@ export default class SwupFragmentPlugin extends PluginBase {
 			to: context.to!.url
 		};
 
-		const visit = this.getRouteInfo(route);
+		const state = this.getState(route, this.logger);
 
-		// Bail early if the current route doesn't match any rule
-		if (!visit.rule) return;
+		this.logger.log("fragment visit:", state);
 
-		const fragments = getValidFragments(route, visit.rule.fragments, this.logger);
-
-		// Bail early if no fragments would be replaced for the current rule
-		if (!fragments?.length) return;
+		/**
+		 * Bail early if the current route doesn't match
+		 * a rule or wouldn't replace any fragments
+		 */
+		if (!state) return;
 
 		// Disable scrolling for this transition
 		context.scroll.reset = false;
 
 		// Add a suffix to all transition classes, e.g. .is-animating--fragment, .is-leaving--fragment, ...
-		context.transition.name = visit.rule.name;
+		context.transition.name = state.rule.name;
 
 		// Add the transition classes directly to the fragments for this visit
 		context.transition.scope = 'containers';
 
 		// Overwrite the containers for this visit
-		context.containers = fragments;
+		context.containers = state.fragments;
 	};
 
 	/**
