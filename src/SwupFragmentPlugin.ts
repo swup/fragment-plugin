@@ -4,8 +4,6 @@ import Rule from './inc/Rule.js';
 import type { Path, Handler } from 'swup';
 import Logger from './inc/Logger.js';
 import {
-	addClassToUnchangedFragments,
-	cleanupAnimationAttributes,
 	cleanupFragmentUrls,
 	handleDynamicFragmentLinks,
 	updateFragmentUrlAttributes,
@@ -41,8 +39,8 @@ export type PluginOptions = {
 /**
  * The context, available throughout every transition
  */
-type PluginContext = {
-	matchedRule?: Rule;
+type RouteInfo = {
+	rule?: Rule;
 	fragments?: string[];
 };
 
@@ -97,8 +95,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 	mount() {
 		const swup = this.swup;
 
+		swup.hooks.before('samePage', this.onSamePage);
 		swup.hooks.on('transitionStart', this.onTransitionStart);
-		swup.hooks.on('transitionEnd', this.onTransitionEnd);
 		swup.hooks.on('replaceContent', this.afterReplaceContent);
 
 		updateFragmentUrlAttributes(this.rules, this.swup.getCurrentUrl());
@@ -110,30 +108,31 @@ export default class SwupFragmentPlugin extends PluginBase {
 	unmount() {
 		const swup = this.swup;
 
+		swup.hooks.off('samePage', this.onSamePage);
 		swup.hooks.off('transitionStart', this.onTransitionStart);
-		swup.hooks.off('transitionEnd', this.onTransitionEnd);
 		swup.hooks.on('replaceContent', this.afterReplaceContent);
 
 		cleanupFragmentUrls();
 	}
 
 	/**
-	 * Handles a visit from a URL to another URL
+	 * Get info about a given route. This function can also be
+	 * called from the outside.
 	 */
-	getContext(route: Route, logger?: Logger): PluginContext {
-		const matchedRule = this.getFirstMatchingRule(route);
+	getRouteInfo(route: Route, logger?: Logger): RouteInfo {
+		const rule = this.getFirstMatchingRule(route);
 
 		// Bail early if no rule matched
-		if (!matchedRule) return {};
+		if (!rule) return {};
 
 		// Validate the fragments from the matched rule
-		const fragments = getValidFragments(route, matchedRule.fragments, logger);
+		const fragments = getValidFragments(route, rule.fragments, logger);
 
-		const context = { matchedRule, fragments };
+		const info = { rule, fragments };
 
-		if (logger) logger.log('Context:', context);
+		if (logger) logger.log('Info:', info);
 
-		return context;
+		return info;
 	}
 
 	/**
@@ -144,45 +143,48 @@ export default class SwupFragmentPlugin extends PluginBase {
 	};
 
 	/**
+	 * Do not scroll if clicking on a link to the same page
+	 * and the route matches a fragment rule
+	 */
+	onSamePage: Handler<'samePage'> = (context) => {
+		const rule = this.getFirstMatchingRule({
+			from: context.from.url,
+			to: context.to!.url
+		});
+
+		if (rule) context.scroll.reset = false;
+	};
+
+	/**
 	 * Do special things if this is a fragment visit
 	 */
 	onTransitionStart: Handler<'transitionStart'> = async (context) => {
-		const swup = this.swup;
-
-		const currentRoute = {
+		const route = {
 			from: context.from.url,
 			to: context.to!.url
 		};
 
-		const { matchedRule, fragments } = this.getContext(currentRoute, this.logger);
-
-		// Add classes to fragments
-		addClassToUnchangedFragments(currentRoute.to);
+		const visit = this.getRouteInfo(route);
 
 		// Bail early if the current route doesn't match any rule
-		if (!matchedRule) return;
+		if (!visit.rule) return;
+
+		const fragments = getValidFragments(route, visit.rule.fragments, this.logger);
 
 		// Bail early if no fragments would be replaced for the current rule
 		if (!fragments?.length) return;
 
 		// Disable scrolling for this transition
-		swup.context.scroll.reset = false;
+		context.scroll.reset = false;
 
 		// Add a suffix to all transition classes, e.g. .is-animating--fragment, .is-leaving--fragment, ...
-		swup.context.transition.name = matchedRule.name;
+		context.transition.name = visit.rule.name;
 
 		// Add the transition classes directly to the fragments for this visit
-		swup.context.transition.scope = 'containers';
+		context.transition.scope = 'containers';
 
 		// Overwrite the containers for this visit
-		swup.context.containers = fragments;
-	};
-
-	/**
-	 * Reset everything after each transition
-	 */
-	onTransitionEnd = () => {
-		cleanupAnimationAttributes();
+		context.containers = fragments;
 	};
 
 	/**

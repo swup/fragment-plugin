@@ -130,4 +130,4 @@ A name for the rule, for scoped styling.
 ## DOM API
 
 - `[data-swup-fragment-url]` @TODO
-- `.swup-fragment-unchanged` @TODO
+- `[data-swup-link-to-fragment]` @TODO

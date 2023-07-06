@@ -3,21 +3,6 @@ import type { Rule, Route } from '../SwupFragmentPlugin.js';
 import Logger from './Logger.js';
 
 /**
- * Add the class ".swup-fragment-unchanged" to fragments that match a given URL
- */
-export const addClassToUnchangedFragments = (url: string) => {
-	// First, remove the class from all elements
-	document.querySelectorAll<HTMLElement>('.swup-fragment-unchanged').forEach((el) => {
-		el.classList.remove('swup-fragment-unchanged');
-	});
-	// Then, add the class to every element that matches the given URL
-	document.querySelectorAll<HTMLElement>('[data-swup-fragment-url]').forEach((el) => {
-		const fragmentUrl = el.getAttribute('data-swup-fragment-url');
-		el.classList.toggle('swup-fragment-unchanged', fragmentUrl === url);
-	});
-};
-
-/**
  * Updates the `href` of links matching [data-swup-link-to-fragment="#my-fragment"]
  */
 export function handleDynamicFragmentLinks(logger?: Logger): void {
@@ -56,13 +41,6 @@ export const updateFragmentUrlAttributes = (rules: Rule[], url: string): void =>
 	});
 };
 
-/**
- * Removes all fragment-related animation attributes from the `html` element
- */
-export const cleanupAnimationAttributes = () => {
-	document.documentElement.removeAttribute('data-fragment-visit');
-};
-
 export const getValidFragments = (
 	route: Route,
 	fragments: string[],
@@ -86,7 +64,7 @@ export const validateFragment = (selector: string, targetUrl: string): true | st
 	if (!el) return 'Fragment missing in current document';
 
 	if (elementMatchesFragmentUrl(el, targetUrl))
-		return `Ignoring fragment as it already matches the current URL`;
+		return `Ignoring fragment as it already matches the URL`;
 
 	return true;
 };
@@ -102,7 +80,7 @@ export const elementMatchesFragmentUrl = (el: Element, url: string): boolean => 
 /**
  * Checks if two URLs should be considered equal
  *
- * All these URLs would be considered the same:
+ * All these URLs would be considered to be equal:
  *
  * - /test
  * - /test/
@@ -129,45 +107,6 @@ const normalizeUrl = (url: string) => {
 
 	return removeTrailingSlash(location.pathname) + location.search;
 };
-
-/**
- * Replace fragments for a given rule
- */
-export function replaceFragments(html: string, fragments?: string[], logger?: Logger): Element[] {
-	if (!fragments) return [];
-
-	const incomingDocument = new DOMParser().parseFromString(html, 'text/html');
-	const replacedFragments: Element[] = [];
-
-	// Step 1: replace all fragments from the rule
-	fragments.forEach((selector) => {
-		const currentFragment = window.document.querySelector(selector);
-
-		// Bail early if there is no match for the selector in the current dom
-		if (!currentFragment) {
-			logger?.warn('Fragment missing in current document:', selector);
-			return;
-		}
-
-		const newFragment = incomingDocument.querySelector(selector);
-
-		// Bail early if there is no match for the selector in the incoming dom
-		if (!newFragment) {
-			logger?.warn('Fragment missing in incoming document:', selector);
-			return;
-		}
-
-		newFragment.classList.add('is-animating', 'is-entering');
-
-		currentFragment.replaceWith(newFragment);
-
-		replacedFragments.push(newFragment);
-	});
-
-	logger?.log('Replaced:', replacedFragments);
-
-	return replacedFragments;
-}
 
 /**
  * Removes [data-swup-fragment-url] from all elements
