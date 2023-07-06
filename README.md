@@ -11,7 +11,7 @@ https://swup-fragment-plugin.netlify.app
 ## Installation
 
 ```shell
-npm i swup/fragment-plugin --save
+npm i @swup/fragment-plugin --save
 ```
 
 ## Simple Example
@@ -65,9 +65,12 @@ const swup = new Swup({
   ]
 });
 ```
-During fragment visits, all the [animation classes](https://swup.js.org/getting-started/how-it-works/) from swup will be added directly to the matching fragments instead of the `html` element.
+When a rule matches for a visit, the plugin will:
 
-If the current `rule` has a `name` (e.g. "my-route"), that will be reflected as a class `.to-my-route` on the fragment.
+- overwrite the [`containers`](https://swup.js.org/options/#containers) with the rule's `fragments`
+- preserve the current scroll position
+- set the [`animationScope`](https://swup.js.org/options/#animation-scope) to `containers` for scoped animations for the fragments only
+- if the current `rule` has a `name` (e.g. "my-route"), that will be reflected as a class `.to-my-route` on the fragment.
 
 ```css
 /*
