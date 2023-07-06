@@ -16,7 +16,7 @@ npm i swup/fragment-plugin --save
 
 ## Simple Example
 
-Imagine you have an endpoint `/users/` on your site that lists a bunch of users:
+Suppose you have an endpoint `/users/` on your site that lists a bunch of users:
 
 ```html
 <!DOCTYPE html>
@@ -57,8 +57,7 @@ const swup = new Swup({
         {
           from: '/users/:filter?',
           to: '/users/:filter?',
-          fragments: ['#users'],
-          name: 'filterUsers'
+          fragments: ['#users']
         },
         // ... more complex scenarios are possible!
       ]
@@ -66,29 +65,28 @@ const swup = new Swup({
   ]
 });
 ```
-During fragment visits, the attribute `[data-fragment-visit]` will be added to the `html` tag. You can use that
-attribute to disable your default transitions for fragment visits.
+During fragment visits, all the [animation classes](https://swup.js.org/getting-started/how-it-works/) from swup will be added directly to the matching fragments instead of the `html` element.
 
-If the current `rule` has a `name` (e.g. "myRoute"), that will be reflected as `[data-fragment-visit=myRoute]`. Using that attribute, you can define custom transitions for your fragment visits:
+If the current `rule` has a `name` (e.g. "my-route"), that will be reflected as a class `.to-my-route` on the fragment.
 
 ```css
 /*
 * The default transition, for visits without a matching rule
 */
-html:not([data-fragment-visit]) .transition-main {
+html.is-changing .transition-main {
   transition: opacity 250ms;
   opacity: 1;
 }
-html:not([data-fragment-visit]).is-animating .transition-main {
+html.is-animating .transition-main {
   opacity: 0;
 }
 /*
 * The transitions for the named rule "filterUsers"
 */
-html[data-fragment-visit='filterUsers'] .transition-users {
+.transition-users.is-changing {
   transition: opacity 250ms;
 }
-html[data-fragment-visit='filterUsers'].is-animating .transition-users {
+.transition-users.is-changing {
   opacity: 0;
 }
 ```
