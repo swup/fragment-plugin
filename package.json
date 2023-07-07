@@ -44,9 +44,7 @@
     "url": "https://github.com/swup/fragment-plugin.git"
   },
   "dependencies": {
-    "@swup/plugin": "npm:@daun/swup-plugin@^3.0.0-rc.3",
-    "path-to-regexp": "^6.2.1",
-    "scrl": "^2.0.0"
+    "@swup/plugin": "npm:@daun/swup-plugin@^3.0.0-rc.3"
   },
   "devDependencies": {
     "swup": "npm:@daun/swup@^4.0.0-rc.17"
