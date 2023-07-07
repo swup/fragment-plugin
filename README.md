@@ -82,12 +82,14 @@ const swup = new Swup({
   ]
 });
 ```
-When a rule matches for a visit, the plugin will
 
-- **change** the [`containers`](https://swup.js.org/options/#containers) to the rule's `fragments`
-- **preserve** the current scroll position
-- set the [`animationScope`](https://swup.js.org/options/#animation-scope) to `containers` for **scoped animations** on the fragments only
-- if the current `rule` has a `name` (e.g. "my-route"), that will be reflected as a class `.to-my-route` on the fragment.
+When the current visit matches a fragment rule, the plugin will:
+
+- **update** only the contents of the elements defined in the rule's `fragment` key
+- **not update** the default content [containers](https://swup.js.org/options/#containers) of all other visits
+- **preserve** the current scroll position upon navigation
+- **wait** for CSS transitions on those fragment elements using [scoped animations](https://swup.js.org/options/#animation-scope)
+- add a `to-route-name` class the the elements if the current `rule` has a `name`  key
 
 ```css
 /*
@@ -100,8 +102,9 @@ html.is-changing .transition-main {
 html.is-animating .transition-main {
   opacity: 0;
 }
+
 /*
-* The transitions for the named rule "filterUsers"
+* The transitions for the named rule "users"
 */
 .transition-users.is-changing {
   transition: opacity 250ms;
@@ -111,41 +114,45 @@ html.is-animating .transition-main {
 }
 ```
 
-## JavaScript API
+## Options
 
-### Rules
+### rules
 
-Each rule consist of these properties:
+The rules that define whether a visit will be considered as a fragment visit.
+
+Each rule consists of mandatory `from` and `to` URL patterns, an array `fragments` of selectors, as
+well as an optional `name` of this rule.
 
 #### `from: string | string[]`
 
-The path before the current visit. Will be converted to a `RegExp`.
+The pattern to match against the previous URL. Converted to a regular expression via
+[path-to-regexp](https://www.npmjs.com/package/path-to-regexp).
 
 #### `to: string | string[]`
 
-The new path of the current visit. Will be converted to a `RegExp`.
+The pattern or regular expression to match against the next page.
 
 #### `fragments: string[]`
 
-An array of selectors for fragments that should be replaced if the rule matches the current visit
+An array of selectors for fragments that should be replaced if the visit matches the above patterns.
 
 #### `name: string` (optional)
 
-A name for the rule, for scoped styling.
+An optional name for this rule to allow scoped styling.
 
-### Rule matching logic
+### How rules are matched
 
 - The first matching rule in your `rules` array will be used for the current visit
 - If no `rule` matches the current visist, the default `swup.containers` will be replaced
-- `rule.from` and `rule.to` are converted to a regular expression by [pathToRegexp](https://github.com/pillarjs/path-to-regexp). If you want to create an either/or-regex, you can also provide an array of paths, for example `['/users/', '/users/filter/:filter']`
+- `rule.from` and `rule.to` are converted to a regular expression by [path-to-regexp](https://www.npmjs.com/package/path-to-regexp). If you want to create an either/or pattern, you can also provide an array of patterns, for example `['/users/', '/users/filter/:filter']`
 
-### Fragments
+### Fragment selectors
 
 - The `rule.fragments` selectors from the matching `rule` need to be present in **both the current and the incoming document**
 - For each `rule.fragments` entry, the **first** matching element in the DOM will be selected
 - The plugin will check if a fragment already matches the new URL before replacing it
 
-## DOM API
+## Markup
 
 - `[data-swup-fragment-url]` @TODO
 - `[data-swup-link-to-fragment]` @TODO
