@@ -16,7 +16,8 @@ export default class Rule {
 	) {
 		this.matchesFrom = matchPath(from);
 		this.matchesTo = matchPath(to);
-		this.fragments = this.fragments.map((selector) => selector.trim());
+		// Trim fragments and remove duplicates
+		this.fragments = [...new Set(this.fragments.map((selector) => selector.trim()))];
 	}
 
 	/**
