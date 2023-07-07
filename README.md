@@ -38,32 +38,32 @@ where the Fragment Plugin comes in.
 ```html
 <!DOCTYPE html>
 <html>
-  <title>My Website</title>
+  <title>Our Users — My Website</title>
 </html>
 <body>
-  <h1>My Website</h1>
+  <div>My Website</div>
   <nav><!-- ... --></nav>
   <div id="swup" class="transition-main">
-    <h2>Our users</h2>
+    <h1>Our Users</h1>
     <main id="users" class="transition-users">
       <!-- A list of filters for the users -->
       <ul>
-        <a href="/users/filter1">Filter 1</a>
-        <a href="/users/filter2">Filter 2</a>
-        <a href="/users/filter3">Filter 2</a>
+        <a href="/users/filter/1/">Filter 1</a> <!-- Clicking here should update the list below -->
+        <a href="/users/filter/2/">Filter 2</a>
+        <a href="/users/filter/3/">Filter 2</a>
       </ul>
       <!-- The list of users, different for each filter -->
       <ul>
-        <li><a href="/user/user1/">User 1</a></li>
-        <li><a href="/user/user2/">User 2</a></li>
-        <li><a href="/user/user3/">User 3</a></li>
+        <li><a href="/user/1/">User 1</a></li>
+        <li><a href="/user/2/">User 2</a></li>
+        <li><a href="/user/3/">User 3</a></li>
       </ul>
     </main>
   </div>
 </body>
 ```
 
-Now you can tell Fragment Plugin to **only** replace `#users` when clicking one of the filters:
+You can tell the Fragment Plugin to **only** update the `#users` list when clicking one of the filters:
 
 ```js
 const swup = new Swup({
