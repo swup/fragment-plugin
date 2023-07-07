@@ -1,6 +1,6 @@
 # Swup Fragment Plugin
 
-Replace page fragments instead of swup's default `containers`, based on user-defined rules
+A [swup](https://swup.js.org) plugin for selectively updating dynamic fragments.
 
 ⚠️ **Please Note**: This plugin is not stable yet and should not be used in production.
 
