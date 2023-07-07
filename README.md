@@ -10,13 +10,28 @@ https://swup-fragment-plugin.netlify.app
 
 ## Installation
 
-```shell
-npm i @swup/fragment-plugin --save
+Install the plugin from npm and import it into your bundle.
+
+```bash
+npm install @swup/fragment-plugin
 ```
 
-## Simple Example
+```js
+import SwupFragmentPlugin from '@swup/fragment-plugin';
+```
 
-Suppose you have an endpoint `/users/` on your site that lists a bunch of users:
+Or include the minified production file from a CDN:
+
+```html
+<script src="https://unpkg.com/@swup/fragment-plugin@1"></script>
+```
+
+## Example
+
+Suppose you have a route `/users/` on your site that renders a list of users. A filter UI
+allows selecting criteria for filtering the user list. Selecting a filter ideally won't
+trigger a full page reload — the only thing that has changed is the list of users itself. This is
+where the Fragment Plugin comes in.
 
 ```html
 <!DOCTYPE html>
