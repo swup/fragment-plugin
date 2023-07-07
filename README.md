@@ -2,11 +2,13 @@
 
 A [swup](https://swup.js.org) plugin for selectively updating dynamic fragments.
 
-⚠️ **Please Note**: This plugin is not stable yet and should not be used in production.
+- Replace dynamic fragments instead of swup's default containers, based on custom rules
+- Whereas content containers typically encompass the main content areas, fragments focus on smaller more dynamic elements within those containers, holding atomic pieces of information
+- Useful for scenarios like filter results or detail overlays, where only certain parts of the page need refreshing on each visit
 
-### Demo
+## Demo
 
-https://swup-fragment-plugin.netlify.app
+[See the plugin in action](https://swup-fragment-plugin.netlify.app) in this interactive demo.
 
 ## Installation
 
