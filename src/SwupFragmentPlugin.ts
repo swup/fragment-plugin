@@ -185,6 +185,9 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		// Overwrite the containers for this visit
 		context.containers = state.fragments;
+
+		// Overwrite the animationSelector for this visit
+		context.transition.selector = state.fragments.join(',');
 	};
 
 	/**
