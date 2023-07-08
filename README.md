@@ -18,6 +18,8 @@ npm i @swup/fragment-plugin --save
 
 Suppose you have an endpoint `/users/` on your site that lists a bunch of users:
 
+### HTML
+
 ```html
 <!DOCTYPE html>
 <html>
@@ -28,7 +30,7 @@ Suppose you have an endpoint `/users/` on your site that lists a bunch of users:
   <nav><!-- ... --></nav>
   <div id="swup" class="transition-main">
     <h2>Our users</h2>
-    <main id="users" class="transition-users">
+    <main id="users">
       <!-- A list of filters for the users -->
       <ul>
         <a href="/users/filter1">Filter 1</a>
@@ -45,6 +47,8 @@ Suppose you have an endpoint `/users/` on your site that lists a bunch of users:
   </div>
 </body>
 ```
+
+### JavaScript
 
 Now you can tell Fragment Plugin to **only** replace `#users` when clicking one of the filters:
 
@@ -69,14 +73,19 @@ When a rule matches for a visit, the plugin will
 
 - **change** the [`containers`](https://swup.js.org/options/#containers) to the rule's `fragments`
 - **preserve** the current scroll position
-- set the [`animationScope`](https://swup.js.org/options/#animation-scope) to `containers` for **scoped animations** on the fragments only
+- set the [`animationScope`](https://swup.js.org/options/#animation-scope) to `containers` for **scoped animations** on the fragments only (see [CSS](#css) below)
 - if the current `rule` has a `name` (e.g. "my-route"), that will be reflected as a class `.to-my-route` on the fragment.
+- If a fragment already matches the current visit's URL, it **will be ignored for that visit**
+
+### CSS
+
+Now you can add custom animations for your fragment rule:
 
 ```css
 /*
-* The default transition, for visits without a matching rule
+* The default animation, for visits without a matching rule
 */
-html.is-changing .transition-main {
+.transition-main {
   transition: opacity 250ms;
   opacity: 1;
 }
@@ -84,15 +93,17 @@ html.is-animating .transition-main {
   opacity: 0;
 }
 /*
-* The transitions for the named rule "filterUsers"
+* The animation when filtering users
 */
-.transition-users.is-changing {
+#users.is-changing {
   transition: opacity 250ms;
 }
-.transition-users.is-changing {
+#users.is-changing {
   opacity: 0;
 }
 ```
+
+[Learn more about the CSS API](https://swup-fragment-plugin.netlify.app/how-it-works/#css-api)
 
 ## JavaScript API
 
@@ -124,11 +135,19 @@ A name for the rule, for scoped styling.
 
 ### Fragments
 
-- The `rule.fragments` selectors from the matching `rule` need to be present in **both the current and the incoming document**
+- The `rule.fragments` elements from the matching `rule` need to be present in **both the current and the incoming document**
 - For each `rule.fragments` entry, the **first** matching element in the DOM will be selected
 - The plugin will check if a fragment already matches the new URL before replacing it
 
 ## DOM API
 
-- `[data-swup-fragment-url]` @TODO
-- `[data-swup-link-to-fragment]` @TODO
+### `[data-swup-fragment-url="/path/to/page/"]`
+
+If you provide this attribute on one of your fragments from the server, you can tell the plugin to persist that fragment when navigating to the given URL. For example: `[data-swup-fragment-url="/users/"]`
+
+
+### `a[data-swup-link-to-fragment="#my-fragment"]`
+
+Tell a link to be synced to a fragment's URL on every visit.
+
+[Learn more about the DOM API](https://swup-fragment-plugin.netlify.app/how-it-works/#dom-api)
