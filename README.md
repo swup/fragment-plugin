@@ -126,7 +126,7 @@ html.is-animating .transition-main {
 export type PluginOptions = {
   rules: Array<{
     from: string | string[];
-    from: string | string[];
+    to: string | string[];
     fragments: string[];
     name?: string;
   }>;
