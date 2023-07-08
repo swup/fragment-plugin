@@ -154,6 +154,13 @@ expressions by [path-to-regexp](https://www.npmjs.com/package/path-to-regexp).
 }
 ```
 
+### (List)
+
+- `from`, required, `string | string[]` — The pattern(s) to match against the previous URL
+- `to`, required, `string | string[]` — The pattern(s) to match against the next URL
+- `fragments`, required, `string[]` — Selectors of containers to be replaced if the visit matches
+- `name`, optional, `string` — A name for this rule to allow scoped styling, ideally in kebab-case
+
 ### (Table)
 
 |    Param    | Required |         Type         |                             Description                             |
@@ -162,13 +169,6 @@ expressions by [path-to-regexp](https://www.npmjs.com/package/path-to-regexp).
 | `to`        | required | `string \| string[]` | The pattern(s) to match against the next URL                        |
 | `fragments` | required | `string[]`           | Selectors of containers to be replaced if the visit matches         |
 | `name`      | optional | `string`             | A name for this rule to allow scoped styling, ideally in kebab-case |
-
-### (List)
-
-- `from`, required, `string | string[]` — The pattern(s) to match against the previous URL
-- `to`, required, `string | string[]` — The pattern(s) to match against the next URL
-- `fragments`, required, `string[]` — Selectors of containers to be replaced if the visit matches
-- `name`, optional, `string` — A name for this rule to allow scoped styling, ideally in kebab-case
 
 ### (Headings)
 
