@@ -38,7 +38,7 @@ Or include the minified production file from a CDN:
 
 ## How it works
 
-When a visit is determinded to be a fragment visit, the plugin will:
+When a visit is determined to be a fragment visit, the plugin will:
 
 - **update only** the contents of the elements defined in the rule's `fragments`
 - **not update** the default content [containers](https://swup.js.org/options/#containers) replaced on all other visits
