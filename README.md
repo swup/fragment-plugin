@@ -206,17 +206,48 @@ Type: `boolean`. Set to `true` for debug information in the console. Defaults to
 - The rule's `from` and `to` patterns are converted to a regular expression by [path-to-regexp](https://www.npmjs.com/package/path-to-regexp). If you want to create an either/or pattern, you can also provide an array of patterns, for example `['/users/', '/users/filter/:filter']`
 - If no rule matches the current visit, the default content containers defined in swup's options will be replaced
 
-## Fragment containers
+## How fragment containers are found
 
 - The `fragments` of the matching rule need to be present in **both the current and the incoming document**
 - For each selector in the `fragments` array, the **first** matching element in the DOM will be selected
 - The plugin will check if a fragment already matches the new URL before replacing it
 
-## DOM API
+## Advanced use cases
 
-### `[data-swup-fragment-url]` @TODO
+Creating the rules for your fragment visits should be enough to enable dynamic updates on most
+sites. However, there are some advanced use cases that require adding certain attributes to the
+fragments themselves or to links on the page. These tend to be situations where overlays are
+involved and swup doesn't know which page the overlay was opened from.
 
-If you provide this attribute on one of your fragments from the server, you can tell the plugin to persist that fragment when navigating to the given URL. For example: `[data-swup-fragment-url="/users/"]`
+### Fragment URL
+
+Use the `data-swup-fragment-url` attribute to uniquely identify fragments.
+
+In scenarios where overlays are rendered on top of other content, leaving or closing the overlay to
+the exact same URL it was opened from should ideally not update the content below the overlay as
+nothing has changed. The fragment plugin will normally do that by keeping track of URLs. However,
+when swup was initialized on a subpage with a visible overlay, the plugin doesn't know which URL
+the overlaid content corresponds to. Hence, we need to tell it manually so it can ignore content
+updates without changes.
+
+```html
+<section data-swup-fragment-url="/users/">
+  <ul>
+    <li>User 1</li>
+    <li>User 2</li>
+    <li>User 3</li>
+  </ul>
+</section>
+
+<article data-swup-fragment-url="/user/1/">
+  <h1>User 1</h1>
+  <p>Lorem ipsum dolor sit amet...</p>
+</article>
+```
+
+### Link to fragment
+
+In the previous
 
 ### `[data-swup-link-to-fragment]` @TODO
 
