@@ -30,10 +30,15 @@ Or include the minified production file from a CDN:
 
 ## Example
 
-Suppose you have a route `/users/` on your site that renders a list of users. A filter UI
-allows selecting criteria for filtering the user list. Selecting a filter ideally won't
-trigger a full page reload — the only thing that has changed is the list of users itself. This is
-where the Fragment Plugin comes in.
+The two prime use cases are content filters and detail overlays.
+
+### Content filter: only update results
+
+A website has a page `/users/` that displays a list of users. Above the user list, there
+is a filter UI to choose which users to display. Selecting a filter will trigger a normal page visit
+to the narrowed-down user list, e.g. `/users/filter/x/`. The only part that has changed is the
+list of users, so that's what we'd like to replace and animate instead of the whole content
+container. The Fragment Plugin automates this process of selectively updating page fragments.
 
 ```html
 <!DOCTYPE html>
@@ -41,35 +46,33 @@ where the Fragment Plugin comes in.
   <title>Our Users — My Website</title>
 </html>
 <body>
-  <div>My Website</div>
+  <header>My Website</header>
   <nav><!-- ... --></nav>
-  <div id="swup" class="transition-main">
+  <main id="swup" class="transition-main">
     <h1>Our Users</h1>
-    <main id="users" class="transition-users">
-      <!-- A list of filters for the users -->
-      <ul>
-        <a href="/users/filter/1/">Filter 1</a> <!-- Clicking here should update the list below -->
-        <a href="/users/filter/2/">Filter 2</a>
-        <a href="/users/filter/3/">Filter 2</a>
-      </ul>
-      <!-- The list of users, different for each filter -->
-      <ul>
-        <li><a href="/user/1/">User 1</a></li>
-        <li><a href="/user/2/">User 2</a></li>
-        <li><a href="/user/3/">User 3</a></li>
-      </ul>
-    </main>
-  </div>
+    <!-- A list of filters for the users: selecting one will update the list below -->
+    <ul>
+      <a href="/users/filter/1/">Filter 1</a>
+      <a href="/users/filter/2/">Filter 2</a>
+      <a href="/users/filter/3/">Filter 2</a>
+    </ul>
+    <!-- The list of users, different for each filter -->
+    <ul id="users" class="transition-users">
+      <li><a href="/user/1/">User 1</a></li>
+      <li><a href="/user/2/">User 2</a></li>
+      <li><a href="/user/3/">User 3</a></li>
+    </ul>
+  </main>
 </body>
 ```
 
-You can tell the Fragment Plugin to **only** update the `#users` list when clicking one of the filters:
+Using the Fragment Plugin, we can **only** update the `#users` list when clicking one of the filters.
+The plugin expects an array of rules to recognize and handle fragment visits.
 
 ```js
 const swup = new Swup({
   plugins: [
     new SwupFragmentPlugin({
-      // The plugin expects an array of rules:
       rules: [
         {
           from: '/users/:filter?',
@@ -83,13 +86,15 @@ const swup = new Swup({
 });
 ```
 
+## How it works
+
 When the current visit matches a fragment rule, the plugin will:
 
 - **update** only the contents of the elements defined in the rule's `fragment` key
-- **not update** the default content [containers](https://swup.js.org/options/#containers) of all other visits
-- **preserve** the current scroll position upon navigation
+- **not update** the default content [containers](https://swup.js.org/options/#containers) replaced on all other visits
 - **wait** for CSS transitions on those fragment elements using [scoped animations](https://swup.js.org/options/#animation-scope)
-- add a `to-route-name` class the the elements if the current `rule` has a `name`  key
+- add a `to-fragment-[name]` class to the elements if the current `rule` has a `name`  key
+- **preserve** the current scroll position upon navigation
 
 ```css
 /*
