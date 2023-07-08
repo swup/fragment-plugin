@@ -103,7 +103,7 @@ html.is-animating .transition-main {
 }
 ```
 
-[Learn more about the CSS API](https://swup-fragment-plugin.netlify.app/how-it-works/#css-api)
+[See a complex example](https://swup-fragment-plugin.netlify.app/how-it-works/#css)
 
 ## JavaScript API
 
@@ -150,4 +150,4 @@ If you provide this attribute on one of your fragments from the server, you can 
 
 Tell a link to be synced to a fragment's URL on every visit.
 
-[Learn more about the DOM API](https://swup-fragment-plugin.netlify.app/how-it-works/#dom-api)
+[See example code here](https://swup-fragment-plugin.netlify.app/how-it-works/#dom)
