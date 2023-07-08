@@ -238,7 +238,6 @@ updates without changes.
     <li>User 3</li>
   </ul>
 </section>
-
 <article data-swup-fragment-url="/user/1/">
   <h1>User 1</h1>
   <p>Lorem ipsum dolor sit amet...</p>
@@ -247,8 +246,27 @@ updates without changes.
 
 ### Link to fragment
 
-In the previous
+Use the `data-swup-link-to-fragment` attribute to automatically update links pointing to a fragment.
 
-### `[data-swup-link-to-fragment]` @TODO
+Consider again an overlay rendered on top of other content. To implement a close button for that
+overlay, we could ideally point a link at the URL of the content where the overlay was closed. The
+fragment plugin will then handle the animation and replacing of the overlay. However, knowing
+where to point that link requires knowing where the current overlay was opened from.
 
-Tell a link to be synced to a fragment's URL on every visit.
+This attribute automates that by keeping the `href` attribute of any link in sync with the currently
+tracked URL of the fragment matching that selector. The code below will make sure the close button
+will always point at the last known URL of the `#list` fragment to allow easy closing of the overlay.
+
+```html
+<section id="list">
+  <ul>
+    <li>User 1</li>
+    <li>User 2</li>
+    <li>User 3</li>
+  </ul>
+</section>
+<article id="overlay">
+  <a href="" data-swup-link-to-fragment="#list">Close</a>
+  <h1>User 1</h1>
+  <p>Lorem ipsum dolor sit amet...</p>
+</article>
