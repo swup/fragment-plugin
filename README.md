@@ -51,7 +51,7 @@ When a visit is determined to be a fragment visit, the plugin will:
 
 ### Content filter: only update list of results
 
-A website has a page `/users/` that displays a list of users. Above the user list, there
+Imagine a website with a `/users/` page that displays a list of users. Above the user list, there
 is a filter UI to choose which users to display. Selecting a filter will trigger a visit
 to the narrowed-down user list at `/users/filter/x/`. The only part that has changed is the
 list of users, so that's what we'd like to replace and animate instead of the whole content
@@ -136,7 +136,7 @@ export type PluginOptions = {
 
 ### rules
 
-The rules that define whether a visit will be considered as a fragment visit. Each rule consists of
+The rules that define whether a visit will be considered a fragment visit. Each rule consists of
 mandatory `from` and `to` URL patterns, an array `fragments` of selectors, as well as an optional
 `name` of this rule to allow precise styling. The from/to patterns are converted to regular
 expressions by [path-to-regexp](https://www.npmjs.com/package/path-to-regexp).
