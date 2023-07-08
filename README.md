@@ -9,7 +9,7 @@ A [swup](https://swup.js.org) plugin for selectively updating dynamic fragments.
 ## Use cases
 
 Both of the following two scenarios require updating only a small content fragment instead of
-performing a full page transition.
+performing a full page transition:
 
 - a filter UI that live-updates its list of results on every interaction
 - a detail overlay that shows on top of the currently open content
@@ -49,7 +49,7 @@ When a visit is determined to be a fragment visit, the plugin will:
 
 ## Example
 
-### Content filter: only update list of results
+### Content filter: only update a list of results
 
 Imagine a website with a `/users/` page that displays a list of users. Above the user list, there
 is a filter UI to choose which users to display. Selecting a filter will trigger a visit
@@ -79,7 +79,7 @@ container.
 ```
 
 Using the Fragment Plugin, we can update **only** the `#users` list when clicking one of the filters.
-The plugin expects an array of rules to recognize and handle fragment visits.
+The plugin expects an array of rules to recognize and handle fragment visits:
 
 ```js
 const swup = new Swup({
@@ -95,7 +95,7 @@ const swup = new Swup({
 });
 ```
 
-Now you can add custom animations for your fragment rule:
+Now we can add custom animations for our fragment rule:
 
 ```css
 /*
@@ -137,9 +137,10 @@ export type PluginOptions = {
 ### rules
 
 The rules that define whether a visit will be considered a fragment visit. Each rule consists of
-mandatory `from` and `to` URL patterns, an array `fragments` of selectors, as well as an optional
-`name` of this rule to allow scoped styling. The from/to patterns are interpreted and follow the
-syntax established by [path-to-regexp](https://www.npmjs.com/package/path-to-regexp).
+mandatory `from` and `to` URL paths, an array `fragments` of selectors, as well as an optional
+`name` of this rule to allow scoped styling.
+
+The rule's `from`/`to` paths are converted to a regular expression by [path-to-regexp](https://github.com/pillarjs/path-to-regexp) and matched against the current browser URL. If you want to create an either/or path, you can also provide an array of paths, for example `['/users/', '/users/filter/:filter']`.
 
 ```js
 {
@@ -154,41 +155,12 @@ syntax established by [path-to-regexp](https://www.npmjs.com/package/path-to-reg
 }
 ```
 
-### (List)
-
-- `from`, required, `string | string[]` — The pattern(s) to match against the previous URL
-- `to`, required, `string | string[]` — The pattern(s) to match against the next URL
-- `fragments`, required, `string[]` — Selectors of containers to be replaced if the visit matches
-- `name`, optional, `string` — A name for this rule to allow scoped styling, ideally in kebab-case
-
-### (Table)
-
 |    Param    | Required |         Type         |                             Description                             |
 | ----------- | -------- | -------------------- | ------------------------------------------------------------------- |
-| `from`      | required | `string \| string[]` | The pattern(s) to match against the previous URL                    |
-| `to`        | required | `string \| string[]` | The pattern(s) to match against the next URL                        |
+| `from`      | required | `string \| string[]` | The path(s) to match against the previous URL                    |
+| `to`        | required | `string \| string[]` | The path(s) to match against the next URL                        |
 | `fragments` | required | `string[]`           | Selectors of containers to be replaced if the visit matches         |
 | `name`      | optional | `string`             | A name for this rule to allow scoped styling, ideally in kebab-case |
-
-### (Headings)
-
-#### from
-
-**Required**. Type: `string | string[]`. The pattern to match against the previous URL. Converted
-to a regular expression via [path-to-regexp](https://www.npmjs.com/package/path-to-regexp).
-
-#### to
-
-**Required**. Type: `string | string[]`. The pattern or regular expression to match against the next page.
-
-#### fragments
-
-**Required**. Type: `string[]`. An array of selectors for fragments to be replaced if the visit
-matches the above patterns.
-
-#### name
-
-Optional. Type: `string`. An optional name for this rule to allow scoped styling, ideally in kebab-case.
 
 ### debug
 
@@ -203,7 +175,6 @@ Type: `boolean`. Set to `true` for debug information in the console. Defaults to
 ## How rules are matched
 
 - The first matching rule in your `rules` array will be used for the current visit
-- The rule's `from` and `to` patterns are converted to a regular expression by [path-to-regexp](https://www.npmjs.com/package/path-to-regexp). If you want to create an either/or pattern, you can also provide an array of patterns, for example `['/users/', '/users/filter/:filter']`
 - If no rule matches the current visit, the default content containers defined in swup's options will be replaced
 
 ## How fragment containers are found
@@ -231,14 +202,14 @@ the overlaid content corresponds to. Hence, we need to tell it manually so it ca
 updates without changes.
 
 ```html
-<section data-swup-fragment-url="/users/">
+<section id="list" data-swup-fragment-url="/users/">
   <ul>
     <li>User 1</li>
     <li>User 2</li>
     <li>User 3</li>
   </ul>
 </section>
-<article data-swup-fragment-url="/user/1/">
+<article id="overlay">
   <h1>User 1</h1>
   <p>Lorem ipsum dolor sit amet...</p>
 </article>
@@ -253,12 +224,12 @@ overlay, we could ideally point a link at the URL of the content where the overl
 fragment plugin will then handle the animation and replacing of the overlay. However, knowing
 where to point that link requires knowing where the current overlay was opened from.
 
-This attribute automates that by keeping the `href` attribute of any link in sync with the currently
-tracked URL of the fragment matching that selector. The code below will make sure the close button
-will always point at the last known URL of the `#list` fragment to allow easy closing of the overlay.
+`data-swup-link-to-fragment` automates that by keeping the `href` attribute of a link in sync with the currently
+tracked URL of the fragment matching the selector provided by the attribute. The code below will make sure the close button
+will always point at the last known URL of the `#list` fragment to allow seamlessly closing the overlay. To keep your markup semantic and accessible, you should still provide a default value for the `href` attribute of the link.
 
 ```html
-<section id="list">
+<section id="list" data-swup-fragment-url="/users/">
   <ul>
     <li>User 1</li>
     <li>User 2</li>
@@ -266,7 +237,9 @@ will always point at the last known URL of the `#list` fragment to allow easy cl
   </ul>
 </section>
 <article id="overlay">
-  <a href="" data-swup-link-to-fragment="#list">Close</a>
+  <a href="/users/" data-swup-link-to-fragment="#list">Close</a>
   <h1>User 1</h1>
   <p>Lorem ipsum dolor sit amet...</p>
 </article>
+```
+
