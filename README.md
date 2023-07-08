@@ -137,6 +137,18 @@ export type PluginOptions = {
 ### rules
 
 The rules that define whether a visit will be considered as a fragment visit.
+```js
+{
+  rules: [
+    {
+      from: '/users/:filter?',
+      to: '/users/:filter?',
+      fragments: ['#users'],
+      name: 'list'
+    }
+  ]
+}
+```
 
 Each rule consists of mandatory `from` and `to` URL patterns, an array `fragments` of selectors, as
 well as an optional `name` of this rule to allow precise styling.
