@@ -108,35 +108,61 @@ html.is-animating .transition-main {
 
 [See a more complex example](https://swup-fragment-plugin.netlify.app/how-it-works/#css)
 
-## JavaScript API
+## Options
 
-### Rules
+```typescript
+export type PluginOptions = {
+	rules: Array<{
+		from: Path;
+		to: Path;
+		fragments: string[];
+		name?: string;
+	}>;
+	debug?: boolean;
+};
+```
 
-Each rule consist of these properties:
+### rules
 
-#### `from: string | string[]`
+An array of rules consisting of these properties:
+
+#### from (required)
+
+Type: `string | string[]`
 
 The path before the current visit. Will be converted to a `RegExp`.
 
-#### `to: string | string[]`
+#### to (required)
+
+Type: `string | string[]`
 
 The new path of the current visit. Will be converted to a `RegExp`.
 
-#### `fragments: string[]`
+#### fragments (required)
+
+Type: `string[]`
 
 An array of selectors for fragments that should be replaced if the rule matches the current visit
 
-#### `name: string` (optional)
+#### name (optional)
 
-A name for the rule, for scoped styling.
+Type: `string`
 
-### Rule matching logic
+A name for the rule for scoped styling, ideally in kebab-case.
+
+### debug
+
+Type: `boolean`, default: 'false'
+
+Set this to `true` for debug information in the console.
+
+## Rule matching logic
 
 - The first matching rule in your `rules` array will be used for the current visit
 - If no `rule` matches the current visist, the default `swup.containers` will be replaced
 - `rule.from` and `rule.to` are converted to a regular expression by [pathToRegexp](https://github.com/pillarjs/path-to-regexp). If you want to create an either/or-regex, you can also provide an array of paths, for example `['/users/', '/users/filter/:filter']`
 
-### Fragments
+## Fragments
 
 - The `rule.fragments` elements from the matching `rule` need to be present in **both the current and the incoming document**
 - For each `rule.fragments` entry, the **first** matching element in the DOM will be selected
