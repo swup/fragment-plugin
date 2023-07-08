@@ -110,7 +110,7 @@ html.is-animating .transition-main {
 }
 
 /*
-* The animation for the fragment rule named "users"
+* The animation when filtering users
 */
 #users.is-changing {
   transition: opacity 250ms;
@@ -138,8 +138,8 @@ export type PluginOptions = {
 
 The rules that define whether a visit will be considered a fragment visit. Each rule consists of
 mandatory `from` and `to` URL patterns, an array `fragments` of selectors, as well as an optional
-`name` of this rule to allow precise styling. The from/to patterns are converted to regular
-expressions by [path-to-regexp](https://www.npmjs.com/package/path-to-regexp).
+`name` of this rule to allow scoped styling. The from/to patterns are interpreted and follow the
+syntax established by [path-to-regexp](https://www.npmjs.com/package/path-to-regexp).
 
 ```js
 {
