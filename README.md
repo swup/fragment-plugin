@@ -171,9 +171,15 @@ matches the above patterns.
 
 Optional. Type: `string`. An optional name for this rule to allow scoped styling, ideally in kebab-case.
 
-#### debug
+### debug
 
-Type: `boolean`. Set this to `true` for debug information in the console. Defaults to `false`.
+Type: `boolean`. Set to `true` for debug information in the console. Defaults to `false`.
+
+```js
+{
+  debug: true
+}
+```
 
 ## How rules are matched
 
