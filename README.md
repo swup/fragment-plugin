@@ -69,6 +69,9 @@ const swup = new Swup({
   ]
 });
 ```
+
+[See a more complex example](https://swup-fragment-plugin.netlify.app/how-it-works/#js)
+
 When a rule matches for a visit, the plugin will
 
 - **change** the [`containers`](https://swup.js.org/options/#containers) to the rule's `fragments`
@@ -103,7 +106,7 @@ html.is-animating .transition-main {
 }
 ```
 
-[See a complex example](https://swup-fragment-plugin.netlify.app/how-it-works/#css)
+[See a more complex example](https://swup-fragment-plugin.netlify.app/how-it-works/#css)
 
 ## JavaScript API
 
