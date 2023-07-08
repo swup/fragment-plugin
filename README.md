@@ -62,7 +62,7 @@ const swup = new Swup({
           from: '/users/:filter?',
           to: '/users/:filter?',
           fragments: ['#users']
-        },
+        }
         // ... more complex scenarios are possible!
       ]
     })
@@ -108,17 +108,17 @@ html.is-animating .transition-main {
 
 [See a more complex example](https://swup-fragment-plugin.netlify.app/how-it-works/#css)
 
-## Options
+## Plugin Options
 
 ```typescript
 export type PluginOptions = {
-	rules: Array<{
-		from: Path;
-		to: Path;
-		fragments: string[];
-		name?: string;
-	}>;
-	debug?: boolean;
+  rules: Array<{
+    from: string | string[];
+    to: string | string[];
+    fragments: string[];
+    name?: string;
+  }>;
+  debug?: boolean;
 };
 ```
 
@@ -128,7 +128,7 @@ An array of rules consisting of these properties:
 
 #### from (required)
 
-Type: `string | string[]`
+Type: `string | string[]`
 
 The path before the current visit. Will be converted to a `RegExp`.
 
@@ -173,7 +173,6 @@ Set this to `true` for debug information in the console.
 ### `[data-swup-fragment-url="/path/to/page/"]`
 
 If you provide this attribute on one of your fragments from the server, you can tell the plugin to persist that fragment when navigating to the given URL. For example: `[data-swup-fragment-url="/users/"]`
-
 
 ### `a[data-swup-link-to-fragment="#my-fragment"]`
 
