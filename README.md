@@ -155,12 +155,10 @@ The rule's `from`/`to` paths are converted to a regular expression by [path-to-r
 }
 ```
 
-|    Param    | Required |         Type         |                             Description                             |
-| ----------- | -------- | -------------------- | ------------------------------------------------------------------- |
-| `from`      | required | `string \| string[]` | The path(s) to match against the previous URL                    |
-| `to`        | required | `string \| string[]` | The path(s) to match against the next URL                        |
-| `fragments` | required | `string[]`           | Selectors of containers to be replaced if the visit matches         |
-| `name`      | optional | `string`             | A name for this rule to allow scoped styling, ideally in kebab-case |
+- **`from`**: Required, Type: `string | string[]` – The path(s) to match against the previous URL
+- **`to`**: Required, Type: `string | string[]` – The path(s) to match against the next URL
+- **`fragments`**: Required, Type: `string[]` – Selectors of containers to be replaced if the visit matches
+- **`name`**: Optional, Type: `string` – A name for this rule to allow scoped styling, ideally in kebab-case
 
 ### debug
 
