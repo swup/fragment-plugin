@@ -224,7 +224,7 @@ involved and swup doesn't know which page the overlay was opened from.
 Use the `data-swup-fragment-url` attribute to uniquely identify fragments.
 
 In scenarios where overlays are rendered on top of other content, leaving or closing the overlay to
-the exact same URL it was opened from should ideally not update the content below the overlay as
+the same URL it was opened from should ideally not update the content below the overlay as
 nothing has changed. The fragment plugin will normally do that by keeping track of URLs. However,
 when swup was initialized on a subpage with a visible overlay, the plugin doesn't know which URL
 the overlaid content corresponds to. Hence, we need to tell it manually so it can ignore content
