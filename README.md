@@ -249,7 +249,7 @@ updates without changes.
 Use the `data-swup-link-to-fragment` attribute to automatically update links pointing to a fragment.
 
 Consider again an overlay rendered on top of other content. To implement a close button for that
-overlay, we could ideally point a link at the URL of the content where the overlay was closed. The
+overlay, we could ideally point a link at the URL of the content where the overlay is closed. The
 fragment plugin will then handle the animation and replacing of the overlay. However, knowing
 where to point that link requires knowing where the current overlay was opened from.
 
