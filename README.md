@@ -70,7 +70,7 @@ const swup = new Swup({
 });
 ```
 
-[See a more complex example](https://swup-fragment-plugin.netlify.app/how-it-works/#js)
+[See a more complex example](https://swup-fragment-plugin.netlify.app/how-it-works/#javascript)
 
 When a rule matches for a visit, the plugin will
 
