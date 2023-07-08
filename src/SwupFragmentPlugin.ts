@@ -19,20 +19,15 @@ type Route = {
 };
 
 /**
- * This is being used in the type PluginOptions
- */
-type RuleOptions = {
-	from: Path;
-	to: Path;
-	fragments: string[];
-	name?: string;
-};
-
-/**
  * The Plugin Options
  */
 export type PluginOptions = {
-	rules: RuleOptions[];
+	rules: Array<{
+		from: Path;
+		to: Path;
+		fragments: string[];
+		name?: string;
+	}>;
 	debug?: boolean;
 };
 
@@ -164,7 +159,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		const state = this.getState(route, this.logger);
 
-		this.logger.log("fragment visit:", state);
+		this.logger.log('fragment visit:', state);
 
 		/**
 		 * Bail early if the current route doesn't match
