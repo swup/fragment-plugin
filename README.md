@@ -45,11 +45,11 @@ When a visit is determinded to be a fragment visit, the plugin will:
 - **wait** for CSS transitions on those fragment elements using [scoped animations](https://swup.js.org/options/#animation-scope)
 - **preserve** the current scroll position upon navigation
 - add a `to-fragment-[name]` class to the elements if the current `rule` has a `name`  key
-- ignore the visit completely if a fragment already matches the current visit's URL
+- **ignore** the visit completely if a fragment already matches the current visit's URL
 
 ## Example
 
-### Content filter: only update results
+### Content filter: only update list of results
 
 A website has a page `/users/` that displays a list of users. Above the user list, there
 is a filter UI to choose which users to display. Selecting a filter will trigger a visit
