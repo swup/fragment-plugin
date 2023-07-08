@@ -136,7 +136,11 @@ export type PluginOptions = {
 
 ### rules
 
-The rules that define whether a visit will be considered as a fragment visit.
+The rules that define whether a visit will be considered as a fragment visit. Each rule consists of
+mandatory `from` and `to` URL patterns, an array `fragments` of selectors, as well as an optional
+`name` of this rule to allow precise styling. The from/to patterns are converted to regular
+expressions by [path-to-regexp](https://www.npmjs.com/package/path-to-regexp).
+
 ```js
 {
   rules: [
