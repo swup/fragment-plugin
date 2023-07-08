@@ -58,6 +58,11 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 	logger: Logger;
 
+	defaults: PluginOptions = {
+		rules: [],
+		debug: false
+	};
+
 	/**
 	 * Plugin Constructor
 	 * The options are NOT optional and need to contain at least a `rules` property
@@ -65,15 +70,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 	constructor(options: PluginOptions) {
 		super();
 
-		const defaults: PluginOptions = {
-			rules: [],
-			debug: false
-		};
+		this.options = { ...this.defaults, ...options };
 
-		this.options = {
-			...defaults,
-			...options
-		};
 		this.logger = new Logger({
 			prefix: '[@swup/fragment-plugin]',
 			muted: this.options.debug !== true

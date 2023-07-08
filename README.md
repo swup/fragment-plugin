@@ -1,100 +1,114 @@
 # Swup Fragment Plugin
 
-Replace page fragments instead of swup's default `containers`, based on user-defined rules
+A [swup](https://swup.js.org) plugin for selectively updating dynamic fragments.
 
-⚠️ **Please Note**: This plugin is not stable yet and should not be used in production.
+- Replace dynamic fragments instead of the main content container, based on custom rules
+- Improve orientation by animating only the parts of the page that have actually changed
+- Give your site the polish and snappiness of a single-page app
 
-### Demo
+## Use cases
 
-https://swup-fragment-plugin.netlify.app
+Both of the following two scenarios require updating only a small content fragment instead of
+performing a full page transition:
+
+- a filter UI that live-updates its list of results on every interaction
+- a detail overlay that shows on top of the currently open content
+
+## Demo
+
+[See the plugin in action](https://swup-fragment-plugin.netlify.app) in this interactive demo.
 
 ## Installation
 
-```shell
-npm i @swup/fragment-plugin --save
+Install the plugin from npm and import it into your bundle.
+
+```bash
+npm install @swup/fragment-plugin
 ```
 
-## Simple Example
+```js
+import SwupFragmentPlugin from '@swup/fragment-plugin';
+```
 
-Suppose you have an endpoint `/users/` on your site that lists a bunch of users:
-
-### HTML
+Or include the minified production file from a CDN:
 
 ```html
-<!DOCTYPE html>
-<html>
-  <title>My Website</title>
-</html>
+<script src="https://unpkg.com/@swup/fragment-plugin@1"></script>
+```
+
+## How it works
+
+When a visit is determined to be a fragment visit, the plugin will:
+
+- **update only** the contents of the elements defined in the rule's `fragments`
+- **not update** the default content [containers](https://swup.js.org/options/#containers) replaced on all other visits
+- **wait** for CSS transitions on those fragment elements using [scoped animations](https://swup.js.org/options/#animation-scope)
+- **preserve** the current scroll position upon navigation
+- add a `to-fragment-[name]` class to the elements if the current `rule` has a `name`  key
+- **ignore** the visit completely if a fragment already matches the current visit's URL
+
+## Example
+
+### Content filter: only update a list of results
+
+Imagine a website with a `/users/` page that displays a list of users. Above the user list, there
+is a filter UI to choose which users to display. Selecting a filter will trigger a visit
+to the narrowed-down user list at `/users/filter/x/`. The only part that has changed is the
+list of users, so that's what we'd like to replace and animate instead of the whole content
+container.
+
+```html
 <body>
-  <h1>My Website</h1>
-  <nav><!-- ... --></nav>
-  <div id="swup" class="transition-main">
-    <h2>Our users</h2>
-    <main id="users">
-      <!-- A list of filters for the users -->
-      <ul>
-        <a href="/users/filter1">Filter 1</a>
-        <a href="/users/filter2">Filter 2</a>
-        <a href="/users/filter3">Filter 2</a>
-      </ul>
-      <!-- The list of users, different for each filter -->
-      <ul>
-        <li><a href="/user/user1/">User 1</a></li>
-        <li><a href="/user/user2/">User 2</a></li>
-        <li><a href="/user/user3/">User 3</a></li>
-      </ul>
-    </main>
-  </div>
+  <header>Website</header>
+  <main id="swup" class="transition-main">
+    <h1>Users</h1>
+    <!-- A list of filters for the users: selecting one will update the list below -->
+    <ul>
+      <a href="/users/filter/1/">Filter 1</a>
+      <a href="/users/filter/2/">Filter 2</a>
+      <a href="/users/filter/3/">Filter 2</a>
+    </ul>
+    <!-- The list of users, filtered by the criteria above -->
+    <ul id="users" class="transition-users">
+      <li><a href="/user/1/">User 1</a></li>
+      <li><a href="/user/2/">User 2</a></li>
+      <li><a href="/user/3/">User 3</a></li>
+    </ul>
+  </main>
 </body>
 ```
 
-### JavaScript
-
-Now you can tell Fragment Plugin to **only** replace `#users` when clicking one of the filters:
+Using the Fragment Plugin, we can update **only** the `#users` list when clicking one of the filters.
+The plugin expects an array of rules to recognize and handle fragment visits:
 
 ```js
 const swup = new Swup({
   plugins: [
     new SwupFragmentPlugin({
-      // The plugin expects an array of rules:
-      rules: [
-        {
-          from: '/users/:filter?',
-          to: '/users/:filter?',
-          fragments: ['#users']
-        }
-        // ... more complex scenarios are possible!
-      ]
+      rules: [{
+        from: '/users/:filter?',
+        to: '/users/:filter?',
+        fragments: ['#users']
+      }]
     })
   ]
 });
 ```
 
-[See a more complex example](https://swup-fragment-plugin.netlify.app/how-it-works/#javascript)
-
-When a rule matches for a visit, the plugin will
-
-- **change** the [`containers`](https://swup.js.org/options/#containers) to the rule's `fragments`
-- **preserve** the current scroll position
-- set the [`animationScope`](https://swup.js.org/options/#animation-scope) to `containers` for **scoped animations** on the fragments only (see [CSS](#css) below)
-- if the current `rule` has a `name` (e.g. "my-route"), that will be reflected as a class `.to-my-route` on the fragment.
-- If a fragment already matches the current visit's URL, it **will be ignored for that visit**
-
-### CSS
-
-Now you can add custom animations for your fragment rule:
+Now we can add custom animations for our fragment rule:
 
 ```css
 /*
-* The default animation, for visits without a matching rule
+* The default animation, for visits without matching fragment rules
 */
-.transition-main {
+html.is-changing .transition-main {
   transition: opacity 250ms;
   opacity: 1;
 }
 html.is-animating .transition-main {
   opacity: 0;
 }
+
 /*
 * The animation when filtering users
 */
@@ -106,9 +120,7 @@ html.is-animating .transition-main {
 }
 ```
 
-[See a more complex example](https://swup-fragment-plugin.netlify.app/how-it-works/#css)
-
-## Plugin Options
+## Options
 
 ```typescript
 export type PluginOptions = {
@@ -124,58 +136,110 @@ export type PluginOptions = {
 
 ### rules
 
-An array of rules consisting of these properties:
+The rules that define whether a visit will be considered a fragment visit. Each rule consists of
+mandatory `from` and `to` URL paths, an array `fragments` of selectors, as well as an optional
+`name` of this rule to allow scoped styling.
 
-#### from (required)
+The rule's `from`/`to` paths are converted to a regular expression by [path-to-regexp](https://github.com/pillarjs/path-to-regexp) and matched against the current browser URL. If you want to create an either/or path, you can also provide an array of paths, for example `['/users/', '/users/filter/:filter']`.
 
-Type: `string | string[]`
+```js
+{
+  rules: [
+    {
+      from: '/users/:filter?',
+      to: '/users/:filter?',
+      fragments: ['#users'],
+      name: 'list'
+    }
+  ]
+}
+```
 
-The path before the current visit. Will be converted to a `RegExp`.
-
-#### to (required)
-
-Type: `string | string[]`
-
-The new path of the current visit. Will be converted to a `RegExp`.
-
-#### fragments (required)
-
-Type: `string[]`
-
-An array of selectors for fragments that should be replaced if the rule matches the current visit
-
-#### name (optional)
-
-Type: `string`
-
-A name for the rule for scoped styling, ideally in kebab-case.
+|    Param    | Required |         Type         |                             Description                             |
+| ----------- | -------- | -------------------- | ------------------------------------------------------------------- |
+| `from`      | required | `string \| string[]` | The path(s) to match against the previous URL                    |
+| `to`        | required | `string \| string[]` | The path(s) to match against the next URL                        |
+| `fragments` | required | `string[]`           | Selectors of containers to be replaced if the visit matches         |
+| `name`      | optional | `string`             | A name for this rule to allow scoped styling, ideally in kebab-case |
 
 ### debug
 
-Type: `boolean`, default: 'false'
+Type: `boolean`. Set to `true` for debug information in the console. Defaults to `false`.
 
-Set this to `true` for debug information in the console.
+```js
+{
+  debug: true
+}
+```
 
-## Rule matching logic
+## How rules are matched
 
 - The first matching rule in your `rules` array will be used for the current visit
-- If no `rule` matches the current visist, the default `swup.containers` will be replaced
-- `rule.from` and `rule.to` are converted to a regular expression by [pathToRegexp](https://github.com/pillarjs/path-to-regexp). If you want to create an either/or-regex, you can also provide an array of paths, for example `['/users/', '/users/filter/:filter']`
+- If no rule matches the current visit, the default content containers defined in swup's options will be replaced
 
-## Fragments
+## How fragment containers are found
 
-- The `rule.fragments` elements from the matching `rule` need to be present in **both the current and the incoming document**
-- For each `rule.fragments` entry, the **first** matching element in the DOM will be selected
+- The `fragments` of the matching rule need to be present in **both the current and the incoming document**
+- For each selector in the `fragments` array, the **first** matching element in the DOM will be selected
 - The plugin will check if a fragment already matches the new URL before replacing it
 
-## DOM API
+## Advanced use cases
 
-### `[data-swup-fragment-url="/path/to/page/"]`
+Creating the rules for your fragment visits should be enough to enable dynamic updates on most
+sites. However, there are some advanced use cases that require adding certain attributes to the
+fragments themselves or to links on the page. These tend to be situations where overlays are
+involved and swup doesn't know which page the overlay was opened from.
 
-If you provide this attribute on one of your fragments from the server, you can tell the plugin to persist that fragment when navigating to the given URL. For example: `[data-swup-fragment-url="/users/"]`
+### Fragment URL
 
-### `a[data-swup-link-to-fragment="#my-fragment"]`
+Use the `data-swup-fragment-url` attribute to uniquely identify fragments.
 
-Tell a link to be synced to a fragment's URL on every visit.
+In scenarios where overlays are rendered on top of other content, leaving or closing the overlay to
+the same URL it was opened from should ideally not update the content below the overlay as
+nothing has changed. The fragment plugin will normally do that by keeping track of URLs. However,
+when swup was initialized on a subpage with a visible overlay, the plugin doesn't know which URL
+the overlaid content corresponds to. Hence, we need to tell it manually so it can ignore content
+updates without changes.
 
-[See example code here](https://swup-fragment-plugin.netlify.app/how-it-works/#dom)
+```html
+<section id="list" data-swup-fragment-url="/users/">
+  <ul>
+    <li>User 1</li>
+    <li>User 2</li>
+    <li>User 3</li>
+  </ul>
+</section>
+<article id="overlay">
+  <h1>User 1</h1>
+  <p>Lorem ipsum dolor sit amet...</p>
+</article>
+```
+
+### Link to fragment
+
+Use the `data-swup-link-to-fragment` attribute to automatically update links pointing to a fragment.
+
+Consider again an overlay rendered on top of other content. To implement a close button for that
+overlay, we could ideally point a link at the URL of the content where the overlay is closed. The
+fragment plugin will then handle the animation and replacing of the overlay. However, knowing
+where to point that link requires knowing where the current overlay was opened from.
+
+`data-swup-link-to-fragment` automates that by keeping the `href` attribute of a link in sync with the currently
+tracked URL of the fragment matching the selector provided by the attribute. The code below will make sure the close button
+will always point at the last known URL of the `#list` fragment to allow seamlessly closing the overlay. To keep your markup semantic and accessible, you should still provide a default value for the `href` attribute of the link.
+
+```html
+<section id="list" data-swup-fragment-url="/users/">
+  <ul>
+    <li>User 1</li>
+    <li>User 2</li>
+    <li>User 3</li>
+  </ul>
+</section>
+<article id="overlay">
+  <a href="/users/" data-swup-link-to-fragment="#list">Close</a>
+  <h1>User 1</h1>
+  <p>Lorem ipsum dolor sit amet...</p>
+</article>
+```
+
