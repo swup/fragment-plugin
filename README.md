@@ -2,8 +2,9 @@
 
 A [swup](https://swup.js.org) plugin for selectively updating dynamic fragments.
 
-- Replace dynamic fragments instead of swup's default containers, based on custom rules
-- Communicate context and improve orientation by animating only the parts of the page that have actually changed
+- Replace dynamic fragments instead of the main content container, based on custom rules
+- Improve orientation by animating only the parts of the page that have actually changed
+- Give your site the polish and snappiness of a single-page app
 
 ## Use cases
 
