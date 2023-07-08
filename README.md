@@ -154,8 +154,23 @@ expressions by [path-to-regexp](https://www.npmjs.com/package/path-to-regexp).
 }
 ```
 
-Each rule consists of mandatory `from` and `to` URL patterns, an array `fragments` of selectors, as
-well as an optional `name` of this rule to allow precise styling.
+### (Table)
+
+|    Param    | Required |         Type         |                             Description                             |
+| ----------- | -------- | -------------------- | ------------------------------------------------------------------- |
+| `from`      | required | `string \| string[]` | The pattern(s) to match against the previous URL                    |
+| `to`        | required | `string \| string[]` | The pattern(s) to match against the next URL                        |
+| `fragments` | required | `string[]`           | Selectors of containers to be replaced if the visit matches         |
+| `name`      | optional | `string`             | A name for this rule to allow scoped styling, ideally in kebab-case |
+
+### (List)
+
+- `from`, required, `string | string[]` — The pattern(s) to match against the previous URL
+- `to`, required, `string | string[]` — The pattern(s) to match against the next URL
+- `fragments`, required, `string[]` — Selectors of containers to be replaced if the visit matches
+- `name`, optional, `string` — A name for this rule to allow scoped styling, ideally in kebab-case
+
+### (Headings)
 
 #### from
 
