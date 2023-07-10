@@ -29,7 +29,8 @@
     }
   ],
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "swup-plugin build",
