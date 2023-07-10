@@ -1,7 +1,7 @@
 {
   "name": "@swup/fragment-plugin",
   "amdName": "SwupFragmentPlugin",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "A swup plugin for replacing dynamic fragments",
   "type": "module",
   "source": "src/index.ts",
@@ -45,13 +45,7 @@
     "url": "https://github.com/swup/fragment-plugin.git"
   },
   "dependencies": {
-    "@swup/plugin": "npm:@daun/swup-plugin@^3.0.0-rc.3"
-  },
-  "devDependencies": {
-    "swup": "npm:@daun/swup@^4.0.0-rc.18"
-  },
-  "peerDependencies": {
-    "swup": "npm:@daun/swup@^4.0.0-rc.18"
+    "@swup/plugin": "npm:@hirasso/swup-plugin@^3.0.0-rc.4"
   },
   "browserslist": [
     "extends @swup/browserslist-config"
