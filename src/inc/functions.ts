@@ -1,4 +1,5 @@
 import { Location } from 'swup';
+import type { Context } from 'swup';
 import type { Rule, Route } from '../SwupFragmentPlugin.js';
 import Logger from './Logger.js';
 
@@ -116,3 +117,13 @@ export const cleanupFragmentUrls = () => {
 		el.removeAttribute('data-swup-fragment-url');
 	});
 };
+
+/**
+ * Get the route from a given context
+ */
+export const getRoute = (context: Context): Route | undefined => {
+	const from = context.from.url;
+	const to = context.to.url;
+	if (!from || !to) return;
+	return { from, to }
+}

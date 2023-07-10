@@ -7,7 +7,8 @@ import {
 	cleanupFragmentUrls,
 	handleDynamicFragmentLinks,
 	updateFragmentUrlAttributes,
-	getValidFragments
+	getValidFragments,
+	getRoute
 } from './inc/functions.js';
 
 /**
@@ -140,10 +141,10 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * and the route matches a fragment rule
 	 */
 	onSamePage: Handler<'samePage'> = (context) => {
-		const rule = this.getFirstMatchingRule({
-			from: context.from.url,
-			to: context.to!.url
-		});
+		const route = getRoute(context);
+		if (!route) return;
+
+		const rule = this.getFirstMatchingRule(route);
 
 		if (rule) context.scroll.reset = false;
 	};
@@ -152,10 +153,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * Do special things if this is a fragment visit
 	 */
 	onTransitionStart: Handler<'transitionStart'> = async (context) => {
-		const route = {
-			from: context.from.url,
-			to: context.to!.url
-		};
+		const route = getRoute(context);
+		if (!route) return;
 
 		const state = this.getState(route, this.logger);
 
@@ -171,16 +170,16 @@ export default class SwupFragmentPlugin extends PluginBase {
 		context.scroll.reset = false;
 
 		// Add a suffix to all transition classes, e.g. .is-animating--fragment, .is-leaving--fragment, ...
-		context.transition.name = state.rule.name;
+		context.animation.name = state.rule.name;
 
 		// Add the transition classes directly to the fragments for this visit
-		context.transition.scope = 'containers';
+		context.animation.scope = 'containers';
 
 		// Overwrite the containers for this visit
 		context.containers = state.fragments;
 
 		// Overwrite the animationSelector for this visit
-		context.transition.selector = state.fragments.join(',');
+		context.animation.selector = state.fragments.join(',');
 	};
 
 	/**
