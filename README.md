@@ -223,11 +223,10 @@ fragment plugin will then handle the animation and replacing of the overlay. How
 where to point that link requires knowing where the current overlay was opened from.
 
 `data-swup-link-to-fragment` automates that by keeping the `href` attribute of a link in sync with the currently
-tracked URL of the fragment matching the selector provided by the attribute. The code below will make sure the close button
-will always point at the last known URL of the `#list` fragment to allow seamlessly closing the overlay. To keep your markup semantic and accessible, you should still provide a default value for the `href` attribute of the link.
+tracked URL of the fragment matching the selector provided by the attribute. The code below will make sure the close button will always point at the last known URL of the `#list` fragment to allow seamlessly closing the overlay:
 
 ```html
-<section id="list" data-swup-fragment-url="/users/">
+<section id="list">
   <ul>
     <li>User 1</li>
     <li>User 2</li>
@@ -235,9 +234,15 @@ will always point at the last known URL of the `#list` fragment to allow seamles
   </ul>
 </section>
 <article id="overlay">
-  <a href="/users/" data-swup-link-to-fragment="#list">Close</a>
+  <!-- `href` will be synced to the fragment URL of #list at runtime: -->
+  <a href="" data-swup-link-to-fragment="#list">Close</a>
   <h1>User 1</h1>
   <p>Lorem ipsum dolor sit amet...</p>
 </article>
 ```
 
+💡 **Note**: To keep your markup semantic and accessible, we recommend you **always provide a default value** for the link's `href` attribute, even though it will be updated automatically at runtime:
+
+```html
+<a href="/users/" data-swup-link-to-fragment="#list">Close</a>
+```
