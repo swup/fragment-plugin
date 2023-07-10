@@ -16,16 +16,6 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "swup-plugin build",
-    "dev": "swup-plugin dev",
-    "lint": "swup-plugin lint",
-    "format": "swup-plugin format",
-    "prepublish": "npm run build"
-  },
   "author": {
     "name": "Rasso Hilber",
     "email": "mail@rassohilber.com",
@@ -38,6 +28,16 @@
       "url": "https://philippdaun.net"
     }
   ],
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "swup-plugin build",
+    "dev": "swup-plugin dev",
+    "lint": "swup-plugin lint",
+    "format": "swup-plugin format",
+    "prepublish": "npm run build"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -47,10 +47,10 @@
     "@swup/plugin": "npm:@daun/swup-plugin@^3.0.0-rc.3"
   },
   "devDependencies": {
-    "swup": "npm:@daun/swup@^4.0.0-rc.17"
+    "swup": "npm:@daun/swup@^4.0.0-rc.18"
   },
   "peerDependencies": {
-    "swup": "npm:@daun/swup@^4.0.0-rc.17"
+    "swup": "npm:@daun/swup@^4.0.0-rc.18"
   },
   "browserslist": [
     "extends @swup/browserslist-config"
