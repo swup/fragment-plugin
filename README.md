@@ -247,6 +247,8 @@ tracked URL of the fragment matching the selector provided by the attribute. The
 
 > **Note**: To keep your markup semantic and accessible, we recommend you **always provide a default value** for the link's `href` attribute, even though it will be updated automatically at runtime:
 
-```html
-<a href="/users/" data-swup-link-to-fragment="#list">Close</a>
+```diff
+<a
++ href="/users/"
+  data-swup-link-to-fragment="#list">Close</a>
 ```
