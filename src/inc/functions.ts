@@ -62,10 +62,10 @@ export const getValidFragments = (
 export const validateFragment = (selector: string, targetUrl: string): true | string => {
 	const el = document.querySelector(selector);
 
-	if (!el) return 'Fragment missing in current document';
+	if (!el) return `fragment "${selector}" missing in current document`;
 
 	if (elementMatchesFragmentUrl(el, targetUrl))
-		return `Ignoring fragment as it already matches the URL`;
+		return `ignoring fragment "${selector}" as it already matches the URL`;
 
 	return true;
 };
