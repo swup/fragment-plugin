@@ -158,13 +158,13 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		const state = this.getState(route, this.logger);
 
-		this.logger.log('fragment visit:', state);
-
 		/**
 		 * Bail early if the current route doesn't match
 		 * a rule or wouldn't replace any fragments
 		 */
 		if (!state) return;
+
+		this.logger.log('fragment visit:', state);
 
 		// Disable scrolling for this transition
 		context.scroll.reset = false;
