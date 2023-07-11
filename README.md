@@ -245,7 +245,7 @@ tracked URL of the fragment matching the selector provided by the attribute. The
 </article>
 ```
 
-> **Note**: To keep your markup semantic and accessible, we recommend you **always provide a default value** for the link's `href` attribute, even though it will be updated automatically at runtime:
+> **Note** To keep your markup semantic and accessible, we recommend you **always provide a default value** for the link's `href` attribute, even though it will be updated automatically at runtime:
 
 ```diff
 <a
