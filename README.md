@@ -199,8 +199,10 @@ when swup was initialized on a subpage with a visible overlay, the plugin doesn'
 the overlaid content corresponds to. Hence, we need to tell it manually so it can ignore content
 updates without changes.
 
-```html
-<section id="list" data-swup-fragment-url="/users/">
+```diff
+<section
+  id="list"
++  data-swup-fragment-url="/users/">
   <ul>
     <li>User 1</li>
     <li>User 2</li>
@@ -225,8 +227,10 @@ where to point that link requires knowing where the current overlay was opened f
 `data-swup-link-to-fragment` automates that by keeping the `href` attribute of a link in sync with the currently
 tracked URL of the fragment matching the selector provided by the attribute. The code below will make sure the close button will always point at the last known URL of the `#list` fragment to allow seamlessly closing the overlay:
 
-```html
-<section id="list">
+```diff
+<section
+  id="list"
+  data-swup-fragment-url="/users/">
   <ul>
     <li>User 1</li>
     <li>User 2</li>
@@ -235,7 +239,7 @@ tracked URL of the fragment matching the selector provided by the attribute. The
 </section>
 <article id="overlay">
   <!-- `href` will be synced to the fragment URL of #list at runtime: -->
-  <a href="" data-swup-link-to-fragment="#list">Close</a>
++  <a href="" data-swup-link-to-fragment="#list">Close</a>
   <h1>User 1</h1>
   <p>Lorem ipsum dolor sit amet...</p>
 </article>
