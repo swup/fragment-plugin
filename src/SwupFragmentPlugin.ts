@@ -175,7 +175,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 		context.scroll.reset = false;
 
 		// Add the transition classes directly to the fragments for this visit
-		context.animation.scope = 'containers';
+		// @ts-expect-error
+		context.animation.scope = this.state.fragments;
 
 		// Overwrite the containers for this visit
 		context.containers = this.state.fragments;
