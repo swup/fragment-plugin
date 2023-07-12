@@ -93,10 +93,10 @@ export default class SwupFragmentPlugin extends PluginBase {
 	mount() {
 		const swup = this.swup;
 
-		swup.hooks.before('link:self', this.onSamePage);
-		swup.hooks.on('visit:start', this.onTransitionStart);
-		swup.hooks.on('content:replace', this.afterReplaceContent);
-		swup.hooks.on('visit:end', this.onTransitionEnd);
+		swup.hooks.before('link:self', this.onLinkToSelf);
+		swup.hooks.on('visit:start', this.onVisitStart);
+		swup.hooks.on('content:replace', this.onContentReplace);
+		swup.hooks.on('visit:end', this.onVisitEnd);
 
 		updateFragmentUrlAttributes(this.rules, this.swup.getCurrentUrl());
 	}
@@ -107,10 +107,10 @@ export default class SwupFragmentPlugin extends PluginBase {
 	unmount() {
 		const swup = this.swup;
 
-		swup.hooks.off('link:self', this.onSamePage);
-		swup.hooks.off('visit:start', this.onTransitionStart);
-		swup.hooks.off('content:replace', this.afterReplaceContent);
-		swup.hooks.off('visit:end', this.onTransitionEnd);
+		swup.hooks.off('link:self', this.onLinkToSelf);
+		swup.hooks.off('visit:start', this.onVisitStart);
+		swup.hooks.off('content:replace', this.onContentReplace);
+		swup.hooks.off('visit:end', this.onVisitEnd);
 
 		cleanupFragmentUrls();
 	}
@@ -146,7 +146,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * Do not scroll if clicking on a link to the same page
 	 * and the route matches a fragment rule
 	 */
-	onSamePage: Handler<'link:self'> = (context) => {
+	onLinkToSelf: Handler<'link:self'> = (context) => {
 		const route = getRoute(context);
 		if (!route) return;
 
@@ -158,7 +158,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Do special things if this is a fragment visit
 	 */
-	onTransitionStart: Handler<'visit:start'> = async (context) => {
+	onVisitStart: Handler<'visit:start'> = async (context) => {
 		const route = getRoute(context);
 		if (!route) return;
 
@@ -190,7 +190,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Runs after the content was replaced
 	 */
-	afterReplaceContent: Handler<'content:replace'> = () => {
+	onContentReplace: Handler<'content:replace'> = () => {
 		if (this.state) addRuleNameToFragments(this.state);
 		updateFragmentUrlAttributes(this.rules, this.swup.getCurrentUrl());
 		handleDynamicFragmentLinks(this.logger);
@@ -199,7 +199,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Remove the rule name from fragments
 	 */
-	onTransitionEnd: Handler<"visit:end"> = () => {
+	onVisitEnd: Handler<"visit:end"> = () => {
 		if (this.state) removeRuleNameFromFragments(this.state);
 		this.state = undefined;
 	}
