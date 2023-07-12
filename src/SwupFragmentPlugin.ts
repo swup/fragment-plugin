@@ -8,7 +8,9 @@ import {
 	handleDynamicFragmentLinks,
 	updateFragmentUrlAttributes,
 	getValidFragments,
-	getRoute
+	getRoute,
+	addRuleNameToFragments,
+	removeRuleNameFromFragments
 } from './inc/functions.js';
 
 /**
@@ -35,7 +37,7 @@ export type PluginOptions = {
 /**
  * The context, available throughout every transition
  */
-type State = {
+export type State = {
 	rule: Rule;
 	fragments: string[];
 };
@@ -63,6 +65,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 		rules: [],
 		debug: false
 	};
+
+	state?: State;
 
 	/**
 	 * Plugin Constructor
@@ -92,6 +96,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		swup.hooks.before('samePage', this.onSamePage);
 		swup.hooks.on('transitionStart', this.onTransitionStart);
 		swup.hooks.on('replaceContent', this.afterReplaceContent);
+		swup.hooks.on('transitionEnd', this.onTransitionEnd);
 
 		updateFragmentUrlAttributes(this.rules, this.swup.getCurrentUrl());
 	}
@@ -156,37 +161,44 @@ export default class SwupFragmentPlugin extends PluginBase {
 		const route = getRoute(context);
 		if (!route) return;
 
-		const state = this.getState(route, this.logger);
+		this.state = this.getState(route, this.logger);
 
 		/**
 		 * Bail early if the current route doesn't match
 		 * a rule or wouldn't replace any fragments
 		 */
-		if (!state) return;
+		if (!this.state) return;
 
-		this.logger.log('fragment visit:', state);
+		this.logger.log('fragment visit:', this.state);
 
 		// Disable scrolling for this transition
 		context.scroll.reset = false;
-
-		// Add a suffix to all transition classes, e.g. .is-animating--fragment, .is-leaving--fragment, ...
-		context.animation.name = state.rule.name;
 
 		// Add the transition classes directly to the fragments for this visit
 		context.animation.scope = 'containers';
 
 		// Overwrite the containers for this visit
-		context.containers = state.fragments;
+		context.containers = this.state.fragments;
 
 		// Overwrite the animationSelector for this visit
-		context.animation.selector = state.fragments.join(',');
+		context.animation.selector = this.state.fragments.join(',');
+
+		addRuleNameToFragments(this.state);
 	};
 
 	/**
 	 * Runs after the content was replaced
 	 */
 	afterReplaceContent: Handler<'replaceContent'> = () => {
+		if (this.state) addRuleNameToFragments(this.state);
 		updateFragmentUrlAttributes(this.rules, this.swup.getCurrentUrl());
 		handleDynamicFragmentLinks(this.logger);
 	};
+
+	/**
+	 * Remove the rule name from fragments
+	 */
+	onTransitionEnd: Handler<"transitionEnd"> = () => {
+		if (this.state) removeRuleNameFromFragments(this.state);
+	}
 }

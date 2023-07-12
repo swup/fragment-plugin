@@ -1,6 +1,6 @@
 import { Location } from 'swup';
 import type { Context } from 'swup';
-import type { Rule, Route } from '../SwupFragmentPlugin.js';
+import type { Rule, Route, State } from '../SwupFragmentPlugin.js';
 import Logger from './Logger.js';
 
 /**
@@ -125,5 +125,25 @@ export const getRoute = (context: Context): Route | undefined => {
 	const from = context.from.url;
 	const to = context.to.url;
 	if (!from || !to) return;
-	return { from, to }
-}
+	return { from, to };
+};
+
+/**
+ * Add the rule name to fragments
+ */
+export const addRuleNameToFragments = ({ rule, fragments }: State): void => {
+	if (!rule.name) return;
+	for (const selector of fragments) {
+		document.querySelector(selector)?.classList.add(`${rule.name}`);
+	}
+};
+
+/**
+ * Remove the rule name from fragments
+ */
+export const removeRuleNameFromFragments = ({ rule, fragments }: State): void => {
+	if (!rule.name) return;
+	for (const selector of fragments) {
+		document.querySelector(selector)?.classList.remove(`${rule.name}`);
+	}
+};

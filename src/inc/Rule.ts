@@ -1,4 +1,4 @@
-import { matchPath, type Path } from 'swup';
+import { matchPath, classify, type Path } from 'swup';
 import type { Route } from '../SwupFragmentPlugin.js';
 
 /**
@@ -12,12 +12,13 @@ export default class Rule {
 		public from: Path,
 		public to: Path,
 		public fragments: string[],
-		public name: string | undefined = 'fragment'
+		public name?: string
 	) {
 		this.matchesFrom = matchPath(from);
 		this.matchesTo = matchPath(to);
 		// Trim fragments and remove duplicates
 		this.fragments = [...new Set(this.fragments.map((selector) => selector.trim()))];
+		if (this.name) this.name = classify(this.name);
 	}
 
 	/**
