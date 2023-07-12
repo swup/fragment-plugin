@@ -200,5 +200,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 */
 	onTransitionEnd: Handler<"transitionEnd"> = () => {
 		if (this.state) removeRuleNameFromFragments(this.state);
+		this.state = undefined;
 	}
 }
