@@ -134,7 +134,7 @@ export const getRoute = (context: Context): Route | undefined => {
 export const addRuleNameToFragments = ({ rule, fragments }: State): void => {
 	if (!rule.name) return;
 	for (const selector of fragments) {
-		document.querySelector(selector)?.classList.add(`${rule.name}`);
+		document.querySelector(selector)?.classList.add(`rule--${rule.name}`);
 	}
 };
 
@@ -144,6 +144,6 @@ export const addRuleNameToFragments = ({ rule, fragments }: State): void => {
 export const removeRuleNameFromFragments = ({ rule, fragments }: State): void => {
 	if (!rule.name) return;
 	for (const selector of fragments) {
-		document.querySelector(selector)?.classList.remove(`${rule.name}`);
+		document.querySelector(selector)?.classList.remove(`rule--${rule.name}`);
 	}
 };
