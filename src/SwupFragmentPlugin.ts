@@ -146,7 +146,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * Do not scroll if clicking on a link to the same page
 	 * and the route matches a fragment rule
 	 */
-	onSamePage: Handler<'samePage'> = (context) => {
+	onSamePage: Handler<'link:self'> = (context) => {
 		const route = getRoute(context);
 		if (!route) return;
 
@@ -176,7 +176,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 		context.scroll.reset = false;
 
 		// Add the transition classes directly to the fragments for this visit
-		// @ts-expect-error
 		context.animation.scope = this.state.fragments;
 
 		// Overwrite the containers for this visit
@@ -200,7 +199,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Remove the rule name from fragments
 	 */
-	onTransitionEnd: Handler<"transitionEnd"> = () => {
+	onTransitionEnd: Handler<"visit:end"> = () => {
 		if (this.state) removeRuleNameFromFragments(this.state);
 		this.state = undefined;
 	}
