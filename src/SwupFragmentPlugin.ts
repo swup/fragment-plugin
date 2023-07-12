@@ -93,10 +93,10 @@ export default class SwupFragmentPlugin extends PluginBase {
 	mount() {
 		const swup = this.swup;
 
-		swup.hooks.before('samePage', this.onSamePage);
-		swup.hooks.on('transitionStart', this.onTransitionStart);
-		swup.hooks.on('replaceContent', this.afterReplaceContent);
-		swup.hooks.on('transitionEnd', this.onTransitionEnd);
+		swup.hooks.before('link:self', this.onSamePage);
+		swup.hooks.on('visit:start', this.onTransitionStart);
+		swup.hooks.on('content:replace', this.afterReplaceContent);
+		swup.hooks.on('visit:end', this.onTransitionEnd);
 
 		updateFragmentUrlAttributes(this.rules, this.swup.getCurrentUrl());
 	}
@@ -107,9 +107,10 @@ export default class SwupFragmentPlugin extends PluginBase {
 	unmount() {
 		const swup = this.swup;
 
-		swup.hooks.off('samePage', this.onSamePage);
-		swup.hooks.off('transitionStart', this.onTransitionStart);
-		swup.hooks.on('replaceContent', this.afterReplaceContent);
+		swup.hooks.off('link:self', this.onSamePage);
+		swup.hooks.off('visit:start', this.onTransitionStart);
+		swup.hooks.off('content:replace', this.afterReplaceContent);
+		swup.hooks.off('visit:end', this.onTransitionEnd);
 
 		cleanupFragmentUrls();
 	}
@@ -157,7 +158,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Do special things if this is a fragment visit
 	 */
-	onTransitionStart: Handler<'transitionStart'> = async (context) => {
+	onTransitionStart: Handler<'visit:start'> = async (context) => {
 		const route = getRoute(context);
 		if (!route) return;
 
@@ -190,7 +191,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Runs after the content was replaced
 	 */
-	afterReplaceContent: Handler<'replaceContent'> = () => {
+	afterReplaceContent: Handler<'content:replace'> = () => {
 		if (this.state) addRuleNameToFragments(this.state);
 		updateFragmentUrlAttributes(this.rules, this.swup.getCurrentUrl());
 		handleDynamicFragmentLinks(this.logger);
