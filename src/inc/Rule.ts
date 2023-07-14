@@ -1,5 +1,5 @@
 import { matchPath, classify, type Path } from 'swup';
-import type { Route, Fragment } from '../SwupFragmentPlugin.js';
+import type { Route, Fragment, FragmentOptions } from '../SwupFragmentPlugin.js';
 /**
  * Represents a Rule
  */
@@ -15,30 +15,41 @@ export default class Rule {
 	constructor(
 		from: Path,
 		to: Path,
-		fragments: (string | Fragment)[],
+		fragmentOptions: FragmentOptions[],
 		name?: string
 	) {
 		this.from = from;
 		this.to = to;
 		this.matchesFrom = matchPath(from);
 		this.matchesTo = matchPath(to);
-		this.fragments = this.parseFragments(fragments);
+		this.fragments = this.parseFragmentOptions(fragmentOptions);
 		if (name) this.name = classify(name);
 	}
 
 	/**
 	 * Converts any provided fragments option into an array of fragment objects
 	 */
-	parseFragments(providedFragments: (string | Fragment)[]): Fragment[] {
-		// ensure ojects
-		const fragments = providedFragments.map((fragment) => {
-			return typeof fragment === 'string' ? { selector: fragment } : fragment;
+	parseFragmentOptions(fragmentOptions: FragmentOptions[]): Fragment[] {
+		// Ensure ojects
+		const objects = fragmentOptions.map((option) => {
+			return typeof option === 'string' ? { selector: option } : option;
 		});
+
+		// Mixin defaults
+		const defaults: Fragment = {
+			selector: '',
+			teleport: false
+		}
+		const fragments = objects.map((fragment) => {
+			return {
+				...defaults,
+				...fragment
+			}
+		})
 
 		// Sanitize values
 		fragments.forEach((fragment) => {
 			fragment.selector = fragment.selector.trim();
-			if (fragment.appendTo) fragment.appendTo = fragment.appendTo.trim();
 		});
 
 		/**

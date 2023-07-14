@@ -1,4 +1,4 @@
-import { Location } from 'swup';
+import Swup, { Location } from 'swup';
 import type { Context } from 'swup';
 import type { Rule, Route, State, Fragment } from '../SwupFragmentPlugin.js';
 import Logger from './Logger.js';
@@ -34,14 +34,7 @@ export function handleDynamicFragmentLinks(logger?: Logger): void {
  */
 export const addFragmentUrls = (rules: Rule[], url: string): void => {
 	rules.forEach((rule) => {
-		const matchesFrom = rule.matchesFrom(url);
-		const matchesTo = rule.matchesTo(url);
-
-		/**
-		 * Bail early if the current rule doesn't match the url in any direction
-		 * @TODO: See in the wild if the logic actually makes sense here
-		 */
-		if (!matchesFrom && !matchesTo) return;
+		if (!rule.matchesFrom(url)) return;
 
 		rule.fragments.forEach((fragment) => {
 			const element = document.querySelector(fragment.selector);
@@ -165,6 +158,58 @@ export const removeRuleNameFromFragments = ({ rule, fragments }: State): void =>
 /**
  * Extract the selectors of an array of fragment objects
  */
-export const getFragmentSelectors = (fragments: Fragment[]) : string[] => {
-	return fragments.map(fragment => fragment.selector);
-}
+export const getFragmentSelectors = (fragments: Fragment[]): string[] => {
+	return fragments.map((fragment) => fragment.selector);
+};
+
+/**
+ * Cleanup existing teleported fragments
+ */
+export const cleanupTeleportedFragments = (context: Context) => {
+	document.querySelectorAll('[data-swup-fragment-parents]').forEach((el) => {
+		const parentSelectors = JSON.parse(
+			String(el.getAttribute('data-swup-fragment-parents'))
+		) as string[];
+
+		const shouldBeRemoved = parentSelectors.some((selector) =>
+			context.containers.includes(selector)
+		);
+
+		if (shouldBeRemoved) el.remove();
+	});
+};
+
+/**
+ * Get the parents of a teleported fragment
+ */
+const getParentsOfTeleportedFragment = ({ selector }: Fragment, swup: Swup): string[] => {
+	const containers = swup.options.containers;
+
+	const doc = swup.context.to?.html
+		? new DOMParser().parseFromString(swup.context.to.html, 'text/html')
+		: document;
+
+	const el = doc.querySelector(selector);
+	if (!el) return [];
+
+	const parents = containers.filter(
+		(containerSelector) => !el.matches(containerSelector) && el.closest(containerSelector)
+	);
+
+	return parents;
+};
+
+/**
+ * Teleport a fragment
+ */
+export const teleportFragment = (fragment: Fragment, swup: Swup): void => {
+	const el = document.querySelector(fragment.selector);
+	if (!el) return;
+
+	if (!fragment.teleport) return;
+
+	const parents = getParentsOfTeleportedFragment(fragment, swup);
+
+	el.setAttribute('data-swup-fragment-parents', JSON.stringify(parents));
+	document.body.prepend(el);
+};

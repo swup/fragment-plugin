@@ -22,21 +22,25 @@ type Route = {
 	to: string;
 };
 
-/**
- * The Plugin Options
- */
-export type PluginOptions = {
-	rules: Array<{
-		from: Path;
-		to: Path;
-		fragments: string[];
-		name?: string;
-	}>;
+export type FragmentOptions = string | {
+	selector: string;
+	teleport?: boolean;
+};
+
+export type RuleOptions = {
+	from: Path;
+	to: Path;
+	fragments: FragmentOptions[];
+	name?: string;
+};
+
+export type Options = {
+	rules: RuleOptions[];
 	debug?: boolean;
 };
 
 /**
- * The context, available throughout every transition
+ * The state of the current visit
  */
 export type State = {
 	rule: Rule;
@@ -48,7 +52,7 @@ export type State = {
  */
 export type Fragment = {
 	selector: string;
-	appendTo?: string;
+	teleport: boolean;
 };
 
 /**
@@ -66,11 +70,11 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 	rules: Rule[] = [];
 
-	options: PluginOptions;
+	options: Options;
 
 	logger: Logger;
 
-	defaults: PluginOptions = {
+	defaults: Options = {
 		rules: [],
 		debug: false
 	};
@@ -81,7 +85,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * Plugin Constructor
 	 * The options are NOT optional and need to contain at least a `rules` property
 	 */
-	constructor(options: PluginOptions) {
+	constructor(options: Options) {
 		super();
 
 		this.options = { ...this.defaults, ...options };
@@ -139,7 +143,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 		if (!fragments.length) return;
 
 		const state = { rule, fragments };
-
 
 		return state;
 	}
@@ -210,8 +213,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Remove the rule name from fragments
 	 */
-	onVisitEnd: Handler<"visit:end"> = () => {
+	onVisitEnd: Handler<'visit:end'> = () => {
 		if (this.state) removeRuleNameFromFragments(this.state);
 		this.state = undefined;
-	}
+	};
 }
