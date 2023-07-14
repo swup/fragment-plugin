@@ -51,13 +51,13 @@ export const addFragmentUrls = ({ rules, swup }: SwupFragmentPlugin): void => {
 /**
  * Get all fragments that should be replaced for a given visit's route
  */
-export const getValidFragments = (
+export const getReplaceableFragments = (
 	route: Route,
 	fragments: Fragment[],
 	logger: Logger | undefined
 ): Fragment[] => {
 	return fragments.filter((fragment) => {
-		const result = validateFragment(fragment.selector, route.to);
+		const result = isReplaceableFragment(fragment.selector, route.to);
 		if (result === true) return true;
 
 		if (logger) logger.log(result);
@@ -66,9 +66,9 @@ export const getValidFragments = (
 };
 
 /**
- * Validate a fragment for a target URL. Returns either true or a string with the reason
+ * Checks if a fragment can should be replaced for a target URL. Returns either true or a string with the reason
  */
-export const validateFragment = (selector: string, targetUrl: string): true | string => {
+export const isReplaceableFragment = (selector: string, targetUrl: string): true | string => {
 	const el = document.querySelector(selector);
 
 	if (!el) return `fragment "${selector}" missing in current document`;
@@ -239,4 +239,8 @@ export const teleportFragments = ({ rules, swup }: SwupFragmentPlugin): void => 
 
 		rule.fragments.forEach((fragment) => teleportFragment(fragment, swup));
 	});
+};
+
+export const updateCacheForExistingFragments = ({ swup }: SwupFragmentPlugin): void => {
+
 };

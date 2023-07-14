@@ -7,14 +7,15 @@ import {
 	addFragmentUrls,
 	cleanupFragmentUrls,
 	handleDynamicFragmentLinks,
-	getValidFragments,
+	getReplaceableFragments,
 	getRoute,
 	addRuleNameToFragments,
 	removeRuleNameFromFragments,
 	getFragmentSelectors,
 	cleanupTeleportedFragments,
 	teleportFragments,
-	getFirstMatchingRule
+	getFirstMatchingRule,
+	updateCacheForExistingFragments
 } from './inc/functions.js';
 
 declare module "swup" {
@@ -147,7 +148,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		if (!rule) return;
 
 		// Validate the fragments from the matched rule
-		const fragments = getValidFragments(route, rule.fragments, logger);
+		const fragments = getReplaceableFragments(route, rule.fragments, logger);
 		// Bail early if there are no valid fragments for the rule
 		if (!fragments.length) return;
 
@@ -214,6 +215,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 		handleDynamicFragmentLinks(this.logger);
 		cleanupTeleportedFragments(context);
 		teleportFragments(this);
+		updateCacheForExistingFragments(this);
+		console.log(this.swup.cache.get(this.swup.getCurrentUrl()))
 	};
 
 	/**
