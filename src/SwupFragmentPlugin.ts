@@ -11,7 +11,9 @@ import {
 	getRoute,
 	addRuleNameToFragments,
 	removeRuleNameFromFragments,
-	getFragmentSelectors
+	getFragmentSelectors,
+	cleanupTeleportedFragments,
+	teleportFragments
 } from './inc/functions.js';
 
 /**
@@ -111,7 +113,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 		swup.hooks.on('content:replace', this.onContentReplace);
 		swup.hooks.on('visit:end', this.onVisitEnd);
 
-		addFragmentUrls(this.rules, this.swup.getCurrentUrl());
+		addFragmentUrls(this.rules, this.swup);
+		teleportFragments(this.rules, this.swup);
 	}
 
 	/**
@@ -204,10 +207,12 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Runs after the content was replaced
 	 */
-	onContentReplace: Handler<'content:replace'> = () => {
+	onContentReplace: Handler<'content:replace'> = (context) => {
 		if (this.state) addRuleNameToFragments(this.state);
-		addFragmentUrls(this.rules, this.swup.getCurrentUrl());
+		addFragmentUrls(this.rules, this.swup);
 		handleDynamicFragmentLinks(this.logger);
+		cleanupTeleportedFragments(context);
+		teleportFragments(this.rules, this.swup);
 	};
 
 	/**

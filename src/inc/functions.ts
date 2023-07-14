@@ -32,7 +32,8 @@ export function handleDynamicFragmentLinks(logger?: Logger): void {
 /**
  * Adds [data-swup-fragment-url] to all fragments that don't already contain that attribute
  */
-export const addFragmentUrls = (rules: Rule[], url: string): void => {
+export const addFragmentUrls = (rules: Rule[], swup: Swup): void => {
+	const url = swup.getCurrentUrl();
 	rules.forEach((rule) => {
 		if (!rule.matchesFrom(url)) return;
 
@@ -182,8 +183,8 @@ export const cleanupTeleportedFragments = (context: Context) => {
 /**
  * Get the parents of a teleported fragment
  */
-const getParentsOfTeleportedFragment = ({ selector }: Fragment, swup: Swup): string[] => {
-	const containers = swup.options.containers;
+const getParentContainers = ({ selector }: Fragment, swup: Swup): string[] => {
+	const containers = [...new Set([...swup.options.containers, ...swup.context.containers])];
 
 	const doc = swup.context.to?.html
 		? new DOMParser().parseFromString(swup.context.to.html, 'text/html')
@@ -203,13 +204,31 @@ const getParentsOfTeleportedFragment = ({ selector }: Fragment, swup: Swup): str
  * Teleport a fragment
  */
 export const teleportFragment = (fragment: Fragment, swup: Swup): void => {
+	// Bail early if the fragment shouldn't be teleported
+	if (!fragment.teleport) return;
+
+	// Bail early if the fragment doesn't exist
 	const el = document.querySelector(fragment.selector);
 	if (!el) return;
 
-	if (!fragment.teleport) return;
-
-	const parents = getParentsOfTeleportedFragment(fragment, swup);
+	const parents = getParentContainers(fragment, swup);
 
 	el.setAttribute('data-swup-fragment-parents', JSON.stringify(parents));
 	document.body.prepend(el);
+};
+
+/**
+ * Teleport fragments to the body
+ */
+export const teleportFragments = (rules: Rule[], swup: Swup): void => {
+	const url = swup.getCurrentUrl();
+
+	rules.forEach((rule) => {
+		const matchesFrom = rule.matchesFrom(url);
+		const matchesTo = rule.matchesTo(url);
+
+		if (!matchesFrom && !matchesTo) return;
+
+		rule.fragments.forEach((fragment) => teleportFragment(fragment, swup));
+	});
 };
