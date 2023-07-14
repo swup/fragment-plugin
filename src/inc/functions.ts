@@ -1,6 +1,6 @@
 import { Location } from 'swup';
 import type { Context } from 'swup';
-import type { Rule, Route, State } from '../SwupFragmentPlugin.js';
+import type { Rule, Route, State, Fragment } from '../SwupFragmentPlugin.js';
 import Logger from './Logger.js';
 
 /**
@@ -32,23 +32,37 @@ export function handleDynamicFragmentLinks(logger?: Logger): void {
 /**
  * Adds [data-swup-fragment-url] to all fragments that don't already contain that attribute
  */
-export const updateFragmentUrlAttributes = (rules: Rule[], url: string): void => {
-	rules.forEach(({ fragments: selectors }) => {
-		selectors.forEach((selector) => {
-			const fragment = document.querySelector(selector);
-			if (fragment?.matches('[data-swup-fragment-url]')) return;
-			fragment?.setAttribute('data-swup-fragment-url', url);
+export const addFragmentUrls = (rules: Rule[], url: string): void => {
+	rules.forEach((rule) => {
+		const matchesFrom = rule.matchesFrom(url);
+		const matchesTo = rule.matchesTo(url);
+
+		/**
+		 * Bail early if the current rule doesn't match the url in any direction
+		 * @TODO: See in the wild if the logic actually makes sense here
+		 */
+		if (!matchesFrom && !matchesTo) return;
+
+		rule.fragments.forEach((fragment) => {
+			const element = document.querySelector(fragment.selector);
+			// Bail early if the fragment already has the attribute
+			if (element?.matches('[data-swup-fragment-url]')) return;
+			// Finally, add the attribute
+			element?.setAttribute('data-swup-fragment-url', url);
 		});
 	});
 };
 
+/**
+ * Get all fragments that should be replaced for a given visit's route
+ */
 export const getValidFragments = (
 	route: Route,
-	fragments: string[],
+	fragments: Fragment[],
 	logger: Logger | undefined
-): string[] => {
-	return fragments.filter((selector) => {
-		const result = validateFragment(selector, route.to);
+): Fragment[] => {
+	return fragments.filter((fragment) => {
+		const result = validateFragment(fragment.selector, route.to);
 		if (result === true) return true;
 
 		if (logger) logger.log(result);
@@ -133,9 +147,9 @@ export const getRoute = (context: Context): Route | undefined => {
  */
 export const addRuleNameToFragments = ({ rule, fragments }: State): void => {
 	if (!rule.name) return;
-	for (const selector of fragments) {
+	fragments.forEach(({ selector }) => {
 		document.querySelector(selector)?.classList.add(`to-${rule.name}`);
-	}
+	});
 };
 
 /**
@@ -143,7 +157,14 @@ export const addRuleNameToFragments = ({ rule, fragments }: State): void => {
  */
 export const removeRuleNameFromFragments = ({ rule, fragments }: State): void => {
 	if (!rule.name) return;
-	for (const selector of fragments) {
+	fragments.forEach(({ selector }) => {
 		document.querySelector(selector)?.classList.remove(`to-${rule.name}`);
-	}
+	});
 };
+
+/**
+ * Extract the selectors of an array of fragment objects
+ */
+export const getFragmentSelectors = (fragments: Fragment[]) : string[] => {
+	return fragments.map(fragment => fragment.selector);
+}

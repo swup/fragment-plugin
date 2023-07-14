@@ -4,13 +4,14 @@ import Rule from './inc/Rule.js';
 import type { Path, Handler } from 'swup';
 import Logger from './inc/Logger.js';
 import {
+	addFragmentUrls,
 	cleanupFragmentUrls,
 	handleDynamicFragmentLinks,
-	updateFragmentUrlAttributes,
 	getValidFragments,
 	getRoute,
 	addRuleNameToFragments,
-	removeRuleNameFromFragments
+	removeRuleNameFromFragments,
+	getFragmentSelectors
 } from './inc/functions.js';
 
 /**
@@ -39,7 +40,15 @@ export type PluginOptions = {
  */
 export type State = {
 	rule: Rule;
-	fragments: string[];
+	fragments: Fragment[];
+};
+
+/**
+ * Represents a fragment object
+ */
+export type Fragment = {
+	selector: string;
+	appendTo?: string;
 };
 
 /**
@@ -98,7 +107,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		swup.hooks.on('content:replace', this.onContentReplace);
 		swup.hooks.on('visit:end', this.onVisitEnd);
 
-		updateFragmentUrlAttributes(this.rules, this.swup.getCurrentUrl());
+		addFragmentUrls(this.rules, this.swup.getCurrentUrl());
 	}
 
 	/**
@@ -172,14 +181,16 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		this.logger.log('fragment visit:', this.state);
 
+		const fragmentSelectors = getFragmentSelectors(this.state.fragments);
+
 		// Disable scrolling for this transition
 		context.scroll.reset = false;
 
 		// Add the transition classes directly to the fragments for this visit
-		context.animation.scope = this.state.fragments;
+		context.animation.scope = fragmentSelectors;
 
 		// Overwrite the containers for this visit
-		context.containers = this.state.fragments;
+		context.containers = fragmentSelectors;
 
 		// Overwrite the animationSelector for this visit
 		context.animation.selector = this.state.fragments.join(',');
@@ -192,7 +203,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 */
 	onContentReplace: Handler<'content:replace'> = () => {
 		if (this.state) addRuleNameToFragments(this.state);
-		updateFragmentUrlAttributes(this.rules, this.swup.getCurrentUrl());
+		addFragmentUrls(this.rules, this.swup.getCurrentUrl());
 		handleDynamicFragmentLinks(this.logger);
 	};
 
