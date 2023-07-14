@@ -1,7 +1,8 @@
 import Swup, { Location } from 'swup';
 import type { Context as SwupContext } from 'swup';
-import type { Rule, Route, FragmentVisitContext, Fragment } from '../SwupFragmentPlugin.js';
+import type { Rule, Route, FragmentVisit, Fragment } from '../SwupFragmentPlugin.js';
 import Logger from './Logger.js';
+import SwupFragmentPlugin from '../SwupFragmentPlugin.js';
 
 /**
  * Updates the `href` of links matching [data-swup-link-to-fragment="#my-fragment"]
@@ -32,7 +33,7 @@ export function handleDynamicFragmentLinks(logger?: Logger): void {
 /**
  * Adds [data-swup-fragment-url] to all fragments that don't already contain that attribute
  */
-export const addFragmentUrls = (rules: Rule[], swup: Swup): void => {
+export const addFragmentUrls = ({ rules, swup }: SwupFragmentPlugin): void => {
 	const url = swup.getCurrentUrl();
 	rules.forEach((rule) => {
 		if (!rule.matchesFrom(url)) return;
@@ -139,7 +140,7 @@ export const getRoute = (context: SwupContext): Route | undefined => {
 /**
  * Add the rule name to fragments
  */
-export const addRuleNameToFragments = ({ rule, fragments }: FragmentVisitContext): void => {
+export const addRuleNameToFragments = ({ rule, fragments }: FragmentVisit): void => {
 	if (!rule.name) return;
 	fragments.forEach(({ selector }) => {
 		document.querySelector(selector)?.classList.add(`to-${rule.name}`);
@@ -149,7 +150,7 @@ export const addRuleNameToFragments = ({ rule, fragments }: FragmentVisitContext
 /**
  * Remove the rule name from fragments
  */
-export const removeRuleNameFromFragments = ({ rule, fragments }: FragmentVisitContext): void => {
+export const removeRuleNameFromFragments = ({ rule, fragments }: FragmentVisit): void => {
 	if (!rule.name) return;
 	fragments.forEach(({ selector }) => {
 		document.querySelector(selector)?.classList.remove(`to-${rule.name}`);
@@ -218,9 +219,16 @@ export const teleportFragment = (fragment: Fragment, swup: Swup): void => {
 };
 
 /**
+ * Get the first matching rule for a given route
+ */
+export const getFirstMatchingRule = (route: Route, rules: Rule[]): Rule | undefined => {
+	return rules.find((rule) => rule.matches(route));
+};
+
+/**
  * Teleport fragments to the body
  */
-export const teleportFragments = (rules: Rule[], swup: Swup): void => {
+export const teleportFragments = ({ rules, swup }: SwupFragmentPlugin): void => {
 	const url = swup.getCurrentUrl();
 
 	rules.forEach((rule) => {

@@ -13,7 +13,8 @@ import {
 	removeRuleNameFromFragments,
 	getFragmentSelectors,
 	cleanupTeleportedFragments,
-	teleportFragments
+	teleportFragments,
+	getFirstMatchingRule
 } from './inc/functions.js';
 
 declare module "swup" {
@@ -118,8 +119,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 		swup.hooks.on('content:replace', this.onContentReplace);
 		swup.hooks.on('visit:end', this.onVisitEnd);
 
-		addFragmentUrls(this.rules, this.swup);
-		teleportFragments(this.rules, this.swup);
+		addFragmentUrls(this);
+		teleportFragments(this);
 	}
 
 	/**
@@ -140,7 +141,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * Get the state for a given route
 	 */
 	getFragmentVisit(route: Route, logger?: Logger): FragmentVisit | undefined {
-		const rule = this.getFirstMatchingRule(route);
+		const rule = getFirstMatchingRule(route, this.rules);
 
 		// Bail early if no rule matched
 		if (!rule) return;
@@ -156,13 +157,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 	}
 
 	/**
-	 * Get the first matching rule for a given route
-	 */
-	getFirstMatchingRule = (route: Route): Rule | undefined => {
-		return this.rules.find((rule) => rule.matches(route));
-	};
-
-	/**
 	 * Do not scroll if clicking on a link to the same page
 	 * and the route matches a fragment rule
 	 */
@@ -170,7 +164,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		const route = getRoute(context);
 		if (!route) return;
 
-		const rule = this.getFirstMatchingRule(route);
+		const rule = getFirstMatchingRule(route, this.rules);
 
 		if (rule) context.scroll.reset = false;
 	};
@@ -216,10 +210,10 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 */
 	onContentReplace: Handler<'content:replace'> = (context) => {
 		if (context.fragmentVisit) addRuleNameToFragments(context.fragmentVisit);
-		addFragmentUrls(this.rules, this.swup);
+		addFragmentUrls(this);
 		handleDynamicFragmentLinks(this.logger);
 		cleanupTeleportedFragments(context);
-		teleportFragments(this.rules, this.swup);
+		teleportFragments(this);
 	};
 
 	/**
