@@ -16,10 +16,17 @@ import {
 	teleportFragments
 } from './inc/functions.js';
 
+declare module "swup" {
+	export interface Context {
+		fragmentVisit?: FragmentVisit
+	}
+}
+
+
 /**
  * Represents a route from one to another URL
  */
-type Route = {
+export type Route = {
 	from: string;
 	to: string;
 };
@@ -44,7 +51,7 @@ export type Options = {
 /**
  * The state of the current visit
  */
-export type State = {
+export type FragmentVisit = {
 	rule: Rule;
 	fragments: Fragment[];
 };
@@ -60,7 +67,7 @@ export type Fragment = {
 /**
  * Re-exports
  */
-export type { Route, Path, Rule };
+export type { Rule };
 
 /**
  * The main plugin class
@@ -80,8 +87,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 		rules: [],
 		debug: false
 	};
-
-	state?: State;
 
 	/**
 	 * Plugin Constructor
@@ -134,7 +139,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Get the state for a given route
 	 */
-	getState(route: Route, logger?: Logger): State | undefined {
+	getFragmentVisit(route: Route, logger?: Logger): FragmentVisit | undefined {
 		const rule = this.getFirstMatchingRule(route);
 
 		// Bail early if no rule matched
@@ -177,17 +182,19 @@ export default class SwupFragmentPlugin extends PluginBase {
 		const route = getRoute(context);
 		if (!route) return;
 
-		this.state = this.getState(route, this.logger);
+		const fragmentVisit = this.getFragmentVisit(route, this.logger);
 
 		/**
 		 * Bail early if the current route doesn't match
 		 * a rule or wouldn't replace any fragments
 		 */
-		if (!this.state) return;
+		if (!fragmentVisit) return;
 
-		this.logger.log('fragment visit:', this.state);
+		context.fragmentVisit = fragmentVisit;
 
-		const fragmentSelectors = getFragmentSelectors(this.state.fragments);
+		this.logger.log('fragment visit:', context.fragmentVisit);
+
+		const fragmentSelectors = getFragmentSelectors(context.fragmentVisit.fragments);
 
 		// Disable scrolling for this transition
 		context.scroll.reset = false;
@@ -201,14 +208,14 @@ export default class SwupFragmentPlugin extends PluginBase {
 		// Overwrite the animationSelector for this visit
 		context.animation.selector = fragmentSelectors.join(',');
 
-		addRuleNameToFragments(this.state);
+		addRuleNameToFragments(context.fragmentVisit);
 	};
 
 	/**
 	 * Runs after the content was replaced
 	 */
 	onContentReplace: Handler<'content:replace'> = (context) => {
-		if (this.state) addRuleNameToFragments(this.state);
+		if (context.fragmentVisit) addRuleNameToFragments(context.fragmentVisit);
 		addFragmentUrls(this.rules, this.swup);
 		handleDynamicFragmentLinks(this.logger);
 		cleanupTeleportedFragments(context);
@@ -218,8 +225,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Remove the rule name from fragments
 	 */
-	onVisitEnd: Handler<'visit:end'> = () => {
-		if (this.state) removeRuleNameFromFragments(this.state);
-		this.state = undefined;
+	onVisitEnd: Handler<'visit:end'> = (context) => {
+		if (context.fragmentVisit) removeRuleNameFromFragments(context.fragmentVisit);
+		context.fragmentVisit = undefined;
 	};
 }

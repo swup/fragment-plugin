@@ -1,6 +1,6 @@
 import Swup, { Location } from 'swup';
-import type { Context } from 'swup';
-import type { Rule, Route, State, Fragment } from '../SwupFragmentPlugin.js';
+import type { Context as SwupContext } from 'swup';
+import type { Rule, Route, FragmentVisitContext, Fragment } from '../SwupFragmentPlugin.js';
 import Logger from './Logger.js';
 
 /**
@@ -129,7 +129,7 @@ export const cleanupFragmentUrls = () => {
 /**
  * Get the route from a given context
  */
-export const getRoute = (context: Context): Route | undefined => {
+export const getRoute = (context: SwupContext): Route | undefined => {
 	const from = context.from.url;
 	const to = context.to.url;
 	if (!from || !to) return;
@@ -139,7 +139,7 @@ export const getRoute = (context: Context): Route | undefined => {
 /**
  * Add the rule name to fragments
  */
-export const addRuleNameToFragments = ({ rule, fragments }: State): void => {
+export const addRuleNameToFragments = ({ rule, fragments }: FragmentVisitContext): void => {
 	if (!rule.name) return;
 	fragments.forEach(({ selector }) => {
 		document.querySelector(selector)?.classList.add(`to-${rule.name}`);
@@ -149,7 +149,7 @@ export const addRuleNameToFragments = ({ rule, fragments }: State): void => {
 /**
  * Remove the rule name from fragments
  */
-export const removeRuleNameFromFragments = ({ rule, fragments }: State): void => {
+export const removeRuleNameFromFragments = ({ rule, fragments }: FragmentVisitContext): void => {
 	if (!rule.name) return;
 	fragments.forEach(({ selector }) => {
 		document.querySelector(selector)?.classList.remove(`to-${rule.name}`);
@@ -166,7 +166,7 @@ export const getFragmentSelectors = (fragments: Fragment[]): string[] => {
 /**
  * Cleanup existing teleported fragments
  */
-export const cleanupTeleportedFragments = (context: Context) => {
+export const cleanupTeleportedFragments = (context: SwupContext) => {
 	document.querySelectorAll('[data-swup-fragment-parents]').forEach((el) => {
 		const parentSelectors = JSON.parse(
 			String(el.getAttribute('data-swup-fragment-parents'))
