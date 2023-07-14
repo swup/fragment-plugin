@@ -15,15 +15,14 @@ import {
 	cleanupTeleportedFragments,
 	teleportFragments,
 	getFirstMatchingRule,
-	updateCacheForExistingFragments
+	cachePersistedFragments
 } from './inc/functions.js';
 
-declare module "swup" {
+declare module 'swup' {
 	export interface Context {
-		fragmentVisit?: FragmentVisit
+		fragmentVisit?: FragmentVisit;
 	}
 }
-
 
 /**
  * Represents a route from one to another URL
@@ -33,10 +32,12 @@ export type Route = {
 	to: string;
 };
 
-export type FragmentOptions = string | {
-	selector: string;
-	teleport?: boolean;
-};
+export type FragmentOptions =
+	| string
+	| {
+			selector: string;
+			teleport?: boolean;
+	  };
 
 export type RuleOptions = {
 	from: Path;
@@ -215,8 +216,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		handleDynamicFragmentLinks(this.logger);
 		cleanupTeleportedFragments(context);
 		teleportFragments(this);
-		updateCacheForExistingFragments(this);
-		console.log(this.swup.cache.get(this.swup.getCurrentUrl()))
+		cachePersistedFragments(this);
 	};
 
 	/**

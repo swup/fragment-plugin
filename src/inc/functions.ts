@@ -241,6 +241,54 @@ export const teleportFragments = ({ rules, swup }: SwupFragmentPlugin): void => 
 	});
 };
 
-export const updateCacheForExistingFragments = ({ swup }: SwupFragmentPlugin): void => {
+/**
+ * Get a flattened array of all available fragments for all rules
+ */
+const getAllFragmentSelectors = (rules: Rule[]): string[] => {
+	const result: string[] = [];
+	rules.forEach((rule) => {
+		rule.fragments.forEach((fragment) => {
+			result.push(fragment.selector);
+		});
+	});
+	return [...new Set([...result])];
+};
+
+/**
+ * Makes sure persisted fragments land in the cache of the current page
+ */
+export const cachePersistedFragments = ({ rules, swup }: SwupFragmentPlugin): void => {
+	const currentUrl = swup.getCurrentUrl();
+	const cache = swup.cache;
+
+	const availableSelectors = getAllFragmentSelectors(rules);
+
+	const persisted = Array.from(
+		document.querySelectorAll('[data-swup-fragment-url]')
+	).filter((el) => !elementMatchesFragmentUrl(el, currentUrl));
+
+	persisted.forEach((el) => {
+		const selector = availableSelectors.find((s) => el.matches(s));
+		if (!selector) return;
+
+		const fragmentUrl = Location.fromUrl(String(el.getAttribute('data-swup-fragment-url'))).url;
+
+		const fragmentCache = cache.get(fragmentUrl);
+		if (!fragmentCache) return;
+
+		const currentCache = cache.get(currentUrl);
+		if (!currentCache) return;
+
+		const fragmentDocument = new DOMParser().parseFromString(fragmentCache.html, 'text/html');
+		const fragmentOriginal = fragmentDocument.querySelector(selector);
+		if (!fragmentOriginal) return;
+
+		const currentDocument = new DOMParser().parseFromString(currentCache.html, 'text/html');
+
+		currentDocument.querySelector(selector)?.replaceWith(fragmentOriginal)
+
+		// Mutate the cache of the current page with the updated html
+		currentCache.html = currentDocument.documentElement.outerHTML;
+	});
 
 };
