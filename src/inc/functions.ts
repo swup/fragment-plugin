@@ -263,9 +263,9 @@ export const cachePersistedFragments = ({ rules, swup }: SwupFragmentPlugin): vo
 
 	const availableSelectors = getAllFragmentSelectors(rules);
 
-	const persisted = Array.from(
-		document.querySelectorAll('[data-swup-fragment-url]')
-	).filter((el) => !elementMatchesFragmentUrl(el, currentUrl));
+	const persisted = Array.from(document.querySelectorAll('[data-swup-fragment-url]')).filter(
+		(el) => !elementMatchesFragmentUrl(el, currentUrl)
+	);
 
 	persisted.forEach((el) => {
 		const selector = availableSelectors.find((s) => el.matches(s));
@@ -279,21 +279,28 @@ export const cachePersistedFragments = ({ rules, swup }: SwupFragmentPlugin): vo
 		const currentCache = cache.get(currentUrl);
 		if (!currentCache) return;
 
-		const fragmentDocument = new DOMParser().parseFromString(fragmentCache.html, 'text/html');
-		const originalFragment = fragmentDocument.querySelector(selector);
-		if (!originalFragment) return;
+		const originalCachedFragment = new DOMParser()
+			.parseFromString(fragmentCache.html, 'text/html')
+			.querySelector(selector);
+		if (!originalCachedFragment) return;
 
-		const currentDocument = new DOMParser().parseFromString(currentCache.html, 'text/html');
-		const currentFragment = currentDocument.querySelector(selector);
-		if (!currentFragment) return;
+		// We don't want a possibly dynamic `data-swup-fragment-url` to end up in the cache
+		originalCachedFragment.removeAttribute('data-swup-fragment-url');
 
-		const currentFragmentUrl = currentFragment.getAttribute('data-swup-fragment-url');
-		if (currentFragmentUrl) originalFragment.setAttribute('data-swup-fragment-url', currentFragmentUrl);
+		const currentCachedDocument = new DOMParser().parseFromString(currentCache.html, 'text/html');
+		const currentCachedFragment = currentCachedDocument.querySelector(selector);
+		if (!currentCachedFragment) return;
 
-		currentFragment.replaceWith(originalFragment);
+		// Preserve `data-swup-fragment-url` if already set on the current fragment
+		const currentFragmentUrl = currentCachedFragment.getAttribute('data-swup-fragment-url');
+		if (currentFragmentUrl) {
+			originalCachedFragment.setAttribute('data-swup-fragment-url', currentFragmentUrl);
+		}
+
+		// Replace the current fragment with the preserved fragment
+		currentCachedFragment.replaceWith(originalCachedFragment);
 
 		// Mutate the cache of the current page with the updated html
-		currentCache.html = currentDocument.documentElement.outerHTML;
+		currentCache.html = currentCachedDocument.documentElement.outerHTML;
 	});
-
 };
