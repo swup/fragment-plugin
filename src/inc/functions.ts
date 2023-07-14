@@ -280,12 +280,17 @@ export const cachePersistedFragments = ({ rules, swup }: SwupFragmentPlugin): vo
 		if (!currentCache) return;
 
 		const fragmentDocument = new DOMParser().parseFromString(fragmentCache.html, 'text/html');
-		const fragmentOriginal = fragmentDocument.querySelector(selector);
-		if (!fragmentOriginal) return;
+		const originalFragment = fragmentDocument.querySelector(selector);
+		if (!originalFragment) return;
 
 		const currentDocument = new DOMParser().parseFromString(currentCache.html, 'text/html');
+		const currentFragment = currentDocument.querySelector(selector);
+		if (!currentFragment) return;
 
-		currentDocument.querySelector(selector)?.replaceWith(fragmentOriginal)
+		const currentFragmentUrl = currentFragment.getAttribute('data-swup-fragment-url');
+		if (currentFragmentUrl) originalFragment.setAttribute('data-swup-fragment-url', currentFragmentUrl);
+
+		currentFragment.replaceWith(originalFragment);
 
 		// Mutate the cache of the current page with the updated html
 		currentCache.html = currentDocument.documentElement.outerHTML;
