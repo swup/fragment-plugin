@@ -135,11 +135,11 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		// Validate the fragments from the matched rule
 		const fragments = getValidFragments(route, rule.fragments, logger);
-
 		// Bail early if there are no valid fragments for the rule
 		if (!fragments.length) return;
 
 		const state = { rule, fragments };
+
 
 		return state;
 	}
@@ -193,7 +193,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		context.containers = fragmentSelectors;
 
 		// Overwrite the animationSelector for this visit
-		context.animation.selector = this.state.fragments.join(',');
+		context.animation.selector = fragmentSelectors.join(',');
 
 		addRuleNameToFragments(this.state);
 	};
