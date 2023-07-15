@@ -246,26 +246,11 @@ export const teleportFragmentsBack = (): void => {
 };
 
 /**
- * Get a flattened array of all available fragments for all rules
- */
-const getAllFragmentSelectors = (rules: Rule[]): string[] => {
-	const result: string[] = [];
-	rules.forEach((rule) => {
-		rule.fragments.forEach((fragment) => {
-			result.push(fragment.selector);
-		});
-	});
-	return [...new Set([...result])];
-};
-
-/**
  * Makes sure persisted fragments land in the cache of the current page
  */
 export const cachePersistedFragments = ({ rules, swup, logger }: SwupFragmentPlugin): void => {
 	const currentUrl = swup.getCurrentUrl();
 	const cache = swup.cache;
-
-	// const availableSelectors = getAllFragmentSelectors(rules);
 
 	const persisted = Array.from(document.querySelectorAll('[data-swup-fragment-url]')).filter(
 		(el) => !elementMatchesFragmentUrl(el, currentUrl)
