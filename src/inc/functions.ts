@@ -33,7 +33,7 @@ export function handleDynamicFragmentLinks(logger?: Logger): void {
 /**
  * Adds [data-swup-fragment-url] to all fragments that don't already contain that attribute
  */
-export const addFragmentUrls = ({ rules, swup }: SwupFragmentPlugin): void => {
+export const addFragmentAttributes = ({ rules, swup }: SwupFragmentPlugin): void => {
 	const url = swup.getCurrentUrl();
 	rules.forEach((rule) => {
 		if (!rule.matchesFrom(url)) return;
@@ -42,8 +42,9 @@ export const addFragmentUrls = ({ rules, swup }: SwupFragmentPlugin): void => {
 			const element = document.querySelector(fragment.selector);
 			// Bail early if the fragment already has the attribute
 			if (element?.matches('[data-swup-fragment-url]')) return;
-			// Finally, add the attribute
+			// Finally, add the attributes
 			element?.setAttribute('data-swup-fragment-url', url);
+			element?.setAttribute('data-swup-fragment-selector', fragment.selector);
 		});
 	});
 };
@@ -212,6 +213,15 @@ export const teleportFragment = (fragment: Fragment, swup: Swup): void => {
 	const el = document.querySelector(fragment.selector);
 	if (!el) return;
 
+	/**
+	 * Insert a placeholder for the teleported fragment.
+	 * Allows us to teleport the fragment back to it's original position
+	 * in the DOM just before the next `content:replace`
+	 */
+	const placeholder = document.createElement('template');
+	placeholder.setAttribute('data-swup-teleport-placeholder', fragment.selector);
+	el.before(placeholder);
+
 	const parents = getParentContainers(fragment, swup);
 
 	el.setAttribute('data-swup-fragment-parents', JSON.stringify(parents));
@@ -230,14 +240,23 @@ export const getFirstMatchingRule = (route: Route, rules: Rule[]): Rule | undefi
  */
 export const teleportFragments = ({ rules, swup }: SwupFragmentPlugin): void => {
 	const url = swup.getCurrentUrl();
-
 	rules.forEach((rule) => {
-		const matchesFrom = rule.matchesFrom(url);
-		const matchesTo = rule.matchesTo(url);
-
-		if (!matchesFrom && !matchesTo) return;
+		if (!rule.matchesTo(url)) return;
 
 		rule.fragments.forEach((fragment) => teleportFragment(fragment, swup));
+	});
+};
+
+/**
+ * Teleports fragments back to their placeholders
+ */
+export const teleportFragmentsBack = (): void => {
+	document.querySelectorAll('[data-swup-teleport-placeholder]').forEach((el) => {
+		const selector = el.getAttribute('data-swup-teleport-placeholder');
+		if (!selector) return;
+		const teleported = document.querySelector(selector);
+		if (!teleported) return;
+		el.replaceWith(teleported);
 	});
 };
 
@@ -287,7 +306,10 @@ export const cachePersistedFragments = ({ rules, swup }: SwupFragmentPlugin): vo
 		// We don't want a possibly dynamic `data-swup-fragment-url` to end up in the cache
 		originalCachedFragment.removeAttribute('data-swup-fragment-url');
 
-		const currentCachedDocument = new DOMParser().parseFromString(currentCache.html, 'text/html');
+		const currentCachedDocument = new DOMParser().parseFromString(
+			currentCache.html,
+			'text/html'
+		);
 		const currentCachedFragment = currentCachedDocument.querySelector(selector);
 		if (!currentCachedFragment) return;
 

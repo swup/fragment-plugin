@@ -4,7 +4,7 @@ import Rule from './inc/Rule.js';
 import type { Path, Handler } from 'swup';
 import Logger from './inc/Logger.js';
 import {
-	addFragmentUrls,
+	addFragmentAttributes,
 	cleanupFragmentUrls,
 	handleDynamicFragmentLinks,
 	getReplaceableFragments,
@@ -15,7 +15,8 @@ import {
 	cleanupTeleportedFragments,
 	teleportFragments,
 	getFirstMatchingRule,
-	cachePersistedFragments
+	cachePersistedFragments,
+	teleportFragmentsBack
 } from './inc/functions.js';
 
 declare module 'swup' {
@@ -118,10 +119,11 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		swup.hooks.before('link:self', this.onLinkToSelf);
 		swup.hooks.on('visit:start', this.onVisitStart);
+		swup.hooks.before('content:replace', this.beforeContentReplace);
 		swup.hooks.on('content:replace', this.onContentReplace);
 		swup.hooks.on('visit:end', this.onVisitEnd);
 
-		addFragmentUrls(this);
+		addFragmentAttributes(this);
 		teleportFragments(this);
 	}
 
@@ -133,6 +135,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		swup.hooks.off('link:self', this.onLinkToSelf);
 		swup.hooks.off('visit:start', this.onVisitStart);
+		swup.hooks.off('content:replace', this.beforeContentReplace);
 		swup.hooks.off('content:replace', this.onContentReplace);
 		swup.hooks.off('visit:end', this.onVisitEnd);
 
@@ -207,14 +210,19 @@ export default class SwupFragmentPlugin extends PluginBase {
 		addRuleNameToFragments(context.fragmentVisit);
 	};
 
+	beforeContentReplace: Handler<"content:replace"> = (context) => {
+		teleportFragmentsBack();
+		// cleanupTeleportedFragments();
+	}
+
 	/**
 	 * Runs after the content was replaced
 	 */
 	onContentReplace: Handler<'content:replace'> = (context) => {
 		if (context.fragmentVisit) addRuleNameToFragments(context.fragmentVisit);
-		addFragmentUrls(this);
+		addFragmentAttributes(this);
 		handleDynamicFragmentLinks(this.logger);
-		cleanupTeleportedFragments(context);
+		// cleanupTeleportedFragments(context);
 		teleportFragments(this);
 		cachePersistedFragments(this);
 	};
