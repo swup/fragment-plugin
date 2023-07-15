@@ -12,7 +12,6 @@ import {
 	addRuleNameToFragments,
 	removeRuleNameFromFragments,
 	getFragmentSelectors,
-	cleanupTeleportedFragments,
 	teleportFragments,
 	getFirstMatchingRule,
 	cachePersistedFragments,
@@ -212,7 +211,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 	beforeContentReplace: Handler<"content:replace"> = (context) => {
 		teleportFragmentsBack();
-		// cleanupTeleportedFragments();
 	}
 
 	/**
@@ -222,7 +220,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 		if (context.fragmentVisit) addRuleNameToFragments(context.fragmentVisit);
 		addFragmentAttributes(this);
 		handleDynamicFragmentLinks(this.logger);
-		// cleanupTeleportedFragments(context);
 		teleportFragments(this);
 		cachePersistedFragments(this);
 	};

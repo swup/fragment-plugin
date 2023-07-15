@@ -166,23 +166,6 @@ export const getFragmentSelectors = (fragments: Fragment[]): string[] => {
 };
 
 /**
- * Cleanup existing teleported fragments
- */
-export const cleanupTeleportedFragments = (context: SwupContext) => {
-	document.querySelectorAll('[data-swup-fragment-parents]').forEach((el) => {
-		const parentSelectors = JSON.parse(
-			String(el.getAttribute('data-swup-fragment-parents'))
-		) as string[];
-
-		const shouldBeRemoved = parentSelectors.some((selector) =>
-			context.containers.includes(selector)
-		);
-
-		if (shouldBeRemoved) el.remove();
-	});
-};
-
-/**
  * Get the parents of a teleported fragment
  */
 const getParentContainers = ({ selector }: Fragment, swup: Swup): string[] => {
