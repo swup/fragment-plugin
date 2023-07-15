@@ -42,6 +42,8 @@ export const addFragmentAttributes = ({ rules, swup }: SwupFragmentPlugin): void
 			const element = document.querySelector(fragment.selector);
 			// Bail early if the fragment already has the attribute
 			if (element?.matches('[data-swup-fragment-url]')) return;
+			// Bail early if this is a <template> element
+			if (element?.tagName === 'TEMPLATE') return;
 			// Finally, add the attributes
 			element?.setAttribute('data-swup-fragment-url', url);
 			element?.setAttribute('data-swup-fragment-selector', fragment.selector);
@@ -259,19 +261,19 @@ const getAllFragmentSelectors = (rules: Rule[]): string[] => {
 /**
  * Makes sure persisted fragments land in the cache of the current page
  */
-export const cachePersistedFragments = ({ rules, swup }: SwupFragmentPlugin): void => {
+export const cachePersistedFragments = ({ rules, swup, logger }: SwupFragmentPlugin): void => {
 	const currentUrl = swup.getCurrentUrl();
 	const cache = swup.cache;
 
-	const availableSelectors = getAllFragmentSelectors(rules);
+	// const availableSelectors = getAllFragmentSelectors(rules);
 
 	const persisted = Array.from(document.querySelectorAll('[data-swup-fragment-url]')).filter(
 		(el) => !elementMatchesFragmentUrl(el, currentUrl)
 	);
 
 	persisted.forEach((el) => {
-		const selector = availableSelectors.find((s) => el.matches(s));
-		if (!selector) return;
+		const selector = el.getAttribute('data-swup-fragment-selector');
+		if (!selector) return logger.warn(`no [data-swup-fragment-selector] found on persisted fragment:`, el);
 
 		const fragmentUrl = Location.fromUrl(String(el.getAttribute('data-swup-fragment-url'))).url;
 
