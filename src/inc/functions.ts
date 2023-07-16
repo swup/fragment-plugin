@@ -34,9 +34,7 @@ function handleLinksToFragments({ logger, swup }: SwupFragmentPlugin): void {
 		const fragmentUrl = fragment.getAttribute('data-swup-fragment-url');
 
 		if (!fragmentUrl)
-			return logger.warn(
-				`Can't get fragment URL of ${selector} as it doesn't exist`
-			);
+			return logger.warn(`Can't get fragment URL of ${selector} as it doesn't exist`);
 
 		// Help finding missing [data-swup-fragment-urls]
 		if (isEqualUrl(fragmentUrl, swup.getCurrentUrl())) {
@@ -53,20 +51,26 @@ function handleLinksToFragments({ logger, swup }: SwupFragmentPlugin): void {
  * Adds [data-swup-fragment-url] to all fragments that don't already contain that attribute
  */
 function addFragmentAttributes({ rules, swup }: SwupFragmentPlugin): void {
-	const url = swup.getCurrentUrl();
+	const currentUrl = swup.getCurrentUrl();
 
 	rules
-		.filter((rule) => rule.matchesFrom(url) || rule.matchesTo(url))
+		.filter((rule) => rule.matchesFrom(currentUrl) || rule.matchesTo(currentUrl))
 		.forEach((rule) => {
 			rule.fragments.forEach((fragment) => {
-				const element = document.querySelector(fragment.selector);
-				// Bail early if this is a <template> element
-				if (element?.tagName === 'TEMPLATE') return;
+				const element = document.querySelector(fragment.selector) as HTMLElement | null;
+				// No element
+				if (!element) return;
+				// Handle <template> elements
+				if (element.tagName === 'TEMPLATE') {
+					element.style.transitionDuration = "1ms";
+					element.style.animationDuration = "1ms";
+					return;
+				}
 				// Save the selector that matched the element
-				element?.setAttribute('data-swup-fragment-selector', fragment.selector);
+				element.setAttribute('data-swup-fragment-selector', fragment.selector);
 				// Finally, add the fragment url attribute if not already present
-				if (!element?.getAttribute('data-swup-fragment-url')) {
-					element?.setAttribute('data-swup-fragment-url', url);
+				if (!element.getAttribute('data-swup-fragment-url')) {
+					element.setAttribute('data-swup-fragment-url', currentUrl);
 				}
 			});
 		});
