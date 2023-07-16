@@ -253,48 +253,69 @@ export const cacheUnchangedFragments = ({ rules, swup, logger }: SwupFragmentPlu
 	const currentUrl = swup.getCurrentUrl();
 	const cache = swup.cache;
 
+	// Get the cache entry for the current URL
+	const currentCache = cache.get(currentUrl);
+	if (!currentCache) return;
+	const currentCachedDocument = new DOMParser().parseFromString(currentCache.html, 'text/html');
+
+	// debug info
+	const updatedFragments: {
+		fragmentSelector: string;
+		fragmentUrl: string;
+	}[] = [];
+
 	// We only want to handle fragments that don't fit the current URL
 	const unchangedFragments = Array.from(
 		document.querySelectorAll('[data-swup-fragment-url]')
 	).filter((el) => !elementMatchesFragmentUrl(el, currentUrl));
 
 	unchangedFragments.forEach((el) => {
+		// Get and validate `fragmentUrl`
+		const rawFragmentUrl = el.getAttribute('data-swup-fragment-url');
+		if (!rawFragmentUrl) {
+			return logger.warn(`invalid [data-swup-fragment-url] found on unchanged fragment:`, el);
+		}
+		const fragmentUrl = Location.fromUrl(rawFragmentUrl).url;
+
+		// Get and validate `fragmentSelector`
 		const fragmentSelector = el.getAttribute('data-swup-fragment-selector');
-		if (!fragmentSelector)
-			return logger.warn(`no [data-swup-fragment-selector] found on persisted fragment:`, el);
+		if (!fragmentSelector) {
+			return logger.warn(`no [data-swup-fragment-selector] found on unchanged fragment:`, el);
+		}
 
-		// Get fragment attributes from the element
-		const fragmentUrl = Location.fromUrl(String(el.getAttribute('data-swup-fragment-url'))).url;
-
-		// Get the cache entry for the fragment URL
+		// Get the cache entry for the fragment URL, bail early if it doesn't exist
 		const fragmentCache = cache.get(fragmentUrl);
 		if (!fragmentCache) return;
 
-		// Re-Query the fragment from it's cache, to make sure it's not mutated (as sent by the server)
-		const fragment = new DOMParser()
+		// Check if the fragment exists in the current cached document
+		const currentFragment = currentCachedDocument.querySelector(fragmentSelector);
+		if (!currentFragment) return;
+
+		// Get a fresh copy of the fragment from it's original cache
+		const unchangedFragment = new DOMParser()
 			.parseFromString(fragmentCache.html, 'text/html')
 			.querySelector(fragmentSelector);
-		if (!fragment) return;
+		if (!unchangedFragment) return;
 
-		// Get the cache entry for the current URL
-		const currentCache = cache.get(currentUrl);
-		if (!currentCache) return;
+		// Make sure the dynamic attributes make it to the cache
+		unchangedFragment.setAttribute('data-swup-fragment-url', fragmentUrl);
+		unchangedFragment.setAttribute('data-swup-fragment-selector', fragmentSelector);
 
-		const cacheDoc = new DOMParser().parseFromString(currentCache.html, 'text/html');
-		const fragmentToReplace = cacheDoc.querySelector(fragmentSelector);
-		if (!fragmentToReplace) return;
+		// Replace the current fragment with the unchanged fragment
+		currentFragment.replaceWith(unchangedFragment);
 
-		fragment.setAttribute('data-swup-fragment-url', fragmentUrl);
-		fragment.setAttribute('data-swup-fragment-selector', fragmentSelector);
-
-		// Replace the current fragment with the preserved fragment
-		fragmentToReplace.replaceWith(fragment);
-
-		// Update the cache of the current page with the updated html
-		cache.update(currentUrl, {
-			...currentCache,
-			html: cacheDoc.documentElement.outerHTML
-		});
-
+		// For debugging
+		updatedFragments.push({ fragmentSelector, fragmentUrl });
 	});
+
+	if (!updatedFragments.length) return;
+
+	// Update the cache of the current page with the updated html
+	cache.update(currentUrl, {
+		...currentCache,
+		html: currentCachedDocument.documentElement.outerHTML
+	});
+
+	// Log the result
+	logger.log(`updated cache for unchanged fragment(s):`, updatedFragments);
 };

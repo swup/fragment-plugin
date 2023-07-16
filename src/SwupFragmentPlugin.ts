@@ -101,7 +101,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		this.options = { ...this.defaults, ...options };
 
 		this.logger = new Logger({
-			prefix: '[@swup/fragment-plugin]',
+			prefix: '🧩',
 			muted: this.options.debug !== true
 		});
 
