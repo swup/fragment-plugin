@@ -8,15 +8,16 @@ import SwupFragmentPlugin from '../SwupFragmentPlugin.js';
  * Handles a page view. Runs on `mount` as well as on every content:replace
  */
 export const handlePageView = (fragmentPlugin: SwupFragmentPlugin): void => {
+	teleportFragments(fragmentPlugin);
+	detectMissingFragmentUrls(fragmentPlugin);
 	addFragmentAttributes(fragmentPlugin);
 	handleLinksToFragments(fragmentPlugin);
-	teleportFragments(fragmentPlugin);
 }
 
 /**
  * Updates the `href` of links matching [data-swup-link-to-fragment="#my-fragment"]
  */
-export function handleLinksToFragments({ logger }: SwupFragmentPlugin): void {
+function handleLinksToFragments({ logger }: SwupFragmentPlugin): void {
 	const targetAttribute = 'data-swup-link-to-fragment';
 	const links = document.querySelectorAll<HTMLAnchorElement>(`a[${targetAttribute}]`);
 
@@ -42,10 +43,14 @@ export function handleLinksToFragments({ logger }: SwupFragmentPlugin): void {
 	});
 }
 
+function detectMissingFragmentUrls({rules}: SwupFragmentPlugin): void {
+
+}
+
 /**
  * Adds [data-swup-fragment-url] to all fragments that don't already contain that attribute
  */
-export const addFragmentAttributes = ({ rules, swup }: SwupFragmentPlugin): void => {
+function addFragmentAttributes({ rules, swup }: SwupFragmentPlugin): void {
 	const url = swup.getCurrentUrl();
 	rules.forEach((rule) => {
 		// if (!rule.matchesFrom(url) && !rule.matchesTo(url)) return;
@@ -137,9 +142,10 @@ const normalizeUrl = (url: string) => {
 /**
  * Removes [data-swup-fragment-url] from all elements
  */
-export const cleanupFragmentUrls = () => {
+export const cleanupFragmentAttributes = () => {
 	document.querySelectorAll('[data-swup-fragment-url]').forEach((el) => {
 		el.removeAttribute('data-swup-fragment-url');
+		el.removeAttribute('data-swup-fragment-selector');
 	});
 };
 
@@ -233,7 +239,7 @@ export const getFirstMatchingRule = (route: Route, rules: Rule[]): Rule | undefi
 /**
  * Teleport fragments to the body
  */
-export const teleportFragments = ({ rules, swup }: SwupFragmentPlugin): void => {
+export function teleportFragments({ rules, swup }: SwupFragmentPlugin): void {
 	const url = swup.getCurrentUrl();
 	rules.forEach((rule) => {
 		if (!rule.matchesTo(url)) return;

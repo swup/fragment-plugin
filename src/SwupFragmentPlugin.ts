@@ -5,9 +5,7 @@ import type { Path, Handler } from 'swup';
 import Logger from './inc/Logger.js';
 import {
 	handlePageView,
-	addFragmentAttributes,
-	cleanupFragmentUrls,
-	handleLinksToFragments,
+	cleanupFragmentAttributes,
 	getReplaceableFragments,
 	getRoute,
 	addRuleNameToFragments,
@@ -138,7 +136,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		swup.hooks.off('content:replace', this.onContentReplace);
 		swup.hooks.off('visit:end', this.onVisitEnd);
 
-		cleanupFragmentUrls();
+		cleanupFragmentAttributes();
 	}
 
 	/**
@@ -155,9 +153,9 @@ export default class SwupFragmentPlugin extends PluginBase {
 		// Bail early if there are no valid fragments for the rule
 		if (!fragments.length) return;
 
-		const state = { rule, fragments };
+		const visit = { rule, fragments };
 
-		return state;
+		return visit;
 	}
 
 	/**
