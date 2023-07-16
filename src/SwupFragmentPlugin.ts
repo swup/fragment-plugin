@@ -17,6 +17,9 @@ import {
 	teleportFragmentsBack
 } from './inc/functions.js';
 
+import FragmentSlotElement from './inc/FragmentSlotElement.js';
+import TeleportBaseElement from './inc/TeleportBaseElement.js';
+
 declare module 'swup' {
 	export interface Context {
 		fragmentVisit?: FragmentVisit;
@@ -107,6 +110,17 @@ export default class SwupFragmentPlugin extends PluginBase {
 		this.rules = this.options.rules.map(
 			({ from, to, fragments, name }) => new Rule(from, to, fragments, name)
 		);
+
+		this.defineCustomElement('swup-teleport-base', TeleportBaseElement);
+		this.defineCustomElement('swup-fragment-slot', FragmentSlotElement);
+	}
+
+	/**
+	 * Defines a custom element if not defied already
+	 */
+	defineCustomElement(elementName: string, className: any): void {
+		if (window.customElements.get(elementName)) return;
+		window.customElements.define(elementName, className);
 	}
 
 	/**
@@ -207,9 +221,9 @@ export default class SwupFragmentPlugin extends PluginBase {
 		addRuleNameToFragments(context.fragmentVisit);
 	};
 
-	beforeContentReplace: Handler<"content:replace"> = (context) => {
+	beforeContentReplace: Handler<'content:replace'> = (context) => {
 		teleportFragmentsBack();
-	}
+	};
 
 	/**
 	 * Runs after the content was replaced

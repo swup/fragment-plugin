@@ -3,6 +3,8 @@ import type { Context as SwupContext } from 'swup';
 import type { Rule, Route, FragmentVisit, Fragment } from '../SwupFragmentPlugin.js';
 import Logger from './Logger.js';
 import SwupFragmentPlugin from '../SwupFragmentPlugin.js';
+import FragmentSlotElement from './FragmentSlotElement.js';
+import TeleportBaseElement from './TeleportBaseElement.js';
 
 /**
  * Handles a page view. Runs on `mount` as well as on every content:replace
@@ -225,13 +227,13 @@ export const teleportFragment = (fragment: Fragment, swup: Swup): void => {
 	if (!el) return;
 
 	/**
-	 * Insert a slot for the teleported fragment.
+	 * Inject a base for the teleported fragment.
 	 * Allows us to teleport the fragment back to it's original position
-	 * in the DOM just before the next `content:replace`
+	 * in the DOM right before the next `content:replace`
 	 */
-	const slot = document.createElement('template');
-	slot.setAttribute('data-swup-teleport-slot', fragment.selector);
-	el.before(slot);
+	const teleportBase = document.createElement('swup-teleport-base') as TeleportBaseElement;
+	teleportBase.selector = fragment.selector;
+	el.before(teleportBase);
 
 	document.body.prepend(el);
 };
@@ -257,12 +259,11 @@ export function teleportFragments({ rules, swup }: SwupFragmentPlugin): void {
  * Teleports fragments back to their placeholders
  */
 export const teleportFragmentsBack = (): void => {
-	document.querySelectorAll('[data-swup-teleport-slot]').forEach((el) => {
-		const selector = el.getAttribute('data-swup-teleport-slot');
-		if (!selector) return;
-		const teleported = document.querySelector(selector);
-		if (!teleported) return;
-		el.replaceWith(teleported);
+	document.querySelectorAll<TeleportBaseElement>('swup-teleport-base').forEach((base) => {
+		if (!base.selector) return;
+		const teleportedFragment = document.querySelector(base.selector);
+		if (!teleportedFragment) return;
+		base.replaceWith(teleportedFragment);
 	});
 };
 
