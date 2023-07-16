@@ -11,32 +11,39 @@ export const handlePageView = (fragmentPlugin: SwupFragmentPlugin): void => {
 	teleportFragments(fragmentPlugin);
 	addFragmentAttributes(fragmentPlugin);
 	handleLinksToFragments(fragmentPlugin);
-}
+};
 
 /**
  * Updates the `href` of links matching [data-swup-link-to-fragment="#my-fragment"]
  */
-function handleLinksToFragments({ logger }: SwupFragmentPlugin): void {
+function handleLinksToFragments({ logger, swup }: SwupFragmentPlugin): void {
 	const targetAttribute = 'data-swup-link-to-fragment';
 	const links = document.querySelectorAll<HTMLAnchorElement>(`a[${targetAttribute}]`);
 
 	links.forEach((el) => {
 		const selector = el.getAttribute(targetAttribute);
-		if (!selector)
-			return logger.warn(
-				`[${targetAttribute}] needs to contain a valid CSS selector`,
-				selector
-			);
+		if (!selector) {
+			return logger.warn(`[${targetAttribute}] needs to contain a valid fragment selector`);
+		}
 
 		const fragment = document.querySelector(selector);
-		if (!fragment) return logger?.warn(`No element found for [${targetAttribute}]:`, selector);
+		if (!fragment) {
+			return logger?.warn(`no element found for [${targetAttribute}="${selector}"]`);
+		}
 
 		const fragmentUrl = fragment.getAttribute('data-swup-fragment-url');
 
 		if (!fragmentUrl)
 			return logger.warn(
-				`[${targetAttribute}]: ${selector} doesn't have a [data-swup-fragment-url]`
+				`Can't get fragment URL of ${selector} as it doesn't exist`
 			);
+
+		// Help finding missing [data-swup-fragment-urls]
+		if (isEqualUrl(fragmentUrl, swup.getCurrentUrl())) {
+			return logger.warn(
+				`The fragment URL of ${selector} is identical to the current URL. This could mean that [data-swup-fragment-url] needs to be provided by the server.`
+			);
+		}
 
 		el.href = fragmentUrl;
 	});
@@ -47,22 +54,23 @@ function handleLinksToFragments({ logger }: SwupFragmentPlugin): void {
  */
 function addFragmentAttributes({ rules, swup }: SwupFragmentPlugin): void {
 	const url = swup.getCurrentUrl();
-	rules.forEach((rule) => {
-		// if (!rule.matchesFrom(url) && !rule.matchesTo(url)) return;
 
-		rule.fragments.forEach((fragment) => {
-			const element = document.querySelector(fragment.selector);
-			// Bail early if this is a <template> element
-			if (element?.tagName === 'TEMPLATE') return;
-			// Save the selector that matched the element
-			element?.setAttribute('data-swup-fragment-selector', fragment.selector);
-			// Finally, add the fragment url attribute if not already present
-			if (!element?.getAttribute('data-swup-fragment-url')) {
-				element?.setAttribute('data-swup-fragment-url', url);
-			}
+	rules
+		.filter((rule) => rule.matchesFrom(url) || rule.matchesTo(url))
+		.forEach((rule) => {
+			rule.fragments.forEach((fragment) => {
+				const element = document.querySelector(fragment.selector);
+				// Bail early if this is a <template> element
+				if (element?.tagName === 'TEMPLATE') return;
+				// Save the selector that matched the element
+				element?.setAttribute('data-swup-fragment-selector', fragment.selector);
+				// Finally, add the fragment url attribute if not already present
+				if (!element?.getAttribute('data-swup-fragment-url')) {
+					element?.setAttribute('data-swup-fragment-url', url);
+				}
+			});
 		});
-	});
-};
+}
 
 /**
  * Get all fragments that should be replaced for a given visit's route
@@ -236,12 +244,10 @@ export const getFirstMatchingRule = (route: Route, rules: Rule[]): Rule | undefi
  */
 export function teleportFragments({ rules, swup }: SwupFragmentPlugin): void {
 	const url = swup.getCurrentUrl();
-	rules.forEach((rule) => {
-		if (!rule.matchesTo(url)) return;
-
-		rule.fragments.forEach((fragment) => teleportFragment(fragment, swup));
-	});
-};
+	rules
+		.filter((rule) => rule.matchesTo(url))
+		.forEach((rule) => rule.fragments.forEach((fragment) => teleportFragment(fragment, swup)));
+}
 
 /**
  * Teleports fragments back to their placeholders
