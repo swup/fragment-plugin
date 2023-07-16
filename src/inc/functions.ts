@@ -5,16 +5,25 @@ import Logger from './Logger.js';
 import SwupFragmentPlugin from '../SwupFragmentPlugin.js';
 
 /**
+ * Handles a page view. Runs on `mount` as well as on every content:replace
+ */
+export const handlePageView = (fragmentPlugin: SwupFragmentPlugin): void => {
+	addFragmentAttributes(fragmentPlugin);
+	handleLinksToFragments(fragmentPlugin);
+	teleportFragments(fragmentPlugin);
+}
+
+/**
  * Updates the `href` of links matching [data-swup-link-to-fragment="#my-fragment"]
  */
-export function handleDynamicFragmentLinks(logger?: Logger): void {
+export function handleLinksToFragments({ logger }: SwupFragmentPlugin): void {
 	const targetAttribute = 'data-swup-link-to-fragment';
 	const links = document.querySelectorAll<HTMLAnchorElement>(`a[${targetAttribute}]`);
 
 	links.forEach((el) => {
 		const selector = el.getAttribute(targetAttribute);
 		if (!selector)
-			return logger?.warn(
+			return logger.warn(
 				`[${targetAttribute}] needs to contain a valid CSS selector`,
 				selector
 			);
@@ -23,8 +32,11 @@ export function handleDynamicFragmentLinks(logger?: Logger): void {
 		if (!fragment) return logger?.warn(`No element found for [${targetAttribute}]:`, selector);
 
 		const fragmentUrl = fragment.getAttribute('data-swup-fragment-url');
+
 		if (!fragmentUrl)
-			return logger?.warn("Targeted element doesn't have a [data-swup-fragme-url]", fragment);
+			return logger.warn(
+				`[${targetAttribute}]: ${selector} doesn't have a [data-swup-fragment-url]`
+			);
 
 		el.href = fragmentUrl;
 	});
@@ -200,17 +212,14 @@ export const teleportFragment = (fragment: Fragment, swup: Swup): void => {
 	if (!el) return;
 
 	/**
-	 * Insert a placeholder for the teleported fragment.
+	 * Insert a slot for the teleported fragment.
 	 * Allows us to teleport the fragment back to it's original position
 	 * in the DOM just before the next `content:replace`
 	 */
-	const placeholder = document.createElement('template');
-	placeholder.setAttribute('data-swup-teleport-placeholder', fragment.selector);
-	el.before(placeholder);
+	const slot = document.createElement('template');
+	slot.setAttribute('data-swup-teleport-slot', fragment.selector);
+	el.before(slot);
 
-	const parents = getParentContainers(fragment, swup);
-
-	el.setAttribute('data-swup-fragment-parents', JSON.stringify(parents));
 	document.body.prepend(el);
 };
 
@@ -237,8 +246,8 @@ export const teleportFragments = ({ rules, swup }: SwupFragmentPlugin): void => 
  * Teleports fragments back to their placeholders
  */
 export const teleportFragmentsBack = (): void => {
-	document.querySelectorAll('[data-swup-teleport-placeholder]').forEach((el) => {
-		const selector = el.getAttribute('data-swup-teleport-placeholder');
+	document.querySelectorAll('[data-swup-teleport-slot]').forEach((el) => {
+		const selector = el.getAttribute('data-swup-teleport-slot');
 		if (!selector) return;
 		const teleported = document.querySelector(selector);
 		if (!teleported) return;

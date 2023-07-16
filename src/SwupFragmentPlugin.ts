@@ -4,9 +4,10 @@ import Rule from './inc/Rule.js';
 import type { Path, Handler } from 'swup';
 import Logger from './inc/Logger.js';
 import {
+	handlePageView,
 	addFragmentAttributes,
 	cleanupFragmentUrls,
-	handleDynamicFragmentLinks,
+	handleLinksToFragments,
 	getReplaceableFragments,
 	getRoute,
 	addRuleNameToFragments,
@@ -122,8 +123,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		swup.hooks.on('content:replace', this.onContentReplace);
 		swup.hooks.on('visit:end', this.onVisitEnd);
 
-		addFragmentAttributes(this);
-		teleportFragments(this);
+		handlePageView(this);
 	}
 
 	/**
@@ -218,9 +218,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 */
 	onContentReplace: Handler<'content:replace'> = (context) => {
 		if (context.fragmentVisit) addRuleNameToFragments(context.fragmentVisit);
-		addFragmentAttributes(this);
-		handleDynamicFragmentLinks(this.logger);
-		teleportFragments(this);
+		handlePageView(this);
 		cacheUnchangedFragments(this);
 	};
 
