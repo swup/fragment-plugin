@@ -14,7 +14,7 @@ import {
 	getFragmentSelectors,
 	teleportFragments,
 	getFirstMatchingRule,
-	cachePersistedFragments,
+	cacheUnchangedFragments,
 	teleportFragmentsBack
 } from './inc/functions.js';
 
@@ -221,7 +221,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		addFragmentAttributes(this);
 		handleDynamicFragmentLinks(this.logger);
 		teleportFragments(this);
-		cachePersistedFragments(this);
+		cacheUnchangedFragments(this);
 	};
 
 	/**
