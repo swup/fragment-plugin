@@ -1,4 +1,8 @@
+/**
+ * Acts as a base for teleported fragment elements
+ */
 export default class TeleportBaseElement extends HTMLElement {
+
 	get selector() {
 		return this.getAttribute('selector');
 	}
@@ -11,15 +15,15 @@ export default class TeleportBaseElement extends HTMLElement {
 		this.setAttribute('selector', val);
 	}
 
-	static get observedAttributes() {
-		return ['selector'];
-	}
+	// static get observedAttributes() {
+	// 	return ['selector'];
+	// }
 
-	attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-		switch (name) {
-			case 'selector':
-				this.selector = newValue;
-				break;
-		}
-	}
+	// attributeChangedCallback(name: string, oldValue: string, newValue: string) {
+	// 	switch (name) {
+	// 		case 'selector':
+	// 			this.setSelector(newValue);
+	// 			break;
+	// 	}
+	// }
 }
