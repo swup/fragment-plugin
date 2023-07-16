@@ -247,7 +247,7 @@ export const teleportFragmentsBack = (): void => {
 };
 
 /**
- * Makes sure persisted fragments land in the cache of the current page
+ * Makes sure unchanged fragments land in the cache of the current page
  */
 export const cacheUnchangedFragments = ({ rules, swup, logger }: SwupFragmentPlugin): void => {
 	const currentUrl = swup.getCurrentUrl();
