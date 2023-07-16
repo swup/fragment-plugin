@@ -1,3 +1,5 @@
 @TODO:
+  ❍ Think about the API `teleport`
   ❍ Document `teleport`
   ❍ If possible: Warn about overlayed fragments that don't have an initial [data-swup-fragment-url]
+
