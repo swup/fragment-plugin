@@ -2,6 +2,7 @@
   ❍ Think about the API `teleport`: maybe `modal` is more clear? DOM or JS?
   ❍ Document `teleport`
   ❍ Tests – maybe in the plugin itself in this case?
+  ❍ Check if the code of `TeleportBaseElement` should be optimized
   ✔ If possible: Warn about overlayed fragments that don't have an initial [data-swup-fragment-url]
     > kind of solved in `handleLinksToFragments`
 
