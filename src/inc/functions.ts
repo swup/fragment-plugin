@@ -9,7 +9,6 @@ import SwupFragmentPlugin from '../SwupFragmentPlugin.js';
  */
 export const handlePageView = (fragmentPlugin: SwupFragmentPlugin): void => {
 	teleportFragments(fragmentPlugin);
-	detectMissingFragmentUrls(fragmentPlugin);
 	addFragmentAttributes(fragmentPlugin);
 	handleLinksToFragments(fragmentPlugin);
 }
@@ -41,10 +40,6 @@ function handleLinksToFragments({ logger }: SwupFragmentPlugin): void {
 
 		el.href = fragmentUrl;
 	});
-}
-
-function detectMissingFragmentUrls({rules}: SwupFragmentPlugin): void {
-
 }
 
 /**
