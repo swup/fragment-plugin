@@ -62,12 +62,8 @@ function addFragmentAttributes({ rules, swup }: SwupFragmentPlugin): void {
 				const element = document.querySelector(fragment.selector) as HTMLElement | null;
 				// No element
 				if (!element) return;
-				// Handle <template> elements
-				if (element.tagName === 'TEMPLATE') {
-					element.style.transitionDuration = "1ms";
-					element.style.animationDuration = "1ms";
-					return;
-				}
+				// Ignore <template> and <swup-fragment-slot>
+				if (['template', 'swup-fragment-slot'].includes(element.tagName.toLowerCase())) return;
 				// Save the selector that matched the element
 				element.setAttribute('data-swup-fragment-selector', fragment.selector);
 				// Finally, add the fragment url attribute if not already present
