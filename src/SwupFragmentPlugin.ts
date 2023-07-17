@@ -210,7 +210,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * Runs just before the content is replaced
 	 */
 	beforeContentReplace: Handler<'content:replace'> = (context) => {
-		cleanupModals();
+		cleanupModals(context);
 	};
 
 	/**

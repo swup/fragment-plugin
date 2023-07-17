@@ -6,6 +6,7 @@ import Logger from "./Logger.js";
 export default class ModalOriginElement extends HTMLElement {
 
 	logger?: Logger;
+	modalElement?: Element;
 
 	/**
 	 * Make it easier to access "selector"

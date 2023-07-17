@@ -9,9 +9,9 @@ import { handleModals } from './modals.js';
  * Handles a page view. Runs on `mount` as well as on every content:replace
  */
 export const handlePageView = (fragmentPlugin: SwupFragmentPlugin): void => {
-	handleModals(fragmentPlugin);
 	addFragmentAttributes(fragmentPlugin);
 	handleLinksToFragments(fragmentPlugin);
+	handleModals(fragmentPlugin);
 };
 
 /**
