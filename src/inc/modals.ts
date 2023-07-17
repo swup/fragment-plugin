@@ -1,6 +1,6 @@
 import type { Context as SwupContext } from 'swup';
 import SwupFragmentPlugin from '../SwupFragmentPlugin.js';
-import SwupModalOrigin from './SwupModalOrigin.js';
+import SwupModalPlaceholder from './SwupModalPlaceholder.js';
 
 /**
  * Handle fragments marked with [data-swup-fragment-modal]
@@ -30,7 +30,7 @@ export const createModal = (el: Element, { logger }: SwupFragmentPlugin): void =
 	const selector = el.getAttribute('data-swup-fragment-selector')!;
 
 	// Create the origin
-	const origin = document.createElement('swup-modal-origin') as SwupModalOrigin;
+	const origin = document.createElement('swup-modal-placeholder') as SwupModalPlaceholder;
 	origin.logger = logger;
 	origin.selector = selector;
 	el.before(origin);
@@ -45,7 +45,7 @@ export const createModal = (el: Element, { logger }: SwupFragmentPlugin): void =
 export const cleanupModals = (context: SwupContext): void => {
 	const containers = context.containers;
 
-	document.querySelectorAll<SwupModalOrigin>('swup-modal-origin').forEach((origin) => {
+	document.querySelectorAll<SwupModalPlaceholder>('swup-modal-placeholder').forEach((origin) => {
 
 		// We only want to clean-up the modal, if it will be replaced during this visit
 		const doCleanup = containers.some((containerSelector) => {

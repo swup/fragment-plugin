@@ -17,7 +17,7 @@ import {
 import { cleanupModals } from './inc/modals.js';
 
 import SwupFragmentSlot from './inc/SwupFragmentSlot.js';
-import SwupModalOrigin from './inc/SwupModalOrigin.js';
+import SwupModalPlaceholder from './inc/SwupModalPlaceholder.js';
 
 declare module 'swup' {
 	export interface Context {
@@ -102,8 +102,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * Defines custom elements
 	 */
 	defineCustomElements(): void {
-		if (!window.customElements.get('swup-modal-origin')) {
-			window.customElements.define('swup-modal-origin', SwupModalOrigin);
+		if (!window.customElements.get('swup-modal-placeholder')) {
+			window.customElements.define('swup-modal-placeholder', SwupModalPlaceholder);
 		}
 		if (!window.customElements.get('swup-fragment-slot')) {
 			window.customElements.define('swup-fragment-slot', SwupFragmentSlot);

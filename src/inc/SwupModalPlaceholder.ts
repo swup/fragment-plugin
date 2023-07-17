@@ -48,7 +48,7 @@ export default class extends HTMLElement {
 		const target = document.querySelector(selector);
 		if (target == null) {
 			console.log(this.logger);
-			this.logger?.error(`<swup-modal-origin>: '${selector}' doesn't match an element`);
+			this.logger?.error(`<swup-modal-placeholder>: '${selector}' doesn't match an element`);
 		}
 	}
 }
