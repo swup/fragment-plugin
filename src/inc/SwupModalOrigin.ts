@@ -1,9 +1,9 @@
 import Logger from "./Logger.js";
 
 /**
- * Acts as the origin for teleported elements
+ * Acts as the origin for modals
  */
-export default class TeleportOriginElement extends HTMLElement {
+export default class ModalOriginElement extends HTMLElement {
 
 	logger?: Logger;
 
@@ -48,7 +48,7 @@ export default class TeleportOriginElement extends HTMLElement {
 		const target = document.querySelector(selector);
 		if (target == null) {
 			console.log(this.logger);
-			this.logger?.error(`<swup-teleport-origin>: '${selector}' doesn't match an element`);
+			this.logger?.error(`<swup-modal-origin>: '${selector}' doesn't match an element`);
 		}
 	}
 }

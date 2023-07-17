@@ -11,12 +11,13 @@ import {
 	addRuleNameToFragments,
 	removeRuleNameFromFragments,
 	getFirstMatchingRule,
-	cacheUnchangedFragments,
-	cleanupTeleported
+	cacheUnchangedFragments
 } from './inc/functions.js';
 
-import FragmentSlotElement from './inc/FragmentSlotElement.js';
-import TeleportOriginElement from './inc/TeleportOriginElement.js';
+import { cleanupModals } from './inc/modals.js';
+
+import SwupFragmentSlot from './inc/SwupFragmentSlot.js';
+import SwupModalOrigin from './inc/SwupModalOrigin.js';
 
 declare module 'swup' {
 	export interface Context {
@@ -32,17 +33,10 @@ export type Route = {
 	to: string;
 };
 
-export type FragmentOptions =
-	| string
-	| {
-			selector: string;
-			teleport?: boolean;
-	  };
-
 export type RuleOptions = {
 	from: Path;
 	to: Path;
-	fragments: FragmentOptions[];
+	fragments: string[];
 	name?: string;
 };
 
@@ -56,15 +50,7 @@ export type Options = {
  */
 export type FragmentVisit = {
 	rule: Rule;
-	fragments: Fragment[];
-};
-
-/**
- * Represents a fragment object
- */
-export type Fragment = {
-	selector: string;
-	teleport: boolean;
+	fragments: string[];
 };
 
 /**
@@ -109,16 +95,19 @@ export default class SwupFragmentPlugin extends PluginBase {
 			({ from, to, fragments, name }) => new Rule(from, to, fragments, name)
 		);
 
-		this.defineCustomElement('swup-teleport-origin', TeleportOriginElement);
-		this.defineCustomElement('swup-fragment-slot', FragmentSlotElement);
+		this.defineCustomElements();
 	}
 
 	/**
-	 * Defines a custom element if not defied already
+	 * Defines custom elements
 	 */
-	defineCustomElement(elementName: string, className: any): void {
-		if (window.customElements.get(elementName)) return;
-		window.customElements.define(elementName, className);
+	defineCustomElements(): void {
+		if (!window.customElements.get('swup-modal-origin')) {
+			window.customElements.define('swup-modal-origin', SwupModalOrigin);
+		}
+		if (!window.customElements.get('swup-fragment-slot')) {
+			window.customElements.define('swup-fragment-slot', SwupFragmentSlot);
+		}
 	}
 
 	/**
@@ -202,19 +191,17 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		this.logger.log('fragment visit:', context.fragmentVisit);
 
-		const fragmentSelectors = context.fragmentVisit.fragments.map((fragment) => fragment.selector);
-
 		// Disable scrolling for this transition
 		context.scroll.reset = false;
 
 		// Add the transition classes directly to the fragments for this visit
-		context.animation.scope = fragmentSelectors;
+		context.animation.scope = context.fragmentVisit.fragments;
 
 		// Overwrite the containers for this visit
-		context.containers = fragmentSelectors;
+		context.containers = context.fragmentVisit.fragments;
 
 		// Overwrite the animationSelector for this visit
-		context.animation.selector = fragmentSelectors.join(',');
+		context.animation.selector = context.fragmentVisit.fragments.join(',');
 
 		addRuleNameToFragments(context.fragmentVisit);
 	};
@@ -223,7 +210,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * Runs just before the content is replaced
 	 */
 	beforeContentReplace: Handler<'content:replace'> = (context) => {
-		cleanupTeleported();
+		cleanupModals();
 	};
 
 	/**

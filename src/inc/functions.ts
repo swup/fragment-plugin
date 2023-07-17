@@ -1,15 +1,15 @@
-import Swup, { Location } from 'swup';
+import { Location } from 'swup';
 import type { Context as SwupContext } from 'swup';
-import type { Rule, Route, FragmentVisit, Fragment } from '../SwupFragmentPlugin.js';
+import type { Rule, Route, FragmentVisit } from '../SwupFragmentPlugin.js';
 import Logger from './Logger.js';
 import SwupFragmentPlugin from '../SwupFragmentPlugin.js';
-import TeleportOriginElement from './TeleportOriginElement.js';
+import { handleModals } from './modals.js';
 
 /**
  * Handles a page view. Runs on `mount` as well as on every content:replace
  */
 export const handlePageView = (fragmentPlugin: SwupFragmentPlugin): void => {
-	teleportFragments(fragmentPlugin);
+	handleModals(fragmentPlugin);
 	addFragmentAttributes(fragmentPlugin);
 	handleLinksToFragments(fragmentPlugin);
 };
@@ -57,15 +57,15 @@ function addFragmentAttributes({ rules, swup }: SwupFragmentPlugin): void {
 	rules
 		.filter((rule) => rule.matchesFrom(currentUrl) || rule.matchesTo(currentUrl))
 		.forEach((rule) => {
-			rule.fragments.forEach((fragment) => {
-				const element = document.querySelector(fragment.selector) as HTMLElement | null;
+			rule.fragments.forEach((selector) => {
+				const element = document.querySelector(selector) as HTMLElement | null;
 				// No element
 				if (!element) return;
 				// Ignore <template> and <swup-fragment-slot>
 				if (['template', 'swup-fragment-slot'].includes(element.tagName.toLowerCase()))
 					return;
 				// Save the selector that matched the element
-				element.setAttribute('data-swup-fragment-selector', fragment.selector);
+				element.setAttribute('data-swup-fragment-selector', selector);
 				// Finally, add the fragment url attribute if not already present
 				if (!element.getAttribute('data-swup-fragment-url')) {
 					element.setAttribute('data-swup-fragment-url', currentUrl);
@@ -79,11 +79,11 @@ function addFragmentAttributes({ rules, swup }: SwupFragmentPlugin): void {
  */
 export const getReplaceableFragments = (
 	route: Route,
-	fragments: Fragment[],
+	fragments: string[],
 	logger: Logger | undefined
-): Fragment[] => {
-	return fragments.filter((fragment) => {
-		const result = isReplaceableFragment(fragment.selector, route.to);
+): string[] => {
+	return fragments.filter((selector) => {
+		const result = isReplaceableFragment(selector, route.to);
 		if (result === true) return true;
 
 		if (logger) logger.log(result);
@@ -169,7 +169,7 @@ export const getRoute = (context: SwupContext): Route | undefined => {
  */
 export const addRuleNameToFragments = ({ rule, fragments }: FragmentVisit): void => {
 	if (!rule.name) return;
-	fragments.forEach(({ selector }) => {
+	fragments.forEach((selector) => {
 		document.querySelector(selector)?.classList.add(`to-${rule.name}`);
 	});
 };
@@ -179,33 +179,9 @@ export const addRuleNameToFragments = ({ rule, fragments }: FragmentVisit): void
  */
 export const removeRuleNameFromFragments = ({ rule, fragments }: FragmentVisit): void => {
 	if (!rule.name) return;
-	fragments.forEach(({ selector }) => {
+	fragments.forEach((selector) => {
 		document.querySelector(selector)?.classList.remove(`to-${rule.name}`);
 	});
-};
-
-/**
- * Teleport a fragment
- */
-export const teleportFragment = (fragment: Fragment, logger: Logger): void => {
-	// Bail early if the fragment shouldn't be teleported
-	if (!fragment.teleport) return;
-
-	// Bail early if the fragment doesn't exist
-	const el = document.querySelector(fragment.selector);
-	if (!el) return;
-
-	/**
-	 * Inject a base for the teleported fragment.
-	 * Allows us to teleport the fragment back to it's original position
-	 * in the DOM right before the next `content:replace`
-	 */
-	const origin = document.createElement('swup-teleport-origin') as TeleportOriginElement;
-	origin.logger = logger;
-	origin.selector = fragment.selector;
-	el.before(origin);
-
-	document.body.prepend(el);
 };
 
 /**
@@ -213,30 +189,6 @@ export const teleportFragment = (fragment: Fragment, logger: Logger): void => {
  */
 export const getFirstMatchingRule = (route: Route, rules: Rule[]): Rule | undefined => {
 	return rules.find((rule) => rule.matches(route));
-};
-
-/**
- * Teleport fragments to the body
- */
-export function teleportFragments({ rules, swup, logger }: SwupFragmentPlugin): void {
-	const url = swup.getCurrentUrl();
-	rules
-		.filter((rule) => rule.matchesTo(url))
-		.forEach((rule) =>
-			rule.fragments.forEach((fragment) => teleportFragment(fragment, logger))
-		);
-}
-
-/**
- * Teleports fragments back to their placeholders
- */
-export const cleanupTeleported = (): void => {
-	document.querySelectorAll<TeleportOriginElement>('swup-teleport-origin').forEach((origin) => {
-		if (!origin.selector) return;
-		const target = document.querySelector(origin.selector);
-		if (!target) return;
-		origin.replaceWith(target);
-	});
 };
 
 /**
