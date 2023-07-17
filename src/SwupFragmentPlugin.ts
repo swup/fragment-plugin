@@ -10,15 +10,13 @@ import {
 	getRoute,
 	addRuleNameToFragments,
 	removeRuleNameFromFragments,
-	getFragmentSelectors,
-	teleportFragments,
 	getFirstMatchingRule,
 	cacheUnchangedFragments,
-	teleportFragmentsBack
+	cleanupTeleported
 } from './inc/functions.js';
 
 import FragmentSlotElement from './inc/FragmentSlotElement.js';
-import TeleportBaseElement from './inc/TeleportBaseElement.js';
+import TeleportOriginElement from './inc/TeleportOriginElement.js';
 
 declare module 'swup' {
 	export interface Context {
@@ -111,7 +109,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 			({ from, to, fragments, name }) => new Rule(from, to, fragments, name)
 		);
 
-		this.defineCustomElement('swup-teleport-base', TeleportBaseElement);
+		this.defineCustomElement('swup-teleport-origin', TeleportOriginElement);
 		this.defineCustomElement('swup-fragment-slot', FragmentSlotElement);
 	}
 
@@ -204,7 +202,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		this.logger.log('fragment visit:', context.fragmentVisit);
 
-		const fragmentSelectors = getFragmentSelectors(context.fragmentVisit.fragments);
+		const fragmentSelectors = context.fragmentVisit.fragments.map((fragment) => fragment.selector);
 
 		// Disable scrolling for this transition
 		context.scroll.reset = false;
@@ -221,8 +219,11 @@ export default class SwupFragmentPlugin extends PluginBase {
 		addRuleNameToFragments(context.fragmentVisit);
 	};
 
+	/**
+	 * Runs just before the content is replaced
+	 */
 	beforeContentReplace: Handler<'content:replace'> = (context) => {
-		teleportFragmentsBack();
+		cleanupTeleported();
 	};
 
 	/**

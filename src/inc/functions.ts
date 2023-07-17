@@ -3,8 +3,7 @@ import type { Context as SwupContext } from 'swup';
 import type { Rule, Route, FragmentVisit, Fragment } from '../SwupFragmentPlugin.js';
 import Logger from './Logger.js';
 import SwupFragmentPlugin from '../SwupFragmentPlugin.js';
-import FragmentSlotElement from './FragmentSlotElement.js';
-import TeleportBaseElement from './TeleportBaseElement.js';
+import TeleportOriginElement from './TeleportOriginElement.js';
 
 /**
  * Handles a page view. Runs on `mount` as well as on every content:replace
@@ -63,7 +62,8 @@ function addFragmentAttributes({ rules, swup }: SwupFragmentPlugin): void {
 				// No element
 				if (!element) return;
 				// Ignore <template> and <swup-fragment-slot>
-				if (['template', 'swup-fragment-slot'].includes(element.tagName.toLowerCase())) return;
+				if (['template', 'swup-fragment-slot'].includes(element.tagName.toLowerCase()))
+					return;
 				// Save the selector that matched the element
 				element.setAttribute('data-swup-fragment-selector', fragment.selector);
 				// Finally, add the fragment url attribute if not already present
@@ -185,36 +185,9 @@ export const removeRuleNameFromFragments = ({ rule, fragments }: FragmentVisit):
 };
 
 /**
- * Extract the selectors of an array of fragment objects
- */
-export const getFragmentSelectors = (fragments: Fragment[]): string[] => {
-	return fragments.map((fragment) => fragment.selector);
-};
-
-/**
- * Get the parents of a teleported fragment
- */
-const getParentContainers = ({ selector }: Fragment, swup: Swup): string[] => {
-	const containers = [...new Set([...swup.options.containers, ...swup.context.containers])];
-
-	const doc = swup.context.to?.html
-		? new DOMParser().parseFromString(swup.context.to.html, 'text/html')
-		: document;
-
-	const el = doc.querySelector(selector);
-	if (!el) return [];
-
-	const parents = containers.filter(
-		(containerSelector) => !el.matches(containerSelector) && el.closest(containerSelector)
-	);
-
-	return parents;
-};
-
-/**
  * Teleport a fragment
  */
-export const teleportFragment = (fragment: Fragment, swup: Swup): void => {
+export const teleportFragment = (fragment: Fragment, logger: Logger): void => {
 	// Bail early if the fragment shouldn't be teleported
 	if (!fragment.teleport) return;
 
@@ -227,9 +200,10 @@ export const teleportFragment = (fragment: Fragment, swup: Swup): void => {
 	 * Allows us to teleport the fragment back to it's original position
 	 * in the DOM right before the next `content:replace`
 	 */
-	const teleportBase = document.createElement('swup-teleport-base') as TeleportBaseElement;
-	teleportBase.selector = fragment.selector;
-	el.before(teleportBase);
+	const origin = document.createElement('swup-teleport-origin') as TeleportOriginElement;
+	origin.logger = logger;
+	origin.selector = fragment.selector;
+	el.before(origin);
 
 	document.body.prepend(el);
 };
@@ -244,22 +218,24 @@ export const getFirstMatchingRule = (route: Route, rules: Rule[]): Rule | undefi
 /**
  * Teleport fragments to the body
  */
-export function teleportFragments({ rules, swup }: SwupFragmentPlugin): void {
+export function teleportFragments({ rules, swup, logger }: SwupFragmentPlugin): void {
 	const url = swup.getCurrentUrl();
 	rules
 		.filter((rule) => rule.matchesTo(url))
-		.forEach((rule) => rule.fragments.forEach((fragment) => teleportFragment(fragment, swup)));
+		.forEach((rule) =>
+			rule.fragments.forEach((fragment) => teleportFragment(fragment, logger))
+		);
 }
 
 /**
  * Teleports fragments back to their placeholders
  */
-export const teleportFragmentsBack = (): void => {
-	document.querySelectorAll<TeleportBaseElement>('swup-teleport-base').forEach((base) => {
-		if (!base.selector) return;
-		const teleportedFragment = document.querySelector(base.selector);
-		if (!teleportedFragment) return;
-		base.replaceWith(teleportedFragment);
+export const cleanupTeleported = (): void => {
+	document.querySelectorAll<TeleportOriginElement>('swup-teleport-origin').forEach((origin) => {
+		if (!origin.selector) return;
+		const target = document.querySelector(origin.selector);
+		if (!target) return;
+		origin.replaceWith(target);
 	});
 };
 
