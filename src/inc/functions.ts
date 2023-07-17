@@ -264,3 +264,12 @@ export const cacheUnchangedFragments = ({ rules, swup, logger }: SwupFragmentPlu
 	// Log the result
 	logger.log(`updated cache for unchanged fragment(s):`, updatedFragments);
 };
+
+/**
+ * Make an array unique
+ */
+export function uniqueArray<T>(arr: Array<T>): Array<T> {
+	return arr.filter((current, index) => {
+		return arr.findIndex((compare) => current === compare) === index;
+	})
+}

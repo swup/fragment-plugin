@@ -1,5 +1,6 @@
 import { matchPath, classify, type Path } from 'swup';
 import type { Route } from '../SwupFragmentPlugin.js';
+import { uniqueArray } from './functions.js';
 /**
  * Represents a Rule
  */
@@ -31,9 +32,7 @@ export default class Rule {
 		 * Remove duplicates
 		 * @see https://stackoverflow.com/a/67322087/586823
 		 */
-		return fragments.filter((fragment, index) => {
-			return fragments.findIndex((compare) => fragment === compare) === index;
-		});
+		return uniqueArray(fragments);
 	}
 
 	/**

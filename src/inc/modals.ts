@@ -6,6 +6,7 @@ import SwupModalOrigin from './SwupModalOrigin.js';
  * Handle fragments marked with [data-swup-fragment-modal]
  */
 export function handleModals({ rules, swup, logger }: SwupFragmentPlugin): void {
+	console.log(swup.context);
 	const url = swup.getCurrentUrl();
 	rules
 		.filter((rule) => rule.matchesTo(url))
