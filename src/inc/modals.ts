@@ -49,6 +49,7 @@ export const cleanupModals = (context: SwupContext): void => {
 	document.querySelectorAll<SwupModalOrigin>('swup-modal-origin').forEach((origin) => {
 		if (!origin.modalElement) return;
 
+		// We only want to clean-up the modal, if it will be replaced during this visit
 		const doCleanup = containers.some((containerSelector) => {
 			if (containerSelector === origin.selector) return true;
 			if (origin.closest(containerSelector)) return true;
