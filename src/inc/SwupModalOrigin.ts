@@ -3,31 +3,30 @@ import Logger from "./Logger.js";
 /**
  * Acts as the origin for modals
  */
-export default class ModalOriginElement extends HTMLElement {
+export default class extends HTMLElement {
 
 	logger?: Logger;
-	modalElement?: Element;
 
 	/**
 	 * Make it easier to access "selector"
 	 */
-	get selector(): string {
+	get modal(): string {
 		return this.getAttribute('selector') || '';
 	}
 
-	set selector(value: string) {
+	set modal(value: string) {
 		if (value == null) {
-			this.removeAttribute("selector");
+			this.removeAttribute("modal");
 			return;
 		}
-		this.setAttribute("selector", value);
+		this.setAttribute("modal", value);
 	}
 
 	/**
 	 * Observe the attribute "selector"
 	 */
 	static get observedAttributes(): string[] {
-		return ['selector'];
+		return ['modal'];
 	}
 
 	/**
@@ -35,8 +34,8 @@ export default class ModalOriginElement extends HTMLElement {
 	 */
 	attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
 		switch (name) {
-			case 'selector':
-				this.validateSelector(newValue);
+			case 'modal':
+				this.validateModal(newValue);
 				break;
 		}
 	}
@@ -44,7 +43,7 @@ export default class ModalOriginElement extends HTMLElement {
 	/**
 	 * Makes sure the provided selector actually matches an element in the current DOM
 	 */
-	validateSelector(selector?: string) {
+	validateModal(selector?: string) {
 		if (!selector) return;
 		const target = document.querySelector(selector);
 		if (target == null) {

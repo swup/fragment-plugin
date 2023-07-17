@@ -32,8 +32,7 @@ export const createModal = (el: Element, { logger }: SwupFragmentPlugin): void =
 	// Create the origin
 	const origin = document.createElement('swup-modal-origin') as SwupModalOrigin;
 	origin.logger = logger;
-	origin.selector = selector;
-	origin.modalElement = el;
+	origin.modal = selector;
 	el.before(origin);
 
 	// Move the element to the <body>
@@ -47,15 +46,19 @@ export const cleanupModals = (context: SwupContext): void => {
 	const containers = context.containers;
 
 	document.querySelectorAll<SwupModalOrigin>('swup-modal-origin').forEach((origin) => {
-		if (!origin.modalElement) return;
 
 		// We only want to clean-up the modal, if it will be replaced during this visit
 		const doCleanup = containers.some((containerSelector) => {
-			if (containerSelector === origin.selector) return true;
+			if (containerSelector === origin.modal) return true;
 			if (origin.closest(containerSelector)) return true;
 			return false;
 		});
 
-		if (doCleanup) origin.replaceWith(origin.modalElement);
+		if (!doCleanup) return;
+
+		const modal = document.querySelector(origin.modal);
+		if (!modal) return;
+
+		origin.replaceWith(modal);
 	});
 };

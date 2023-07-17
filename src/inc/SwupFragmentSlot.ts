@@ -3,7 +3,7 @@
  *
  * Automatically disables eventual swup animations, as this element is not visible
  */
-export default class FragmentSlotElement extends HTMLElement {
+export default class extends HTMLElement {
 	shadowRoot: ShadowRoot;
 
 	constructor() {
