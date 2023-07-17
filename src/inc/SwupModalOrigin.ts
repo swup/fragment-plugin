@@ -10,23 +10,23 @@ export default class extends HTMLElement {
 	/**
 	 * Make it easier to access "selector"
 	 */
-	get modal(): string {
+	get selector(): string {
 		return this.getAttribute('selector') || '';
 	}
 
-	set modal(value: string) {
+	set selector(value: string) {
 		if (value == null) {
-			this.removeAttribute("modal");
+			this.removeAttribute("selector");
 			return;
 		}
-		this.setAttribute("modal", value);
+		this.setAttribute("selector", value);
 	}
 
 	/**
 	 * Observe the attribute "selector"
 	 */
 	static get observedAttributes(): string[] {
-		return ['modal'];
+		return ['selector'];
 	}
 
 	/**
@@ -34,7 +34,7 @@ export default class extends HTMLElement {
 	 */
 	attributeChangedCallback(name: string, oldValue: string, newValue: string): void {
 		switch (name) {
-			case 'modal':
+			case 'selector':
 				this.validateModal(newValue);
 				break;
 		}
