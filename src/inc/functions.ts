@@ -194,7 +194,7 @@ export const getFirstMatchingRule = (route: Route, rules: Rule[]): Rule | undefi
 /**
  * Makes sure unchanged fragments land in the cache of the current page
  */
-export const cacheUnchangedFragments = ({ rules, swup, logger }: SwupFragmentPlugin): void => {
+export const cacheUnchangedFragments = ({ swup, logger }: SwupFragmentPlugin): void => {
 	const currentUrl = swup.getCurrentUrl();
 	const cache = swup.cache;
 
