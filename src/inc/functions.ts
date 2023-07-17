@@ -215,6 +215,10 @@ export const cacheUnchangedFragments = ({ rules, swup, logger }: SwupFragmentPlu
 	).filter((el) => !elementMatchesFragmentUrl(el, currentUrl));
 
 	unchangedFragments.forEach((el) => {
+		// Don't cache the fragment if it contains fragments of it's own
+		const containsFragments = el.querySelector('[data-swup-fragment-url]') != null;
+		if (containsFragments) return;
+
 		// Get and validate `fragmentUrl`
 		const rawFragmentUrl = el.getAttribute('data-swup-fragment-url');
 		if (!rawFragmentUrl) {
