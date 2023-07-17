@@ -266,9 +266,10 @@ export const cacheUnchangedFragments = ({ rules, swup, logger }: SwupFragmentPlu
 };
 
 /**
- * Make an array unique
+ * Remove duplicates from an array
+ * @see https://stackoverflow.com/a/67322087/586823
  */
-export function uniqueArray<T>(arr: Array<T>): Array<T> {
+export function removeDuplicates<T>(arr: Array<T>): Array<T> {
 	return arr.filter((current, index) => {
 		return arr.findIndex((compare) => current === compare) === index;
 	})

@@ -1,6 +1,6 @@
 import { matchPath, classify, type Path } from 'swup';
 import type { Route } from '../SwupFragmentPlugin.js';
-import { uniqueArray } from './functions.js';
+import { removeDuplicates } from './functions.js';
 /**
  * Represents a Rule
  */
@@ -28,11 +28,7 @@ export default class Rule {
 	parseFragments(rawFragments: string[]): string[] {
 		// trim selectors
 		const fragments = rawFragments.map((selector) => selector.trim());
-		/**
-		 * Remove duplicates
-		 * @see https://stackoverflow.com/a/67322087/586823
-		 */
-		return uniqueArray(fragments);
+		return removeDuplicates(fragments);
 	}
 
 	/**
