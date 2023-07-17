@@ -4,38 +4,51 @@ import Rule from './inc/Rule.js';
 import type { Path, Handler } from 'swup';
 import Logger from './inc/Logger.js';
 import {
-	cleanupFragmentUrls,
-	handleDynamicFragmentLinks,
-	updateFragmentUrlAttributes,
-	getValidFragments,
-	getRoute
+	handlePageView,
+	cleanupFragmentAttributes,
+	getReplaceableFragments,
+	getRoute,
+	addRuleNameToFragments,
+	removeRuleNameFromFragments,
+	getFirstMatchingRule,
+	cacheUnchangedFragments
 } from './inc/functions.js';
+
+import { cleanupModals } from './inc/modals.js';
+
+import SwupFragmentSlot from './inc/SwupFragmentSlot.js';
+import SwupModalPlaceholder from './inc/SwupModalPlaceholder.js';
+
+declare module 'swup' {
+	export interface Context {
+		fragmentVisit?: FragmentVisit;
+	}
+}
 
 /**
  * Represents a route from one to another URL
  */
-type Route = {
+export type Route = {
 	from: string;
 	to: string;
 };
 
-/**
- * The Plugin Options
- */
-export type PluginOptions = {
-	rules: Array<{
-		from: Path;
-		to: Path;
-		fragments: string[];
-		name?: string;
-	}>;
+export type RuleOptions = {
+	from: Path;
+	to: Path;
+	fragments: string[];
+	name?: string;
+};
+
+export type Options = {
+	rules: RuleOptions[];
 	debug?: boolean;
 };
 
 /**
- * The context, available throughout every transition
+ * The state of the current visit
  */
-type State = {
+export type FragmentVisit = {
 	rule: Rule;
 	fragments: string[];
 };
@@ -43,7 +56,7 @@ type State = {
 /**
  * Re-exports
  */
-export type { Route, Path, Rule };
+export type { Rule };
 
 /**
  * The main plugin class
@@ -55,11 +68,11 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 	rules: Rule[] = [];
 
-	options: PluginOptions;
+	options: Options;
 
 	logger: Logger;
 
-	defaults: PluginOptions = {
+	defaults: Options = {
 		rules: [],
 		debug: false
 	};
@@ -68,19 +81,33 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * Plugin Constructor
 	 * The options are NOT optional and need to contain at least a `rules` property
 	 */
-	constructor(options: PluginOptions) {
+	constructor(options: Options) {
 		super();
 
 		this.options = { ...this.defaults, ...options };
 
 		this.logger = new Logger({
-			prefix: '[@swup/fragment-plugin]',
+			prefix: '🧩',
 			muted: this.options.debug !== true
 		});
 
 		this.rules = this.options.rules.map(
 			({ from, to, fragments, name }) => new Rule(from, to, fragments, name)
 		);
+
+		this.defineCustomElements();
+	}
+
+	/**
+	 * Defines custom elements
+	 */
+	defineCustomElements(): void {
+		if (!window.customElements.get('swup-modal-placeholder')) {
+			window.customElements.define('swup-modal-placeholder', SwupModalPlaceholder);
+		}
+		if (!window.customElements.get('swup-fragment-slot')) {
+			window.customElements.define('swup-fragment-slot', SwupFragmentSlot);
+		}
 	}
 
 	/**
@@ -89,11 +116,13 @@ export default class SwupFragmentPlugin extends PluginBase {
 	mount() {
 		const swup = this.swup;
 
-		swup.hooks.before('samePage', this.onSamePage);
-		swup.hooks.on('transitionStart', this.onTransitionStart);
-		swup.hooks.on('replaceContent', this.afterReplaceContent);
+		swup.hooks.before('link:self', this.onLinkToSelf);
+		swup.hooks.on('visit:start', this.onVisitStart);
+		swup.hooks.before('content:replace', this.beforeContentReplace);
+		swup.hooks.on('content:replace', this.onContentReplace);
+		swup.hooks.on('visit:end', this.onVisitEnd);
 
-		updateFragmentUrlAttributes(this.rules, this.swup.getCurrentUrl());
+		handlePageView(this);
 	}
 
 	/**
@@ -102,49 +131,43 @@ export default class SwupFragmentPlugin extends PluginBase {
 	unmount() {
 		const swup = this.swup;
 
-		swup.hooks.off('samePage', this.onSamePage);
-		swup.hooks.off('transitionStart', this.onTransitionStart);
-		swup.hooks.on('replaceContent', this.afterReplaceContent);
+		swup.hooks.off('link:self', this.onLinkToSelf);
+		swup.hooks.off('visit:start', this.onVisitStart);
+		swup.hooks.off('content:replace', this.beforeContentReplace);
+		swup.hooks.off('content:replace', this.onContentReplace);
+		swup.hooks.off('visit:end', this.onVisitEnd);
 
-		cleanupFragmentUrls();
+		cleanupFragmentAttributes();
 	}
 
 	/**
 	 * Get the state for a given route
 	 */
-	getState(route: Route, logger?: Logger): State | undefined {
-		const rule = this.getFirstMatchingRule(route);
+	getFragmentVisit(route: Route, logger?: Logger): FragmentVisit | undefined {
+		const rule = getFirstMatchingRule(route, this.rules);
 
 		// Bail early if no rule matched
 		if (!rule) return;
 
 		// Validate the fragments from the matched rule
-		const fragments = getValidFragments(route, rule.fragments, logger);
-
+		const fragments = getReplaceableFragments(route, rule.fragments, logger);
 		// Bail early if there are no valid fragments for the rule
 		if (!fragments.length) return;
 
-		const state = { rule, fragments };
+		const visit = { rule, fragments };
 
-		return state;
+		return visit;
 	}
-
-	/**
-	 * Get the first matching rule for a given route
-	 */
-	getFirstMatchingRule = (route: Route): Rule | undefined => {
-		return this.rules.find((rule) => rule.matches(route));
-	};
 
 	/**
 	 * Do not scroll if clicking on a link to the same page
 	 * and the route matches a fragment rule
 	 */
-	onSamePage: Handler<'samePage'> = (context) => {
+	onLinkToSelf: Handler<'link:self'> = (context) => {
 		const route = getRoute(context);
 		if (!route) return;
 
-		const rule = this.getFirstMatchingRule(route);
+		const rule = getFirstMatchingRule(route, this.rules);
 
 		if (rule) context.scroll.reset = false;
 	};
@@ -152,41 +175,58 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Do special things if this is a fragment visit
 	 */
-	onTransitionStart: Handler<'transitionStart'> = async (context) => {
+	onVisitStart: Handler<'visit:start'> = async (context) => {
 		const route = getRoute(context);
 		if (!route) return;
 
-		const state = this.getState(route, this.logger);
+		const fragmentVisit = this.getFragmentVisit(route, this.logger);
 
 		/**
 		 * Bail early if the current route doesn't match
 		 * a rule or wouldn't replace any fragments
 		 */
-		if (!state) return;
+		if (!fragmentVisit) return;
 
-		this.logger.log('fragment visit:', state);
+		context.fragmentVisit = fragmentVisit;
+
+		this.logger.log('fragment visit:', context.fragmentVisit);
 
 		// Disable scrolling for this transition
 		context.scroll.reset = false;
 
-		// Add a suffix to all transition classes, e.g. .is-animating--fragment, .is-leaving--fragment, ...
-		context.animation.name = state.rule.name;
-
 		// Add the transition classes directly to the fragments for this visit
-		context.animation.scope = 'containers';
+		context.animation.scope = context.fragmentVisit.fragments;
 
 		// Overwrite the containers for this visit
-		context.containers = state.fragments;
+		context.containers = context.fragmentVisit.fragments;
 
 		// Overwrite the animationSelector for this visit
-		context.animation.selector = state.fragments.join(',');
+		context.animation.selector = context.fragmentVisit.fragments.join(',');
+
+		addRuleNameToFragments(context.fragmentVisit);
+	};
+
+	/**
+	 * Runs just before the content is replaced
+	 */
+	beforeContentReplace: Handler<'content:replace'> = (context) => {
+		cleanupModals(context);
 	};
 
 	/**
 	 * Runs after the content was replaced
 	 */
-	afterReplaceContent: Handler<'replaceContent'> = () => {
-		updateFragmentUrlAttributes(this.rules, this.swup.getCurrentUrl());
-		handleDynamicFragmentLinks(this.logger);
+	onContentReplace: Handler<'content:replace'> = (context) => {
+		if (context.fragmentVisit) addRuleNameToFragments(context.fragmentVisit);
+		handlePageView(this);
+		cacheUnchangedFragments(this);
+	};
+
+	/**
+	 * Remove the rule name from fragments
+	 */
+	onVisitEnd: Handler<'visit:end'> = (context) => {
+		if (context.fragmentVisit) removeRuleNameFromFragments(context.fragmentVisit);
+		context.fragmentVisit = undefined;
 	};
 }

@@ -37,7 +37,8 @@ export default class Logger {
 	 */
 	log(...args: any) {
 		if (this.options.muted === true) return;
-		console.log(this.options.prefix, ...args);
+		const message = args.shift();
+		console.log(`${this.options.prefix} ${message}`, ...args);
 	}
 
 	/**
@@ -45,7 +46,8 @@ export default class Logger {
 	 */
 	warn(...args: any) {
 		if (this.options.muted === true) return;
-		console.warn(this.options.prefix, ...args);
+		const message = args.shift();
+		console.warn(`${this.options.prefix} ${message}`, ...args);
 	}
 
 	/**
@@ -53,7 +55,8 @@ export default class Logger {
 	 */
 	error(...args: any) {
 		if (this.options.muted === true) return;
-		console.error(this.options.prefix, ...args);
+		const message = args.shift();
+		console.error(`${this.options.prefix} ${message}`, ...args);
 	}
 
 	/**
