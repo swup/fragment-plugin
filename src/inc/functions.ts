@@ -4,6 +4,12 @@ import type { Rule, Route, FragmentVisit } from '../SwupFragmentPlugin.js';
 import Logger from './Logger.js';
 import SwupFragmentPlugin from '../SwupFragmentPlugin.js';
 
+declare global {
+	interface HTMLDialogElement {
+		__fragment_modal_shown: boolean;
+	}
+}
+
 /**
  * Handles a page view. Runs on `mount` as well as on every content:replace
  */
@@ -20,10 +26,12 @@ export const handlePageView = (fragmentPlugin: SwupFragmentPlugin): void => {
  */
 function showDialogs({ logger }: SwupFragmentPlugin): void {
 	document
-		.querySelectorAll<HTMLDialogElement>('dialog[data-swup-fragment-selector]:not([data-swup-modal-shown])')
+		.querySelectorAll<HTMLDialogElement>('dialog[data-swup-fragment-selector]')
 		.forEach((el) => {
+			if (el.__fragment_modal_shown) return;
 			el.removeAttribute('open');
 			el.showModal();
+			el.__fragment_modal_shown = true;
 			el.setAttribute('data-swup-modal-shown', '');
 		});
 }
