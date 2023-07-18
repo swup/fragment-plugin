@@ -170,7 +170,10 @@ Required, Type: `string | string[]` – The path(s) to match against the next UR
 
 #### rule.fragments
 
-Required, Type: `string[]` – Selectors of containers to be replaced if the visit matches
+Required, Type: `string[]` – Selectors of containers to be replaced if the visit matches.
+
+> **Note** **only IDs and no nested selectors are allowed**. `#my-element` is valid, while
+> `.my-element` or `#wrap #child` both will throw an error.
 
 #### rule.name
 
@@ -331,7 +334,7 @@ Suppose you have an overlay that you want to present like a modal, above all oth
     </ul>
   </section>
   <!-- This should be placed above everything else -->
-  <div id="overlay" class="modal">
+  <div id="user" class="modal">
     <main>
       <h1>User 1</h1>
       <p>Lorem ipsum dolor...</p>
@@ -340,7 +343,7 @@ Suppose you have an overlay that you want to present like a modal, above all oth
 </div>
 ```
 
-You might have this (minimal) CSS to make the `#overlay` appear as a modal above everything else:
+You might have this (minimal) CSS to make the `#user` appear as a modal above everything else:
 
 ```css
 .modal {
@@ -350,7 +353,7 @@ You might have this (minimal) CSS to make the `#overlay` appear as a modal above
 }
 ```
 
-This will work fine, unless you have a `transform` applied to the main container:
+This will work fine, until you apply a `transform` to one of the modal's parent elements:
 
 ```css
 html.is-changing .transition-main {
