@@ -3,7 +3,6 @@ import type { Context as SwupContext } from 'swup';
 import type { Rule, Route, FragmentVisit } from '../SwupFragmentPlugin.js';
 import Logger from './Logger.js';
 import SwupFragmentPlugin from '../SwupFragmentPlugin.js';
-import { handleModals } from './modals.js';
 
 /**
  * Handles a page view. Runs on `mount` as well as on every content:replace
@@ -11,7 +10,6 @@ import { handleModals } from './modals.js';
 export const handlePageView = (fragmentPlugin: SwupFragmentPlugin): void => {
 	addFragmentAttributes(fragmentPlugin);
 	handleLinksToFragments(fragmentPlugin);
-	// handleModals(fragmentPlugin);
 	showDialogs(fragmentPlugin);
 };
 
