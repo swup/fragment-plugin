@@ -9,9 +9,6 @@ A [swup](https://swup.js.org) plugin for selectively updating dynamic fragments.
 - Improve orientation by animating only the parts of the page that have actually changed
 - Give your site the polish and snappiness of a single-page app
 
-> **Warning** Fragment Plugin hasn't reached the first stable version, yet. If you want to give it a
-> try, we'd love to get your feedback about how it went in the plugin's [issues section](https://github.com/swup/fragment-plugin/issues)
-
 ## Use cases
 
 Both of the following two scenarios require updating only a small content fragment instead of
