@@ -20,10 +20,11 @@ export const handlePageView = (fragmentPlugin: SwupFragmentPlugin): void => {
  */
 function showDialogs({ logger }: SwupFragmentPlugin): void {
 	document
-		.querySelectorAll<HTMLDialogElement>('dialog[data-swup-fragment-selector]')
+		.querySelectorAll<HTMLDialogElement>('dialog[data-swup-fragment-selector]:not([data-swup-modal-shown])')
 		.forEach((el) => {
 			el.removeAttribute('open');
 			el.showModal();
+			el.setAttribute('data-swup-modal-shown', '');
 		});
 }
 
