@@ -74,8 +74,8 @@ function addFragmentAttributes({ rules, swup }: SwupFragmentPlugin): void {
 				const element = document.querySelector(selector) as HTMLElement | null;
 				// No element
 				if (!element) return;
-				// Ignore <template> and <swup-fragment-slot>
-				if (['template', 'swup-fragment-slot'].includes(element.tagName.toLowerCase()))
+				// Ignore <template> and <swup-fragment-placeholder>
+				if (['template', 'swup-fragment-placeholder'].includes(element.tagName.toLowerCase()))
 					return;
 				// Save the selector that matched the element
 				element.setAttribute('data-swup-fragment-selector', selector);

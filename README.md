@@ -9,6 +9,9 @@ A [swup](https://swup.js.org) plugin for selectively updating dynamic fragments.
 - Improve orientation by animating only the parts of the page that have actually changed
 - Give your site the polish and snappiness of a single-page app
 
+> **Warning** Fragment Plugin hasn't reached the first stable version, yet. If you want to give it a
+> try, we'd love to get your feedback about how it went in the plugin's [issues section](https://github.com/swup/fragment-plugin/issues)
+
 ## Use cases
 
 Both of the following two scenarios require updating only a small content fragment instead of
@@ -43,12 +46,12 @@ Or include the minified production file from a CDN:
 
 When a visit is determined to be a fragment visit, the plugin will:
 
-- **update only** the contents of the elements defined in the rule's `fragments`
-- **not update** the default content [containers](https://swup.js.org/options/#containers) replaced on all other visits
+- **update only** the contents of the elements matching the rule's `fragments`
+- **not update** the default [containers](https://swup.js.org/options/#containers) replaced on all other visits
 - **wait** for CSS transitions on those fragment elements using [scoped animations](https://swup.js.org/options/#animation-scope)
 - **preserve** the current scroll position upon navigation
-- add a `to-fragment-[name]` class to the elements if the current `rule` has a `name` key
-- **ignore** the visit completely if a fragment already matches the current visit's URL
+- add a `to-[name]` class to the elements if the current `rule` has a `name` key
+- **ignore** fragments that already match the current visit's URL
 
 ## Example
 
@@ -72,7 +75,7 @@ container.
       <a href="/users/filter/3/">Filter 2</a>
     </ul>
     <!-- The list of users, filtered by the criteria above -->
-    <ul id="users" class="transition-users">
+    <ul id="users">
       <li><a href="/user/1/">User 1</a></li>
       <li><a href="/user/2/">User 2</a></li>
       <li><a href="/user/3/">User 3</a></li>
@@ -120,7 +123,7 @@ html.is-animating .transition-main {
 #users.is-changing {
   transition: opacity 250ms;
 }
-#users.is-changing {
+#users.is-animating {
   opacity: 0;
 }
 ```
@@ -128,7 +131,7 @@ html.is-animating .transition-main {
 ## Options
 
 ```typescript
-export type PluginOptions = {
+export type Options = {
   rules: Array<{
     from: string | string[];
     to: string | string[];
@@ -160,10 +163,21 @@ The rule's `from`/`to` paths are converted to a regular expression by [path-to-r
 }
 ```
 
-- **`from`**: Required, Type: `string | string[]` – The path(s) to match against the previous URL
-- **`to`**: Required, Type: `string | string[]` – The path(s) to match against the next URL
-- **`fragments`**: Required, Type: `string[]` – Selectors of containers to be replaced if the visit matches
-- **`name`**: Optional, Type: `string` – A name for this rule to allow scoped styling, ideally in kebab-case
+#### rule.from
+
+Required, Type: `string | string[]` – The path(s) to match against the previous URL
+
+#### rule.to
+
+Required, Type: `string | string[]` – The path(s) to match against the next URL
+
+#### rule.fragments
+
+Required, Type: `string[]` – Selectors of containers to be replaced if the visit matches
+
+#### rule.name
+
+Optional, Type: `string` – A name for this rule to allow scoped styling, ideally in kebab-case
 
 ### debug
 
@@ -193,13 +207,13 @@ sites. However, there are some advanced use cases that require adding certain at
 fragments themselves or to links on the page. These tend to be situations where overlays are
 involved and swup doesn't know which page the overlay was opened from.
 
-### Fragment Slot
+### Fragment Placeholders
 
-Use `<swup-fragment-slot>` for invisible fragments.
+Use `<swup-fragment-placeholder>` for invisible fragments.
 
 Let's look at a list of users again. This time, we want to open each user's detail page in an overlay.
-For that, we need an invisible slot for the overlay on the overview page, so that swup can replace
-it when we click on one of the users:
+For that, we need an invisible placeholder for the overlay on the overview page, so that swup can update
+it with the detail view when we click on one of the users:
 
 ```html
 <section id="list">
@@ -209,8 +223,7 @@ it when we click on one of the users:
     <li><a href="/user/3/">User 3</a></li>
   </ul>
 </section>
-<!-- the fragment slot for the overlay: -->
-<div id="overlay"></div>
+<div id="overlay"><!-- nothing here, yet --></div>
 ```
 
 The above will work fine, but Fragment Plugin provides a custom element designed
@@ -225,16 +238,16 @@ specifically for this use case:
   </ul>
 </section>
 -<div id="overlay"></div>
-+<swup-fragment-slot id="overlay"></swup-fragment-slot>
++<swup-fragment-placeholder id="overlay"></swup-fragment-placeholder>
 
 ```
 
-`<swup-fragment-slot>` automatically...
+`<swup-fragment-placeholder>` automatically...
 
 - sets it's `transition-duration` and `animation-duration` to `10ms` so that you don't have to do it in your CSS
 - hides itself from screen readers, since it's not relevant for the current page
 
-Basically, it's the same as if you did this:
+It saves you from having to do this:
 
 ```html
 <div
@@ -256,8 +269,7 @@ the overlaid content corresponds to. Hence, we need to tell it manually so it ca
 updates without changes.
 
 ```diff
-<section
-  id="list"
+<section id="list"
 +  data-swup-fragment-url="/users/">
   <ul>
     <li>User 1</li>
@@ -284,8 +296,7 @@ where to point that link requires knowing where the current overlay was opened f
 tracked URL of the fragment matching the selector provided by the attribute. The code below will make sure the close button will always point at the last known URL of the `#list` fragment to allow seamlessly closing the overlay:
 
 ```diff
-<section
-  id="list"
+<section id="list"
   data-swup-fragment-url="/users/">
   <ul>
     <li>User 1</li>
@@ -301,7 +312,7 @@ tracked URL of the fragment matching the selector provided by the attribute. The
 </article>
 ```
 
-> **Note**: To keep your markup semantic and accessible, we recommend you **always provide a default value** for the link's `href` attribute, even though it will be updated automatically at runtime:
+> **Note** To keep your markup semantic and accessible, we recommend you **always provide a default value** for the link's `href` attribute, even though it will be updated automatically at runtime:
 
 ```diff
 <a

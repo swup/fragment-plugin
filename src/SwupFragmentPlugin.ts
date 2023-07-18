@@ -14,7 +14,7 @@ import {
 	cacheUnchangedFragments
 } from './inc/functions.js';
 
-import SwupFragmentSlot from './inc/SwupFragmentSlot.js';
+import SwupFragmentPlaceholder from './inc/SwupFragmentPlaceholder.js';
 
 declare module 'swup' {
 	export interface Context {
@@ -99,8 +99,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * Defines custom elements
 	 */
 	defineCustomElements(): void {
-		if (!window.customElements.get('swup-fragment-slot')) {
-			window.customElements.define('swup-fragment-slot', SwupFragmentSlot);
+		if (!window.customElements.get('swup-fragment-placeholder')) {
+			window.customElements.define('swup-fragment-placeholder', SwupFragmentPlaceholder);
 		}
 	}
 
