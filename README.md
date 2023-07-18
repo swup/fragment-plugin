@@ -316,3 +316,71 @@ tracked URL of the fragment matching the selector provided by the attribute. The
 + href="/users/"
   data-swup-link-to-fragment="#list">Close</a>
 ```
+
+## Modals as children of `transform`ed parents
+
+Suppose you have an overlay that you want to present like a modal, above all other content:
+
+```html
+<div id="swup" class="transition-main">
+  <section>
+    <ul>
+      <li><a href="/user/1/">User 1</a></li>
+      <li><a href="/user/2/">User 2</a></li>
+      <li><a href="/user/3/">User 3</a></li>
+    </ul>
+  </section>
+  <!-- This should be placed above everything else -->
+  <div id="overlay" class="modal">
+    <main>
+      <h1>User 1</h1>
+      <p>Lorem ipsum dolor...</p>
+    </main>
+  </div>
+</div>
+```
+
+You might have this (minimal) CSS to make the `#overlay` appear as a modal above everything else:
+
+```css
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+}
+```
+
+This will work fine, unless you have a `transform` applied to the main container:
+
+```css
+html.is-changing .transition-main {
+  transition: opacity 250ms, transform 250ms;
+}
+html.is-animating .transition-main {
+  opacity: 0;
+  /* `transform` will misplace the .modal's positioning during an animated page visit */
+  transform: translateY(20px);
+}
+```
+
+The reason for this is that `transform` establishes a [containing block for all descendants](https://www.w3.org/TR/css-transforms-1/#containing-block-for-all-descendants).
+
+You have two options to fix this:
+
+1. Don't apply CSS `transform`s to any of the parents of a modal
+2. Use `<detail open>` for the modal:
+
+```diff
+- <div id="overlay" class="modal">
++ <dialog open id="overlay" aria-role="article">
+    <main>
+      <h1>User 1</h1>
+      <p>Lorem ipsum dolor...</p>
+    </main>
+- </div>
++ </dialog>
+```
+
+Fragment Plugin will detect `<detail>` fragments automatically on every page view and run [`showModal()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/showModal) on them, putting them on the [top layer](https://developer.mozilla.org/en-US/docs/Glossary/Top_layer) and thus allows them to not be affected by parent element styles, anymore.
+
+> **Note** The second solution will produce [semantically incorrect markup](https://stackoverflow.com/a/75007908/586823), so you should only use it if you think you really have to. It's the cleanest solution for now, until the [Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API) reaches [wider browser support](https://caniuse.com/?search=popover).
