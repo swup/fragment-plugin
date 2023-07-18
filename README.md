@@ -160,19 +160,19 @@ The rule's `from`/`to` paths are converted to a regular expression by [path-to-r
 }
 ```
 
-##### `rule.from`:
+##### `rule.from`
 
 Required, Type: `string | string[]` – The path(s) to match against the previous URL
 
-##### `rule.to`:
+##### `rule.to`
 
 Required, Type: `string | string[]` – The path(s) to match against the next URL
 
-##### `rule.fragments`:
+##### `rule.fragments`
 
 Required, Type: `string[]` – Selectors of containers to be replaced if the visit matches
 
-##### `rule.name`:
+##### `rule.name`
 
 Optional, Type: `string` – A name for this rule to allow scoped styling, ideally in kebab-case
 
