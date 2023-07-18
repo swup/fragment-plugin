@@ -92,7 +92,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		});
 
 		this.rules = this.options.rules.map(
-			({ from, to, fragments, name }) => new Rule(from, to, fragments, name)
+			({ from, to, fragments, name }) => new Rule(from, to, fragments, name, this.logger)
 		);
 
 		this.defineCustomElements();
