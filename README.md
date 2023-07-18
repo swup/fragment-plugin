@@ -234,7 +234,7 @@ specifically for this use case:
     <li><a href="/user/3/">User 3</a></li>
   </ul>
 </section>
--<div id="overlay"></div>
+-<div id="overlay"><!-- nothing here, yet --></div>
 +<swup-fragment-placeholder id="overlay"></swup-fragment-placeholder>
 
 ```
