@@ -128,7 +128,7 @@ html.is-animating .transition-main {
 ## Options
 
 ```typescript
-export type PluginOptions = {
+export type Options = {
   rules: Array<{
     from: string | string[];
     to: string | string[];
