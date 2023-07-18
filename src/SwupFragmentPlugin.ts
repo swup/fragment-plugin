@@ -11,7 +11,7 @@ import {
 	addRuleNameToFragments,
 	removeRuleNameFromFragments,
 	getFirstMatchingRule,
-	cacheUnchangedFragments
+	cacheForeignFragments
 } from './inc/functions.js';
 
 import SwupFragmentPlaceholder from './inc/SwupFragmentPlaceholder.js';
@@ -204,7 +204,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	onContentReplace: Handler<'content:replace'> = (context) => {
 		if (context.fragmentVisit) addRuleNameToFragments(context.fragmentVisit);
 		handlePageView(this);
-		cacheUnchangedFragments(this);
+		cacheForeignFragments(this);
 	};
 
 	/**

@@ -216,7 +216,7 @@ export const getFirstMatchingRule = (route: Route, rules: Rule[]): Rule | undefi
 /**
  * Makes sure unchanged fragments land in the cache of the current page
  */
-export const cacheUnchangedFragments = ({ swup, logger }: SwupFragmentPlugin): void => {
+export const cacheForeignFragments = ({ swup, logger }: SwupFragmentPlugin): void => {
 	const currentUrl = swup.getCurrentUrl();
 	const cache = swup.cache;
 
@@ -232,11 +232,14 @@ export const cacheUnchangedFragments = ({ swup, logger }: SwupFragmentPlugin): v
 	}[] = [];
 
 	// We only want to handle fragments that don't fit the current URL
-	const unchangedFragments = Array.from(
+	const foreignFragments = Array.from(
 		document.querySelectorAll('[data-swup-fragment-url]')
 	).filter((el) => !elementMatchesFragmentUrl(el, currentUrl));
 
-	unchangedFragments.forEach((el) => {
+	// Bail early if there are no foreign fragments
+	if (!foreignFragments.length) return;
+
+	foreignFragments.forEach((el) => {
 		// Don't cache the fragment if it contains fragments of it's own
 		const containsFragments = el.querySelector('[data-swup-fragment-url]') != null;
 		if (containsFragments) return;
