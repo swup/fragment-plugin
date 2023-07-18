@@ -11,8 +11,23 @@ import { handleModals } from './modals.js';
 export const handlePageView = (fragmentPlugin: SwupFragmentPlugin): void => {
 	addFragmentAttributes(fragmentPlugin);
 	handleLinksToFragments(fragmentPlugin);
-	handleModals(fragmentPlugin);
+	// handleModals(fragmentPlugin);
+	showDialogs(fragmentPlugin);
 };
+
+/**
+ * Run `showModal` for all `<dialog[data-swup-fragment-selector]>` elements
+ * This puts them on the top layer and makes them ignore css `transform`s on parent elements
+ * @see https://developer.mozilla.org/en-US/docs/Glossary/Top_layer
+ */
+function showDialogs({ logger }: SwupFragmentPlugin): void {
+	document
+		.querySelectorAll<HTMLDialogElement>('dialog[data-swup-fragment-selector]')
+		.forEach((el) => {
+			el.removeAttribute('open');
+			el.showModal();
+		});
+}
 
 /**
  * Updates the `href` of links matching [data-swup-link-to-fragment="#my-fragment"]
@@ -276,5 +291,5 @@ export const cacheUnchangedFragments = ({ swup, logger }: SwupFragmentPlugin): v
 export function dedupe<T>(arr: Array<T>): Array<T> {
 	return arr.filter((current, index) => {
 		return arr.findIndex((compare) => current === compare) === index;
-	})
+	});
 }
