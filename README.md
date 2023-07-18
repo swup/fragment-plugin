@@ -47,7 +47,7 @@ When a visit is determined to be a fragment visit, the plugin will:
 - **not update** the default [containers](https://swup.js.org/options/#containers) replaced on all other visits
 - **wait** for CSS transitions on those fragment elements using [scoped animations](https://swup.js.org/options/#animation-scope)
 - **preserve** the current scroll position upon navigation
-- add a `to-fragment-[name]` class to the elements if the current `rule` has a `name` key
+- add a `to-[name]` class to the elements if the current `rule` has a `name` key
 - **ignore** fragments that already match the current visit's URL
 
 ## Example
