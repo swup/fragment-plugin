@@ -25,8 +25,8 @@ function getStyles() {
 	template.innerHTML = /*html*/ `
 		<style>
 		:host {
-			transition-duration: 1ms;
-			animation-duration: 1ms;
+			transition-duration: 10ms;
+			animation-duration: 10ms;
 			/*
 			 * @TODO: see if "display: block" makes sense in production.
 			 * The default for custom elements is "display: inline"
