@@ -2,6 +2,9 @@
 
 A [swup](https://swup.js.org) plugin for selectively updating dynamic fragments.
 
+> **Note** Fragment Plugin hasn't reached the first stable version, yet. If you want to give it a
+> try, we'd love to get your feedback about how it went in the plugin's [issues section](https://github.com/swup/fragment-plugin/issues)
+
 - Replace dynamic fragments instead of the main content container, based on custom rules
 - Improve orientation by animating only the parts of the page that have actually changed
 - Give your site the polish and snappiness of a single-page app
@@ -44,7 +47,7 @@ When a visit is determined to be a fragment visit, the plugin will:
 - **not update** the default content [containers](https://swup.js.org/options/#containers) replaced on all other visits
 - **wait** for CSS transitions on those fragment elements using [scoped animations](https://swup.js.org/options/#animation-scope)
 - **preserve** the current scroll position upon navigation
-- add a `to-fragment-[name]` class to the elements if the current `rule` has a `name`  key
+- add a `to-fragment-[name]` class to the elements if the current `rule` has a `name` key
 - **ignore** the visit completely if a fragment already matches the current visit's URL
 
 ## Example
@@ -85,11 +88,13 @@ The plugin expects an array of rules to recognize and handle fragment visits:
 const swup = new Swup({
   plugins: [
     new SwupFragmentPlugin({
-      rules: [{
-        from: '/users/:filter?',
-        to: '/users/:filter?',
-        fragments: ['#users']
-      }]
+      rules: [
+        {
+          from: '/users/:filter?',
+          to: '/users/:filter?',
+          fragments: ['#users']
+        }
+      ]
     })
   ]
 });
@@ -151,7 +156,7 @@ The rule's `from`/`to` paths are converted to a regular expression by [path-to-r
       fragments: ['#users'],
       name: 'list'
     }
-  ]
+  ];
 }
 ```
 
@@ -166,7 +171,7 @@ Type: `boolean`. Set to `true` for debug information in the console. Defaults to
 
 ```js
 {
-  debug: true
+  debug: true;
 }
 ```
 
@@ -187,6 +192,57 @@ Creating the rules for your fragment visits should be enough to enable dynamic u
 sites. However, there are some advanced use cases that require adding certain attributes to the
 fragments themselves or to links on the page. These tend to be situations where overlays are
 involved and swup doesn't know which page the overlay was opened from.
+
+### Fragment Slot
+
+Use `<swup-fragment-slot>` for invisible fragments.
+
+Let's look at a list of users again. This time, we want to open each user's detail page in an overlay.
+For that, we need an invisible slot for the overlay on the overview page, so that swup can replace
+it when we click on one of the users:
+
+```html
+<section id="list">
+  <ul>
+    <li><a href="/user/1/">User 1</a></li>
+    <li><a href="/user/2/">User 2</a></li>
+    <li><a href="/user/3/">User 3</a></li>
+  </ul>
+</section>
+<!-- the fragment slot for the overlay: -->
+<div id="overlay"></div>
+```
+
+The above will work fine, but Fragment Plugin provides a custom element designed
+specifically for this use case:
+
+```diff
+<section id="list">
+  <ul>
+    <li><a href="/user/1/">User 1</a></li>
+    <li><a href="/user/2/">User 2</a></li>
+    <li><a href="/user/3/">User 3</a></li>
+  </ul>
+</section>
+-<div id="overlay"></div>
++<swup-fragment-slot id="overlay"></swup-fragment-slot>
+
+```
+
+`<swup-fragment-slot>` automatically...
+
+- sets it's `transition-duration` and `animation-duration` to `10ms` so that you don't have to do it in your CSS
+- hides itself from screen readers, since it's not relevant for the current page
+
+Basically, it's the same as if you did this:
+
+```html
+<div
+  id="overlay"
+  style="transition-duration: 10ms; animation-duration: 10ms;"
+  aria-hidden="true"
+></div>
+```
 
 ### Fragment URL
 
