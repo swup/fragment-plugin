@@ -14,8 +14,6 @@ import {
 	cacheUnchangedFragments
 } from './inc/functions.js';
 
-import { cleanupModals } from './inc/modals.js';
-
 import SwupFragmentSlot from './inc/SwupFragmentSlot.js';
 import SwupModalPlaceholder from './inc/SwupModalPlaceholder.js';
 
@@ -118,7 +116,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		swup.hooks.before('link:self', this.onLinkToSelf);
 		swup.hooks.on('visit:start', this.onVisitStart);
-		swup.hooks.before('content:replace', this.beforeContentReplace);
 		swup.hooks.on('content:replace', this.onContentReplace);
 		swup.hooks.on('visit:end', this.onVisitEnd);
 
@@ -133,7 +130,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		swup.hooks.off('link:self', this.onLinkToSelf);
 		swup.hooks.off('visit:start', this.onVisitStart);
-		swup.hooks.off('content:replace', this.beforeContentReplace);
 		swup.hooks.off('content:replace', this.onContentReplace);
 		swup.hooks.off('visit:end', this.onVisitEnd);
 
@@ -204,13 +200,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 		context.animation.selector = context.fragmentVisit.fragments.join(',');
 
 		addRuleNameToFragments(context.fragmentVisit);
-	};
-
-	/**
-	 * Runs just before the content is replaced
-	 */
-	beforeContentReplace: Handler<'content:replace'> = (context) => {
-		cleanupModals(context);
 	};
 
 	/**
