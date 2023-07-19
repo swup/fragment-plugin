@@ -1,5 +1,5 @@
 import { Location } from 'swup';
-import type { Context as SwupContext } from 'swup';
+import type { Context } from 'swup';
 import type { Rule, Route, FragmentVisit } from '../SwupFragmentPlugin.js';
 import Logger from './Logger.js';
 import SwupFragmentPlugin from '../SwupFragmentPlugin.js';
@@ -117,7 +117,11 @@ export const getFragmentsForVisit = (
 		}
 
 		if (elementMatchesFragmentUrl(el, route.to)) {
-			logger?.log(`ignoring fragment "${selector}" as it already matches the URL`);
+			logger?.log(
+				`ignored fragment %c${selector}%c as it already matches the current URL`,
+				logger.RED,
+				logger.RESET
+			);
 			return false;
 		}
 
@@ -177,7 +181,7 @@ export const cleanupFragmentAttributes = () => {
 /**
  * Get the route from a given context
  */
-export const getRoute = (context: SwupContext): Route | undefined => {
+export const getRoute = (context: Context): Route | undefined => {
 	const from = context.from.url;
 	const to = context.to.url;
 	if (!from || !to) return;
@@ -187,8 +191,12 @@ export const getRoute = (context: SwupContext): Route | undefined => {
 /**
  * Add the rule name to fragments
  */
-export const addRuleNameToFragments = ({ rule, fragments }: FragmentVisit): void => {
+export const addRuleNameClasses = (context: Context): void => {
+	if (!context.fragmentVisit) return;
+
+	const { rule, fragments } = context.fragmentVisit;
 	if (!rule.name) return;
+
 	fragments.forEach((selector) => {
 		document.querySelector(selector)?.classList.add(`to-${rule.name}`);
 	});
@@ -225,8 +233,8 @@ export const cacheForeignFragments = ({ swup, logger }: SwupFragmentPlugin): voi
 
 	// debug info
 	const updatedFragments: {
-		fragmentSelector: string;
-		fragmentUrl: string;
+		selector: string;
+		url: string;
 	}[] = [];
 
 	// We only want to handle fragments that don't fit the current URL
@@ -277,7 +285,7 @@ export const cacheForeignFragments = ({ swup, logger }: SwupFragmentPlugin): voi
 		currentFragment.replaceWith(unchangedFragment);
 
 		// For debugging
-		updatedFragments.push({ fragmentSelector, fragmentUrl });
+		updatedFragments.push({ selector: fragmentSelector, url: fragmentUrl });
 	});
 
 	if (!updatedFragments.length) return;
@@ -288,9 +296,41 @@ export const cacheForeignFragments = ({ swup, logger }: SwupFragmentPlugin): voi
 		html: currentCachedDocument.documentElement.outerHTML
 	});
 
+	updatedFragments.forEach((f) => {
+		logger.log(
+			`updated cache with %c${f.selector}%c from %c${f.url}%c`,
+			logger.RED,
+			logger.RESET,
+			logger.RED,
+			logger.RESET,
+		);
+	});
+
 	// Log the result
-	logger.log(`updated cache for unchanged fragment(s):`, updatedFragments);
 };
+
+/**
+ * Skips the animation if all current containers either
+ *
+ * - are empty
+ * - contain only comments and/or empty text nodes
+ */
+export function shouldSkipAnimation({ swup }: SwupFragmentPlugin): boolean {
+	const { fragmentVisit } = swup.context;
+	if (!fragmentVisit) return false;
+
+	return fragmentVisit.fragments.every((selector) => {
+		const childNodes = Array.from(document.querySelector(selector)?.childNodes || []);
+		if (!childNodes.length) return true;
+		return childNodes.every((node) => {
+			// Check for comments
+			if (node.nodeName === '#comment') return true;
+			// Check for empty text nodes
+			if (node.nodeName === '#text' && !Boolean(node.nodeValue?.trim())) return true;
+			return false;
+		});
+	});
+}
 
 /**
  * Remove duplicates from an array

@@ -6,6 +6,8 @@ type LoggerOptions = {
 export default class Logger {
 	options: LoggerOptions = {};
 
+	red: string = '#C80100';
+
 	constructor(options?: LoggerOptions) {
 		const defaults: LoggerOptions = {
 			prefix: '',
@@ -31,6 +33,21 @@ export default class Logger {
 	unmute() {
 		this.options.muted = false;
 	}
+
+	/**
+	 * Make a string red
+	 */
+	get RED(): string {
+		return `color: ${this.red}`;
+	}
+
+	/**
+	 * Reset the color
+	 */
+	get RESET(): string {
+		return '';
+	}
+
 
 	/**
 	 * Log to console, if not muted

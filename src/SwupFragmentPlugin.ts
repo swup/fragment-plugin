@@ -1,17 +1,18 @@
 import PluginBase from '@swup/plugin';
 import Rule from './inc/Rule.js';
 
-import type { Path, Handler } from 'swup';
+import type { Path, Handler, Context } from 'swup';
 import Logger from './inc/Logger.js';
 import {
 	handlePageView,
 	cleanupFragmentAttributes,
 	getFragmentsForVisit,
 	getRoute,
-	addRuleNameToFragments,
+	addRuleNameClasses,
 	removeRuleNameFromFragments,
 	getFirstMatchingRule,
-	cacheForeignFragments
+	cacheForeignFragments,
+	shouldSkipAnimation
 } from './inc/functions.js';
 
 import SwupFragmentPlaceholder from './inc/SwupFragmentPlaceholder.js';
@@ -112,7 +113,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		swup.hooks.before('link:self', this.onLinkToSelf);
 		swup.hooks.on('visit:start', this.onVisitStart);
-		swup.hooks.on('animation:await', this.onAnimationAwait);
+		swup.hooks.replace('animation:await', this.maybeSkipAnimation);
 		swup.hooks.on('content:replace', this.onContentReplace);
 		swup.hooks.on('visit:end', this.onVisitEnd);
 
@@ -127,7 +128,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		swup.hooks.off('link:self', this.onLinkToSelf);
 		swup.hooks.off('visit:start', this.onVisitStart);
-		swup.hooks.off('animation:await', this.onAnimationAwait);
+		swup.hooks.off('animation:await', this.maybeSkipAnimation);
 		swup.hooks.off('content:replace', this.onContentReplace);
 		swup.hooks.off('visit:end', this.onVisitEnd);
 
@@ -148,7 +149,10 @@ export default class SwupFragmentPlugin extends PluginBase {
 		// Bail early if there are no valid fragments for the rule
 		if (!fragments.length) return;
 
-		const visit = { rule, fragments };
+		const visit: FragmentVisit = {
+			rule,
+			fragments
+		};
 
 		return visit;
 	}
@@ -183,7 +187,14 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		context.fragmentVisit = fragmentVisit;
 
-		this.logger.log('fragment visit:', context.fragmentVisit);
+		this.logger.log(
+			`fragment visit: %c${context.fragmentVisit.fragments.join(', ')}%c`,
+			this.logger.RED,
+			this.logger.RESET
+		);
+
+		// Disable the out animation if there are only placeholders
+		// context.animation.animate = fragmentVisit.animate;
 
 		// Disable scrolling for this transition
 		context.scroll.reset = false;
@@ -197,19 +208,29 @@ export default class SwupFragmentPlugin extends PluginBase {
 		// Overwrite the animationSelector for this visit
 		context.animation.selector = context.fragmentVisit.fragments.join(',');
 
-		addRuleNameToFragments(context.fragmentVisit);
+		addRuleNameClasses(context);
 	};
 
-	onAnimationAwait: Handler<'animation:await'> = (context) => {
-		context.animation.selector = false;
-		console.log(context.containers);
+	/**
+	 * Skips the animation for empty fragments
+	 */
+	maybeSkipAnimation: Handler<'animation:await'> = (context, args, defaultHandler) => {
+		if (context.fragmentVisit && shouldSkipAnimation(this)) {
+			this.logger.log(
+				`${args.direction}-animation skipped for %c${context.fragmentVisit?.fragments}%c`,
+				this.logger.RED,
+				this.logger.RESET
+			);
+			return Promise.resolve();
+		}
+		return defaultHandler?.(context, args);
 	};
 
 	/**
 	 * Runs after the content was replaced
 	 */
 	onContentReplace: Handler<'content:replace'> = (context) => {
-		if (context.fragmentVisit) addRuleNameToFragments(context.fragmentVisit);
+		addRuleNameClasses(context);
 		handlePageView(this);
 		cacheForeignFragments(this);
 	};
