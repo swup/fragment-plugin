@@ -207,56 +207,6 @@ sites. However, there are some advanced use cases that require adding certain at
 fragments themselves or to links on the page. These tend to be situations where overlays are
 involved and swup doesn't know which page the overlay was opened from.
 
-### Fragment Placeholders
-
-Use `<swup-fragment-placeholder>` for invisible fragments.
-
-Let's look at a list of users again. This time, we want to open each user's detail page in an overlay.
-For that, we need an invisible placeholder for the overlay on the overview page, so that swup can update
-it with the detail view when we click on one of the users:
-
-```html
-<section id="list">
-  <ul>
-    <li><a href="/user/1/">User 1</a></li>
-    <li><a href="/user/2/">User 2</a></li>
-    <li><a href="/user/3/">User 3</a></li>
-  </ul>
-</section>
-<div id="overlay"><!-- nothing here, yet --></div>
-```
-
-The above will work fine, but Fragment Plugin provides a custom element designed
-specifically for this use case:
-
-```diff
-<section id="list">
-  <ul>
-    <li><a href="/user/1/">User 1</a></li>
-    <li><a href="/user/2/">User 2</a></li>
-    <li><a href="/user/3/">User 3</a></li>
-  </ul>
-</section>
--<div id="overlay"><!-- nothing here, yet --></div>
-+<swup-fragment-placeholder id="overlay"></swup-fragment-placeholder>
-
-```
-
-`<swup-fragment-placeholder>` automatically...
-
-- sets it's `transition-duration` and `animation-duration` to `10ms` so that you don't have to do it in your CSS
-- hides itself from screen readers, since it's not relevant for the current page
-
-It saves you from having to do this:
-
-```html
-<div
-  id="overlay"
-  style="transition-duration: 10ms; animation-duration: 10ms;"
-  aria-hidden="true"
-></div>
-```
-
 ### Fragment URL
 
 Use the `data-swup-fragment-url` attribute to uniquely identify fragments.
