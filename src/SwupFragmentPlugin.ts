@@ -6,7 +6,7 @@ import Logger from './inc/Logger.js';
 import {
 	handlePageView,
 	cleanupFragmentAttributes,
-	getReplaceableFragments,
+	getFragmentsForVisit,
 	getRoute,
 	addRuleNameToFragments,
 	removeRuleNameFromFragments,
@@ -112,6 +112,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		swup.hooks.before('link:self', this.onLinkToSelf);
 		swup.hooks.on('visit:start', this.onVisitStart);
+		swup.hooks.on('animation:await', this.onAnimationAwait);
 		swup.hooks.on('content:replace', this.onContentReplace);
 		swup.hooks.on('visit:end', this.onVisitEnd);
 
@@ -126,6 +127,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		swup.hooks.off('link:self', this.onLinkToSelf);
 		swup.hooks.off('visit:start', this.onVisitStart);
+		swup.hooks.off('animation:await', this.onAnimationAwait);
 		swup.hooks.off('content:replace', this.onContentReplace);
 		swup.hooks.off('visit:end', this.onVisitEnd);
 
@@ -142,7 +144,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		if (!rule) return;
 
 		// Validate the fragments from the matched rule
-		const fragments = getReplaceableFragments(route, rule.fragments, logger);
+		const fragments = getFragmentsForVisit(route, rule.fragments, logger);
 		// Bail early if there are no valid fragments for the rule
 		if (!fragments.length) return;
 
@@ -196,6 +198,11 @@ export default class SwupFragmentPlugin extends PluginBase {
 		context.animation.selector = context.fragmentVisit.fragments.join(',');
 
 		addRuleNameToFragments(context.fragmentVisit);
+	};
+
+	onAnimationAwait: Handler<'animation:await'> = (context) => {
+		context.animation.selector = false;
+		console.log(context.containers);
 	};
 
 	/**

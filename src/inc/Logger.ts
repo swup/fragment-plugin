@@ -35,36 +35,36 @@ export default class Logger {
 	/**
 	 * Log to console, if not muted
 	 */
-	log(...args: any) {
+	log(...args: any): void {
 		if (this.options.muted === true) return;
 		const message = args.shift();
-		console.log(`${this.options.prefix} ${message}`, ...args);
+		return console.log(`${this.options.prefix} ${message}`, ...args);
 	}
 
 	/**
 	 * Warn if not muted
 	 */
-	warn(...args: any) {
+	warn(...args: any): void {
 		if (this.options.muted === true) return;
 		const message = args.shift();
-		console.warn(`${this.options.prefix} ${message}`, ...args);
+		return console.warn(`${this.options.prefix} ${message}`, ...args);
 	}
 
 	/**
 	 * Warn if not muted
 	 */
-	error(...args: any) {
+	error(...args: any): void {
 		if (this.options.muted === true) return;
 		const message = args.shift();
-		console.error(`${this.options.prefix} ${message}`, ...args);
+		return console.error(`${this.options.prefix} ${message}`, ...args);
 	}
 
 	/**
 	 * log a table if not muted
 	 */
-	table(...args: any) {
+	table(...args: any): void {
 		if (this.options.muted === true) return;
 		console.log(`${this.options.prefix}:`);
-		console.table(...args);
+		return console.table(...args);
 	}
 }

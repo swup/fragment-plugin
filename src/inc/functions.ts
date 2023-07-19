@@ -84,7 +84,11 @@ function addFragmentAttributes({ rules, swup }: SwupFragmentPlugin): void {
 				// No element
 				if (!element) return;
 				// Ignore <template> and <swup-fragment-placeholder>
-				if (['template', 'swup-fragment-placeholder'].includes(element.tagName.toLowerCase()))
+				if (
+					['template', 'swup-fragment-placeholder'].includes(
+						element.tagName.toLowerCase()
+					)
+				)
 					return;
 				// Save the selector that matched the element
 				element.setAttribute('data-swup-fragment-selector', selector);
@@ -99,32 +103,26 @@ function addFragmentAttributes({ rules, swup }: SwupFragmentPlugin): void {
 /**
  * Get all fragments that should be replaced for a given visit's route
  */
-export const getReplaceableFragments = (
+export const getFragmentsForVisit = (
 	route: Route,
-	fragments: string[],
+	selectors: string[],
 	logger: Logger | undefined
-): string[] => {
-	return fragments.filter((selector) => {
-		const result = isReplaceableFragment(selector, route.to);
-		if (result === true) return true;
+) => {
+	return selectors.filter((selector) => {
+		const el = document.querySelector(selector);
 
-		if (logger) logger.log(result);
-		return false;
+		if (!el) {
+			logger?.log(`fragment "${selector}" missing in current document`);
+			return false;
+		}
+
+		if (elementMatchesFragmentUrl(el, route.to)) {
+			logger?.log(`ignoring fragment "${selector}" as it already matches the URL`);
+			return false;
+		}
+
+		return true;
 	});
-};
-
-/**
- * Checks if a fragment can should be replaced for a target URL. Returns either true or a string with the reason
- */
-export const isReplaceableFragment = (selector: string, targetUrl: string): true | string => {
-	const el = document.querySelector(selector);
-
-	if (!el) return `fragment "${selector}" missing in current document`;
-
-	if (elementMatchesFragmentUrl(el, targetUrl))
-		return `ignoring fragment "${selector}" as it already matches the URL`;
-
-	return true;
 };
 
 /**
