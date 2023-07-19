@@ -15,8 +15,6 @@ import {
 	shouldSkipAnimation
 } from './inc/functions.js';
 
-import SwupFragmentPlaceholder from './inc/SwupFragmentPlaceholder.js';
-
 declare module 'swup' {
 	export interface Context {
 		fragmentVisit?: FragmentVisit;
@@ -92,17 +90,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 		this.rules = this.options.rules.map(
 			({ from, to, fragments, name }) => new Rule(from, to, fragments, name, this.logger)
 		);
-
-		this.defineCustomElements();
-	}
-
-	/**
-	 * Defines custom elements
-	 */
-	defineCustomElements(): void {
-		if (!window.customElements.get('swup-fragment-placeholder')) {
-			window.customElements.define('swup-fragment-placeholder', SwupFragmentPlaceholder);
-		}
 	}
 
 	/**
