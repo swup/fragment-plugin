@@ -1,8 +1,7 @@
 import PluginBase from '@swup/plugin';
 import Rule from './inc/Rule.js';
-
 import type { Path, Handler, Context } from 'swup';
-import Logger from './inc/Logger.js';
+import type { ConsolaInstance } from 'consola';
 import {
 	handlePageView,
 	cleanupFragmentAttributes,
@@ -12,8 +11,11 @@ import {
 	removeRuleNameFromFragments,
 	getFirstMatchingRule,
 	cacheForeignFragments,
-	shouldSkipAnimation
+	shouldSkipAnimation,
+	prefix,
 } from './inc/functions.js';
+import { red } from 'console-log-colors';
+
 
 declare module 'swup' {
 	export interface Context {
@@ -38,7 +40,7 @@ export type RuleOptions = {
 
 export type Options = {
 	rules: RuleOptions[];
-	debug?: boolean;
+	logger?: ConsolaInstance;
 };
 
 /**
@@ -66,11 +68,11 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 	options: Options;
 
-	logger: Logger;
+	logger?: ConsolaInstance;
 
 	defaults: Options = {
 		rules: [],
-		debug: false
+		logger: undefined
 	};
 
 	/**
@@ -81,11 +83,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		super();
 
 		this.options = { ...this.defaults, ...options };
-
-		this.logger = new Logger({
-			prefix: '🧩',
-			muted: this.options.debug !== true
-		});
+		this.logger = this.options.logger;
 
 		this.rules = this.options.rules.map(
 			({ from, to, fragments, name }) => new Rule(from, to, fragments, name, this.logger)
@@ -125,7 +123,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Get the state for a given route
 	 */
-	getFragmentVisit(route: Route, logger?: Logger): FragmentVisit | undefined {
+	getFragmentVisit(route: Route, logger?: ConsolaInstance): FragmentVisit | undefined {
 		const rule = getFirstMatchingRule(route, this.rules);
 
 		// Bail early if no rule matched
@@ -174,11 +172,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		context.fragmentVisit = fragmentVisit;
 
-		this.logger.log(
-			`fragment visit: %c${context.fragmentVisit.fragments.join(', ')}%c`,
-			this.logger.RED,
-			this.logger.RESET
-		);
+		this.logger?.info(prefix(`fragment visit: ${red(context.fragmentVisit.fragments.join(', '))}`));
 
 		// Disable the out animation if there are only placeholders
 		// context.animation.animate = fragmentVisit.animate;
@@ -203,11 +197,11 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 */
 	maybeSkipAnimation: Handler<'animation:await'> = (context, args, defaultHandler) => {
 		if (context.fragmentVisit && shouldSkipAnimation(this)) {
-			this.logger.log(
-				`${args.direction}-animation skipped for %c${context.fragmentVisit?.fragments}%c`,
-				this.logger.RED,
-				this.logger.RESET
-			);
+			this.logger?.info(prefix(
+				`${red(args.direction)}-animation skipped for ${red(
+					context.fragmentVisit?.fragments.toString()
+				)}`
+			));
 			return Promise.resolve();
 		}
 		return defaultHandler?.(context, args);

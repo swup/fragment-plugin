@@ -1,7 +1,7 @@
 import { matchPath, classify, type Path } from 'swup';
 import type { Route } from '../SwupFragmentPlugin.js';
-import type Logger from './Logger.js';
-import { dedupe } from './functions.js';
+import type { ConsolaInstance } from 'consola';
+import { dedupe, prefix } from './functions.js';
 /**
  * Represents a Rule
  */
@@ -13,9 +13,9 @@ export default class Rule {
 	to: Path;
 	fragments: string[];
 	name?: string;
-	logger?: Logger;
+	logger?: ConsolaInstance;
 
-	constructor(from: Path, to: Path, rawFragments: string[], name?: string, logger?: Logger) {
+	constructor(from: Path, to: Path, rawFragments: string[], name?: string, logger?: ConsolaInstance) {
 		this.from = from;
 		this.to = to;
 		this.matchesFrom = matchPath(from);
@@ -33,7 +33,7 @@ export default class Rule {
 		const fragments = rawFragments.map((selector) => selector.trim());
 		fragments.forEach((selector) => {
 			const result = this.validateSelector(selector);
-			if (result !== true) this.logger?.error(result);
+			if (result !== true) this.logger?.error(prefix(result));
 		});
 		return dedupe(fragments);
 	}

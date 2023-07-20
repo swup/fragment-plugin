@@ -1,8 +1,11 @@
 import { Location } from 'swup';
 import type { Context } from 'swup';
 import type { Rule, Route, FragmentVisit } from '../SwupFragmentPlugin.js';
-import Logger from './Logger.js';
 import SwupFragmentPlugin from '../SwupFragmentPlugin.js';
+import type { ConsolaInstance } from 'consola';
+import { red } from 'console-log-colors';
+
+export const prefix = (s: string) => `🧩 ${s}`;
 
 declare global {
 	interface HTMLDialogElement {
@@ -46,23 +49,29 @@ function handleLinksToFragments({ logger, swup }: SwupFragmentPlugin): void {
 	links.forEach((el) => {
 		const selector = el.getAttribute(targetAttribute);
 		if (!selector) {
-			return logger.warn(`[${targetAttribute}] needs to contain a valid fragment selector`);
+			return logger?.warn(
+				prefix(`[${targetAttribute}] needs to contain a valid fragment selector`)
+			);
 		}
 
 		const fragment = document.querySelector(selector);
 		if (!fragment) {
-			return logger?.warn(`no element found for [${targetAttribute}="${selector}"]`);
+			return logger?.warn(prefix(`no element found for [${targetAttribute}="${selector}"]`));
 		}
 
 		const fragmentUrl = fragment.getAttribute('data-swup-fragment-url');
 
 		if (!fragmentUrl)
-			return logger.warn(`Can't get fragment URL of ${selector} as it doesn't exist`);
+			return logger?.warn(
+				prefix(`Can't get fragment URL of ${selector} as it doesn't exist`)
+			);
 
 		// Help finding missing [data-swup-fragment-urls]
 		if (isEqualUrl(fragmentUrl, swup.getCurrentUrl())) {
-			return logger.warn(
-				`The fragment URL of ${selector} is identical to the current URL. This could mean that [data-swup-fragment-url] needs to be provided by the server.`
+			return logger?.warn(
+				prefix(
+					`The fragment URL of ${selector} is identical to the current URL. This could mean that [data-swup-fragment-url] needs to be provided by the server.`
+				)
 			);
 		}
 
@@ -106,21 +115,19 @@ function addFragmentAttributes({ rules, swup }: SwupFragmentPlugin): void {
 export const getFragmentsForVisit = (
 	route: Route,
 	selectors: string[],
-	logger: Logger | undefined
+	logger?: ConsolaInstance
 ) => {
 	return selectors.filter((selector) => {
 		const el = document.querySelector(selector);
 
 		if (!el) {
-			logger?.log(`fragment "${selector}" missing in current document`);
+			logger?.info(prefix(`fragment "${selector}" missing in current document`));
 			return false;
 		}
 
 		if (elementMatchesFragmentUrl(el, route.to)) {
-			logger?.log(
-				`ignored fragment %c${selector}%c as it already matches the current URL`,
-				logger.RED,
-				logger.RESET
+			logger?.info(
+				prefix(`ignored fragment ${red(selector)} as it already matches the current URL`)
 			);
 			return false;
 		}
@@ -253,14 +260,20 @@ export const cacheForeignFragments = ({ swup, logger }: SwupFragmentPlugin): voi
 		// Get and validate `fragmentUrl`
 		const rawFragmentUrl = el.getAttribute('data-swup-fragment-url');
 		if (!rawFragmentUrl) {
-			return logger.warn(`invalid [data-swup-fragment-url] found on unchanged fragment:`, el);
+			return logger?.warn(
+				prefix(`invalid [data-swup-fragment-url] found on unchanged fragment:`),
+				el
+			);
 		}
 		const fragmentUrl = Location.fromUrl(rawFragmentUrl).url;
 
 		// Get and validate `fragmentSelector`
 		const fragmentSelector = el.getAttribute('data-swup-fragment-selector');
 		if (!fragmentSelector) {
-			return logger.warn(`no [data-swup-fragment-selector] found on unchanged fragment:`, el);
+			return logger?.warn(
+				prefix(`no [data-swup-fragment-selector] found on unchanged fragment:`),
+				el
+			);
 		}
 
 		// Get the cache entry for the fragment URL, bail early if it doesn't exist
@@ -297,13 +310,7 @@ export const cacheForeignFragments = ({ swup, logger }: SwupFragmentPlugin): voi
 	});
 
 	updatedFragments.forEach((f) => {
-		logger.log(
-			`updated cache with %c${f.selector}%c from %c${f.url}%c`,
-			logger.RED,
-			logger.RESET,
-			logger.RED,
-			logger.RESET,
-		);
+		logger?.info(prefix(`updated cache with ${red(f.selector)} from ${red(f.url)}`));
 	});
 
 	// Log the result
