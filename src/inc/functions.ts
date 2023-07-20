@@ -1,5 +1,5 @@
 import { Location } from 'swup';
-import type { Context } from 'swup';
+import type { Visit } from 'swup';
 import type { Rule, Route, FragmentVisit } from '../SwupFragmentPlugin.js';
 import SwupFragmentPlugin from '../SwupFragmentPlugin.js';
 import type { ConsolaInstance } from 'consola';
@@ -188,9 +188,9 @@ export const cleanupFragmentAttributes = () => {
 /**
  * Get the route from a given context
  */
-export const getRoute = (context: Context): Route | undefined => {
-	const from = context.from.url;
-	const to = context.to.url;
+export const getRoute = (visit: Visit): Route | undefined => {
+	const from = visit.from.url;
+	const to = visit.to.url;
 	if (!from || !to) return;
 	return { from, to };
 };
@@ -198,10 +198,10 @@ export const getRoute = (context: Context): Route | undefined => {
 /**
  * Add the rule name to fragments
  */
-export const addRuleNameClasses = (context: Context): void => {
-	if (!context.fragmentVisit) return;
+export const addRuleNameClasses = (visit: Visit): void => {
+	if (!visit.fragmentVisit) return;
 
-	const { rule, fragments } = context.fragmentVisit;
+	const { rule, fragments } = visit.fragmentVisit;
 	if (!rule.name) return;
 
 	fragments.forEach((selector) => {
@@ -323,7 +323,7 @@ export const cacheForeignFragments = ({ swup, logger }: SwupFragmentPlugin): voi
  * - contain only comments and/or empty text nodes
  */
 export function shouldSkipAnimation({ swup }: SwupFragmentPlugin): boolean {
-	const { fragmentVisit } = swup.context;
+	const { fragmentVisit } = swup.visit;
 	if (!fragmentVisit) return false;
 
 	return fragmentVisit.fragments.every((selector) => {

@@ -1,6 +1,6 @@
 import PluginBase from '@swup/plugin';
 import Rule from './inc/Rule.js';
-import type { Path, Handler, Context } from 'swup';
+import type { Path, Handler, Visit } from 'swup';
 import type { ConsolaInstance } from 'consola';
 import {
 	handlePageView,
@@ -18,7 +18,7 @@ import { red } from 'console-log-colors';
 
 
 declare module 'swup' {
-	export interface Context {
+	export interface Visit {
 		fragmentVisit?: FragmentVisit;
 	}
 }
@@ -94,13 +94,12 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * Runs when the plugin is being mounted
 	 */
 	mount() {
-		const swup = this.swup;
-
-		swup.hooks.before('link:self', this.onLinkToSelf);
-		swup.hooks.on('visit:start', this.onVisitStart);
-		swup.hooks.replace('animation:await', this.maybeSkipAnimation);
-		swup.hooks.on('content:replace', this.onContentReplace);
-		swup.hooks.on('visit:end', this.onVisitEnd);
+		this.before('link:self', this.onLinkToSelf);
+		this.on('visit:start', this.onVisitStart);
+		this.replace('animation:out:await', this.maybeSkipOutAnimation);
+		this.replace('animation:in:await', this.maybeSkipInAnimation);
+		this.on('content:replace', this.onContentReplace);
+		this.on('visit:end', this.onVisitEnd);
 
 		handlePageView(this);
 	}
@@ -109,14 +108,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * Runs when the plugin is being unmounted
 	 */
 	unmount() {
-		const swup = this.swup;
-
-		swup.hooks.off('link:self', this.onLinkToSelf);
-		swup.hooks.off('visit:start', this.onVisitStart);
-		swup.hooks.off('animation:await', this.maybeSkipAnimation);
-		swup.hooks.off('content:replace', this.onContentReplace);
-		swup.hooks.off('visit:end', this.onVisitEnd);
-
+		super.unmount();
 		cleanupFragmentAttributes();
 	}
 
@@ -146,20 +138,20 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * Do not scroll if clicking on a link to the same page
 	 * and the route matches a fragment rule
 	 */
-	onLinkToSelf: Handler<'link:self'> = (context) => {
-		const route = getRoute(context);
+	onLinkToSelf: Handler<'link:self'> = (visit) => {
+		const route = getRoute(visit);
 		if (!route) return;
 
 		const rule = getFirstMatchingRule(route, this.rules);
 
-		if (rule) context.scroll.reset = false;
+		if (rule) visit.scroll.reset = false;
 	};
 
 	/**
 	 * Do special things if this is a fragment visit
 	 */
-	onVisitStart: Handler<'visit:start'> = async (context) => {
-		const route = getRoute(context);
+	onVisitStart: Handler<'visit:start'> = async (visit) => {
+		const route = getRoute(visit);
 		if (!route) return;
 
 		const fragmentVisit = this.getFragmentVisit(route, this.logger);
@@ -170,48 +162,63 @@ export default class SwupFragmentPlugin extends PluginBase {
 		 */
 		if (!fragmentVisit) return;
 
-		context.fragmentVisit = fragmentVisit;
+		visit.fragmentVisit = fragmentVisit;
 
-		this.logger?.info(prefix(`fragment visit: ${red(context.fragmentVisit.fragments.join(', '))}`));
+		this.logger?.info(prefix(`fragment visit: ${red(visit.fragmentVisit.fragments.join(', '))}`));
 
 		// Disable the out animation if there are only placeholders
-		// context.animation.animate = fragmentVisit.animate;
+		// visit.animation.animate = fragmentVisit.animate;
 
 		// Disable scrolling for this transition
-		context.scroll.reset = false;
+		visit.scroll.reset = false;
 
 		// Add the transition classes directly to the fragments for this visit
-		context.animation.scope = context.fragmentVisit.fragments;
+		visit.animation.scope = visit.fragmentVisit.fragments;
 
 		// Overwrite the containers for this visit
-		context.containers = context.fragmentVisit.fragments;
+		visit.containers = visit.fragmentVisit.fragments;
 
 		// Overwrite the animationSelector for this visit
-		context.animation.selector = context.fragmentVisit.fragments.join(',');
+		visit.animation.selector = visit.fragmentVisit.fragments.join(',');
 
-		addRuleNameClasses(context);
+		addRuleNameClasses(visit);
 	};
 
 	/**
-	 * Skips the animation for empty fragments
+	 * Skips the out animation for empty fragments
 	 */
-	maybeSkipAnimation: Handler<'animation:await'> = (context, args, defaultHandler) => {
-		if (context.fragmentVisit && shouldSkipAnimation(this)) {
+	maybeSkipOutAnimation: Handler<'animation:out:await'> = (visit, args, defaultHandler) => {
+		if (visit.fragmentVisit && shouldSkipAnimation(this)) {
 			this.logger?.info(prefix(
-				`${red(args.direction)}-animation skipped for ${red(
-					context.fragmentVisit?.fragments.toString()
+				`${red('out')}-animation skipped for ${red(
+					visit.fragmentVisit?.fragments.toString()
 				)}`
 			));
 			return Promise.resolve();
 		}
-		return defaultHandler?.(context, args);
+		return defaultHandler?.(visit, args);
+	};
+
+	/**
+	 * Skips the in animation for empty fragments
+	 */
+	maybeSkipInAnimation: Handler<'animation:in:await'> = (visit, args, defaultHandler) => {
+		if (visit.fragmentVisit && shouldSkipAnimation(this)) {
+			this.logger?.info(prefix(
+				`${red('in')}-animation skipped for ${red(
+					visit.fragmentVisit?.fragments.toString()
+				)}`
+			));
+			return Promise.resolve();
+		}
+		return defaultHandler?.(visit, args);
 	};
 
 	/**
 	 * Runs after the content was replaced
 	 */
-	onContentReplace: Handler<'content:replace'> = (context) => {
-		addRuleNameClasses(context);
+	onContentReplace: Handler<'content:replace'> = (visit) => {
+		addRuleNameClasses(visit);
 		handlePageView(this);
 		cacheForeignFragments(this);
 	};
@@ -219,8 +226,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Remove the rule name from fragments
 	 */
-	onVisitEnd: Handler<'visit:end'> = (context) => {
-		if (context.fragmentVisit) removeRuleNameFromFragments(context.fragmentVisit);
-		context.fragmentVisit = undefined;
+	onVisitEnd: Handler<'visit:end'> = (visit) => {
+		if (visit.fragmentVisit) removeRuleNameFromFragments(visit.fragmentVisit);
+		visit.fragmentVisit = undefined;
 	};
 }
