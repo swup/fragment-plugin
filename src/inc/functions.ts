@@ -95,9 +95,9 @@ function prepareFragmentElements({ rules, swup, logger }: SwupFragmentPlugin): v
 				const fragmentUrlFromServer = el.getAttribute('data-swup-fragment-url');
 				if (fragmentUrlFromServer) {
 					logger?.log(
-						`fragment url ${highlight(fragmentUrlFromServer)} found on ${highlight(
+						`fragment url ${highlight(fragmentUrlFromServer)} for ${highlight(
 							selector
-						)}`
+						)} provided by server`
 					);
 				}
 				// Get the fragment URL
