@@ -144,14 +144,12 @@ export const elementMatchesFragmentUrl = (el: FragmentElement, url: string): boo
 };
 
 /**
- * Checks if two URLs should be considered equal
+ * Checks if two URLs should be considered equal:
  *
- * All these URLs would be considered to be equal:
+ * - ignores trailing slashes
+ * - ignores query string order
  *
- * - /test
- * - /test/
- * - /test?foo=bar&baz=boo
- * - /test/?baz=boo&foo=bar
+ * Example: /test?foo=bar&baz=boo === /test/?baz=boo&foo=bar
  */
 const isEqualUrl = (url1: string, url2: string) => {
 	return normalizeUrl(url1) === normalizeUrl(url2);
