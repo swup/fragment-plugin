@@ -2,7 +2,6 @@ import { Location } from 'swup';
 import type { Visit } from 'swup';
 import type { Rule, Route, FragmentVisit } from '../SwupFragmentPlugin.js';
 import SwupFragmentPlugin from '../SwupFragmentPlugin.js';
-import { redBright } from 'console-log-colors';
 import Logger, { highlight } from './Logger.js';
 
 interface FragmentElement extends Element {
