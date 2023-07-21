@@ -80,21 +80,29 @@ function handleLinksToFragments({ logger, swup }: SwupFragmentPlugin): void {
 /**
  * Adds attributes and properties to fragments
  */
-function prepareFragmentElements({ rules, swup }: SwupFragmentPlugin): void {
+function prepareFragmentElements({ rules, swup, logger }: SwupFragmentPlugin): void {
 	const currentUrl = swup.getCurrentUrl();
 
 	rules
 		.filter((rule) => rule.matchesFrom(currentUrl) || rule.matchesTo(currentUrl))
 		.forEach((rule) => {
 			rule.fragments.forEach((selector) => {
-				const el = document.querySelector(`${selector}:not([data-swup-fragment])`) as FragmentElement | null;
+				const el = document.querySelector(
+					`${selector}:not([data-swup-fragment])`
+				) as FragmentElement | null;
 				// No element
 				if (!el) return;
+				const fragmentUrlFromServer = el.getAttribute('data-swup-fragment-url');
+				if (fragmentUrlFromServer) {
+					logger?.log(
+						`fragment url ${highlight(fragmentUrlFromServer)} found on ${highlight(
+							selector
+						)}`
+					);
+				}
 				// Get the fragment URL
-				const { url } = Location.fromUrl(
-					el.getAttribute('data-swup-fragment-url') || currentUrl
-				);
-				el.removeAttribute('data-swup-fragment-url');
+				const { url } = Location.fromUrl(fragmentUrlFromServer || currentUrl);
+				// el.removeAttribute('data-swup-fragment-url');
 				// Mark the element as a fragment
 				el.setAttribute('data-swup-fragment', '');
 				// Augment the element with the necessary properties
