@@ -4,7 +4,7 @@ import type { Path, Handler, Visit } from 'swup';
 import Logger from './inc/Logger.js';
 import {
 	handlePageView,
-	cleanupFragmentAttributes,
+	cleanupFragmentElements,
 	getFragmentsForVisit,
 	getRoute,
 	addRuleNameClasses,
@@ -112,7 +112,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	unmount() {
 		super.unmount();
 		this.logger = undefined;
-		cleanupFragmentAttributes();
+		cleanupFragmentElements();
 	}
 
 	/**
