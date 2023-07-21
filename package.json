@@ -1,7 +1,7 @@
 {
   "name": "@swup/fragment-plugin",
   "amdName": "SwupFragmentPlugin",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A swup plugin for replacing dynamic fragments",
   "type": "module",
   "source": "src/index.ts",
@@ -37,7 +37,7 @@
     "dev": "swup-plugin dev",
     "lint": "swup-plugin lint",
     "format": "swup-plugin format",
-    "prepublishOnly": "npm run build"
+    "prepare": "npm run build"
   },
   "license": "MIT",
   "repository": {
