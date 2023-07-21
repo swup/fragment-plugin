@@ -1,20 +1,22 @@
-import type Swup from 'swup';
-import SwupFragmentPlugin from '../SwupFragmentPlugin.js';
+import { bold } from 'console-log-colors';
 
 /**
- * Represents a Rule
+ * A slim wrapper around console statements
  */
 export default class Logger {
-	swup: Swup;
-	debug: boolean;
-
-	constructor({ debug, swup }: SwupFragmentPlugin) {
-		this.debug = debug;
-		this.swup = swup;
+	prefix(s: string): string {
+		return bold(`🧩 ${s}`);
 	}
-
-	info(...args: any) {
-		if (this.debug) return;
-		this.swup?.log(args[0], args[1]);
+	log(...args: any) {
+		const msg = args.shift();
+		console.log(this.prefix(msg), ...args);
+	}
+	warn(...args: any) {
+		const msg = args.shift();
+		console.warn(this.prefix(msg), ...args);
+	}
+	error(...args: any) {
+		const msg = args.shift();
+		console.error(this.prefix(msg), ...args);
 	}
 }

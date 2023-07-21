@@ -1,11 +1,11 @@
 import { Location } from 'swup';
-import type { Context } from 'swup';
+import type { Visit } from 'swup';
 import type { Rule, Route, FragmentVisit } from '../SwupFragmentPlugin.js';
 import SwupFragmentPlugin from '../SwupFragmentPlugin.js';
-import type { ConsolaInstance } from 'consola';
-import { red } from 'console-log-colors';
+import { redBright } from 'console-log-colors';
+import Logger from './Logger.js';
 
-export const prefix = (s: string) => `🧩 ${s}`;
+export const highlight = (s: string) => redBright(s);
 
 declare global {
 	interface HTMLDialogElement {
@@ -19,7 +19,7 @@ declare global {
 export const handlePageView = (fragmentPlugin: SwupFragmentPlugin): void => {
 	addFragmentAttributes(fragmentPlugin);
 	handleLinksToFragments(fragmentPlugin);
-	showDialogs(fragmentPlugin);
+	showDialogs();
 };
 
 /**
@@ -27,7 +27,7 @@ export const handlePageView = (fragmentPlugin: SwupFragmentPlugin): void => {
  * This puts them on the top layer and makes them ignore css `transform`s on parent elements
  * @see https://developer.mozilla.org/en-US/docs/Glossary/Top_layer
  */
-function showDialogs({ logger }: SwupFragmentPlugin): void {
+function showDialogs(): void {
 	document
 		.querySelectorAll<HTMLDialogElement>('dialog[data-swup-fragment-selector]')
 		.forEach((el) => {
@@ -49,29 +49,23 @@ function handleLinksToFragments({ logger, swup }: SwupFragmentPlugin): void {
 	links.forEach((el) => {
 		const selector = el.getAttribute(targetAttribute);
 		if (!selector) {
-			return logger?.warn(
-				prefix(`[${targetAttribute}] needs to contain a valid fragment selector`)
-			);
+			return logger?.warn(`[${targetAttribute}] needs to contain a valid fragment selector`);
 		}
 
 		const fragment = document.querySelector(selector);
 		if (!fragment) {
-			return logger?.warn(prefix(`no element found for [${targetAttribute}="${selector}"]`));
+			return logger?.warn(`no element found for [${targetAttribute}="${selector}"]`);
 		}
 
 		const fragmentUrl = fragment.getAttribute('data-swup-fragment-url');
 
 		if (!fragmentUrl)
-			return logger?.warn(
-				prefix(`Can't get fragment URL of ${selector} as it doesn't exist`)
-			);
+			return logger?.warn(`Can't get fragment URL of ${selector} as it doesn't exist`);
 
 		// Help finding missing [data-swup-fragment-urls]
 		if (isEqualUrl(fragmentUrl, swup.getCurrentUrl())) {
 			return logger?.warn(
-				prefix(
-					`The fragment URL of ${selector} is identical to the current URL. This could mean that [data-swup-fragment-url] needs to be provided by the server.`
-				)
+				`The fragment URL of ${selector} is identical to the current URL. This could mean that [data-swup-fragment-url] needs to be provided by the server.`
 			);
 		}
 
@@ -112,22 +106,18 @@ function addFragmentAttributes({ rules, swup }: SwupFragmentPlugin): void {
 /**
  * Get all fragments that should be replaced for a given visit's route
  */
-export const getFragmentsForVisit = (
-	route: Route,
-	selectors: string[],
-	logger?: ConsolaInstance
-) => {
+export const getFragmentsForVisit = (route: Route, selectors: string[], logger?: Logger) => {
 	return selectors.filter((selector) => {
 		const el = document.querySelector(selector);
 
 		if (!el) {
-			logger?.info(prefix(`fragment "${selector}" missing in current document`));
+			logger?.log(`fragment "${selector}" missing in current document`);
 			return false;
 		}
 
 		if (elementMatchesFragmentUrl(el, route.to)) {
-			logger?.info(
-				prefix(`ignored fragment ${red(selector)} as it already matches the current URL`)
+			logger?.log(
+				`ignored fragment ${highlight(selector)} as it already matches the current URL`
 			);
 			return false;
 		}
@@ -186,11 +176,11 @@ export const cleanupFragmentAttributes = () => {
 };
 
 /**
- * Get the route from a given context
+ * Get the route from a given visit
  */
-export const getRoute = (context: Context): Route | undefined => {
-	const from = context.from.url;
-	const to = context.to.url;
+export const getRoute = (visit: Visit): Route | undefined => {
+	const from = visit.from.url;
+	const to = visit.to.url;
 	if (!from || !to) return;
 	return { from, to };
 };
@@ -198,10 +188,10 @@ export const getRoute = (context: Context): Route | undefined => {
 /**
  * Add the rule name to fragments
  */
-export const addRuleNameClasses = (context: Context): void => {
-	if (!context.fragmentVisit) return;
+export const addRuleNameClasses = (visit: Visit): void => {
+	if (!visit.fragmentVisit) return;
 
-	const { rule, fragments } = context.fragmentVisit;
+	const { rule, fragments } = visit.fragmentVisit;
 	if (!rule.name) return;
 
 	fragments.forEach((selector) => {
@@ -261,7 +251,7 @@ export const cacheForeignFragments = ({ swup, logger }: SwupFragmentPlugin): voi
 		const rawFragmentUrl = el.getAttribute('data-swup-fragment-url');
 		if (!rawFragmentUrl) {
 			return logger?.warn(
-				prefix(`invalid [data-swup-fragment-url] found on unchanged fragment:`),
+				`invalid [data-swup-fragment-url] found on unchanged fragment:`,
 				el
 			);
 		}
@@ -271,7 +261,7 @@ export const cacheForeignFragments = ({ swup, logger }: SwupFragmentPlugin): voi
 		const fragmentSelector = el.getAttribute('data-swup-fragment-selector');
 		if (!fragmentSelector) {
 			return logger?.warn(
-				prefix(`no [data-swup-fragment-selector] found on unchanged fragment:`),
+				`no [data-swup-fragment-selector] found on unchanged fragment:`,
 				el
 			);
 		}
@@ -310,7 +300,7 @@ export const cacheForeignFragments = ({ swup, logger }: SwupFragmentPlugin): voi
 	});
 
 	updatedFragments.forEach((f) => {
-		logger?.info(prefix(`updated cache with ${red(f.selector)} from ${red(f.url)}`));
+		logger?.log(`updated cache with ${highlight(f.selector)} from ${highlight(f.url)}`);
 	});
 
 	// Log the result
@@ -323,7 +313,7 @@ export const cacheForeignFragments = ({ swup, logger }: SwupFragmentPlugin): voi
  * - contain only comments and/or empty text nodes
  */
 export function shouldSkipAnimation({ swup }: SwupFragmentPlugin): boolean {
-	const { fragmentVisit } = swup.context;
+	const { fragmentVisit } = swup.visit;
 	if (!fragmentVisit) return false;
 
 	return fragmentVisit.fragments.every((selector) => {
