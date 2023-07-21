@@ -1,6 +1,6 @@
 # Swup Fragment Plugin
 
-A [swup](https://swup.js.org) plugin for selectively updating dynamic fragments.
+A [swup](https://swup.js.org) plugin for selectively updating fragments based on routes 🧩
 
 > **Note** Fragment Plugin hasn't reached the first stable version, yet. If you want to give it a
 > try, we'd love to get your feedback about how it went in the plugin's [issues section](https://github.com/swup/fragment-plugin/issues)
