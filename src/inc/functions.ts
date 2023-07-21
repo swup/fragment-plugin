@@ -92,16 +92,16 @@ function prepareFragmentElements({ rules, swup, logger }: SwupFragmentPlugin): v
 				) as FragmentElement | null;
 				// No element
 				if (!el) return;
-				const fragmentUrlFromServer = el.getAttribute('data-swup-fragment-url');
-				if (fragmentUrlFromServer) {
+				const providedFragmentUrl = el.getAttribute('data-swup-fragment-url');
+				if (providedFragmentUrl) {
 					logger?.log(
-						`fragment url ${highlight(fragmentUrlFromServer)} for ${highlight(
+						`fragment url ${highlight(providedFragmentUrl)} for ${highlight(
 							selector
 						)} provided by server`
 					);
 				}
 				// Get the fragment URL
-				const { url } = Location.fromUrl(fragmentUrlFromServer || currentUrl);
+				const { url } = Location.fromUrl(providedFragmentUrl || currentUrl);
 				// el.removeAttribute('data-swup-fragment-url');
 				// Mark the element as a fragment
 				el.setAttribute('data-swup-fragment', '');
