@@ -8,8 +8,12 @@ import Logger from './Logger.js';
 export const highlight = (s: string) => redBright(s);
 
 declare global {
-	interface HTMLDialogElement {
-		__fragment_modal_shown: boolean;
+	interface HTMLElement {
+		__swup_fragment: {
+			selector: string;
+			url: string;
+			modalShown?: boolean;
+		}
 	}
 }
 
@@ -31,11 +35,10 @@ function showDialogs(): void {
 	document
 		.querySelectorAll<HTMLDialogElement>('dialog[data-swup-fragment-selector]')
 		.forEach((el) => {
-			if (el.__fragment_modal_shown) return;
+			if (el.__swup_fragment?.modalShown) return;
+			el.__swup_fragment.modalShown = true;
 			el.removeAttribute('open');
 			el.showModal();
-			el.__fragment_modal_shown = true;
-			el.setAttribute('data-swup-modal-shown', '');
 		});
 }
 
@@ -77,27 +80,25 @@ function handleLinksToFragments({ logger, swup }: SwupFragmentPlugin): void {
  * Adds [data-swup-fragment-url] to all fragments that don't already contain that attribute
  */
 function addFragmentAttributes({ rules, swup }: SwupFragmentPlugin): void {
-	const currentUrl = swup.getCurrentUrl();
+	const url = swup.getCurrentUrl();
 
 	rules
-		.filter((rule) => rule.matchesFrom(currentUrl) || rule.matchesTo(currentUrl))
+		.filter((rule) => rule.matchesFrom(url) || rule.matchesTo(url))
 		.forEach((rule) => {
 			rule.fragments.forEach((selector) => {
 				const element = document.querySelector(selector) as HTMLElement | null;
 				// No element
 				if (!element) return;
-				// Ignore <template> and <swup-fragment-placeholder>
-				if (
-					['template', 'swup-fragment-placeholder'].includes(
-						element.tagName.toLowerCase()
-					)
-				)
-					return;
+				// Ignore <template> elements
+				if (['template'].includes(element.tagName.toLowerCase())) return;
+				// Mark the element as a fragment
+				element.setAttribute('data-swup-fragment', '');
+				element.__swup_fragment = { selector, url };
 				// Save the selector that matched the element
 				element.setAttribute('data-swup-fragment-selector', selector);
 				// Finally, add the fragment url attribute if not already present
 				if (!element.getAttribute('data-swup-fragment-url')) {
-					element.setAttribute('data-swup-fragment-url', currentUrl);
+					element.setAttribute('data-swup-fragment-url', url);
 				}
 			});
 		});
