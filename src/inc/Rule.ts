@@ -1,6 +1,5 @@
 import { matchPath, classify, type Path } from 'swup';
 import type { Route } from '../SwupFragmentPlugin.js';
-import type { ConsolaInstance } from 'consola';
 import { dedupe } from './functions.js';
 import Logger from './Logger.js';
 
