@@ -1,7 +1,7 @@
 import PluginBase from '@swup/plugin';
 import Rule from './inc/Rule.js';
 import type { Path, Handler, Visit } from 'swup';
-import Logger from './inc/Logger.js';
+import Logger, { highlight } from './inc/Logger.js';
 import {
 	handlePageView,
 	cleanupFragmentElements,
@@ -11,8 +11,7 @@ import {
 	removeRuleNameFromFragments,
 	getFirstMatchingRule,
 	cacheForeignFragments,
-	shouldSkipAnimation,
-	highlight
+	shouldSkipAnimation
 } from './inc/functions.js';
 
 declare module 'swup' {
@@ -193,7 +192,9 @@ export default class SwupFragmentPlugin extends PluginBase {
 	maybeSkipOutAnimation: Handler<'animation:out:await'> = (visit, args) => {
 		if (visit.fragmentVisit && shouldSkipAnimation(this)) {
 			this.logger?.log(
-				`${highlight('out')}-animation skipped for ${highlight(visit.fragmentVisit?.fragments.toString())}`
+				`${highlight('out')}-animation skipped for ${highlight(
+					visit.fragmentVisit?.fragments.toString()
+				)}`
 			);
 			args.skip = true;
 		}
@@ -205,7 +206,9 @@ export default class SwupFragmentPlugin extends PluginBase {
 	maybeSkipInAnimation: Handler<'animation:in:await'> = (visit, args) => {
 		if (visit.fragmentVisit && shouldSkipAnimation(this)) {
 			this.logger?.log(
-				`${highlight('in')}-animation skipped for ${highlight(visit.fragmentVisit?.fragments.toString())}`
+				`${highlight('in')}-animation skipped for ${highlight(
+					visit.fragmentVisit?.fragments.toString()
+				)}`
 			);
 			args.skip = true;
 		}
