@@ -9,11 +9,8 @@ export const highlight = (s: string) => redBright(s);
 
 declare global {
 	interface HTMLElement {
-		__swup_fragment: {
-			selector: string;
-			url: string;
-			modalShown?: boolean;
-		}
+		__swup_fragment_modal?: boolean;
+		__swup_fragment_selector?: string;
 	}
 }
 
@@ -27,16 +24,16 @@ export const handlePageView = (fragmentPlugin: SwupFragmentPlugin): void => {
 };
 
 /**
- * Run `showModal` for all `<dialog[data-swup-fragment-selector]>` elements
+ * Run `showModal` for all `<dialog[data-swup-fragment-url]>` elements
  * This puts them on the top layer and makes them ignore css `transform`s on parent elements
  * @see https://developer.mozilla.org/en-US/docs/Glossary/Top_layer
  */
 function showDialogs(): void {
 	document
-		.querySelectorAll<HTMLDialogElement>('dialog[data-swup-fragment-selector]')
+		.querySelectorAll<HTMLDialogElement>('dialog[data-swup-fragment-url]')
 		.forEach((el) => {
-			if (el.__swup_fragment?.modalShown) return;
-			el.__swup_fragment.modalShown = true;
+			if (el.__swup_fragment_modal) return;
+			el.__swup_fragment_modal = true;
 			el.removeAttribute('open');
 			el.showModal();
 		});
@@ -92,10 +89,7 @@ function addFragmentAttributes({ rules, swup }: SwupFragmentPlugin): void {
 				// Ignore <template> elements
 				if (['template'].includes(element.tagName.toLowerCase())) return;
 				// Mark the element as a fragment
-				element.setAttribute('data-swup-fragment', '');
-				element.__swup_fragment = { selector, url };
-				// Save the selector that matched the element
-				element.setAttribute('data-swup-fragment-selector', selector);
+				element.__swup_fragment_selector = selector;
 				// Finally, add the fragment url attribute if not already present
 				if (!element.getAttribute('data-swup-fragment-url')) {
 					element.setAttribute('data-swup-fragment-url', url);
@@ -172,7 +166,6 @@ const normalizeUrl = (url: string) => {
 export const cleanupFragmentAttributes = () => {
 	document.querySelectorAll('[data-swup-fragment-url]').forEach((el) => {
 		el.removeAttribute('data-swup-fragment-url');
-		el.removeAttribute('data-swup-fragment-selector');
 	});
 };
 
@@ -238,7 +231,7 @@ export const cacheForeignFragments = ({ swup, logger }: SwupFragmentPlugin): voi
 	// We only want to handle fragments that don't fit the current URL
 	const foreignFragments = Array.from(
 		document.querySelectorAll('[data-swup-fragment-url]')
-	).filter((el) => !elementMatchesFragmentUrl(el, currentUrl));
+	).filter((el) => !elementMatchesFragmentUrl(el, currentUrl)) as HTMLElement[];
 
 	// Bail early if there are no foreign fragments
 	if (!foreignFragments.length) return;
@@ -259,10 +252,10 @@ export const cacheForeignFragments = ({ swup, logger }: SwupFragmentPlugin): voi
 		const fragmentUrl = Location.fromUrl(rawFragmentUrl).url;
 
 		// Get and validate `fragmentSelector`
-		const fragmentSelector = el.getAttribute('data-swup-fragment-selector');
+		const fragmentSelector = el.__swup_fragment_selector;
 		if (!fragmentSelector) {
 			return logger?.warn(
-				`no [data-swup-fragment-selector] found on unchanged fragment:`,
+				`no fragment selector found on unchanged fragment:`,
 				el
 			);
 		}
@@ -281,9 +274,8 @@ export const cacheForeignFragments = ({ swup, logger }: SwupFragmentPlugin): voi
 			.querySelector(fragmentSelector);
 		if (!unchangedFragment) return;
 
-		// Make sure the dynamic attributes make it to the cache
+		// Make sure the dynamic fragment url makes it to the cache
 		unchangedFragment.setAttribute('data-swup-fragment-url', fragmentUrl);
-		unchangedFragment.setAttribute('data-swup-fragment-selector', fragmentSelector);
 
 		// Replace the current fragment with the unchanged fragment
 		currentFragment.replaceWith(unchangedFragment);
