@@ -10,7 +10,7 @@ import {
 	addRuleNameClasses,
 	removeRuleNameFromFragments,
 	getFirstMatchingRule,
-	cacheForeignFragments,
+	cacheForeignFragmentElements,
 	shouldSkipAnimation
 } from './inc/functions.js';
 
@@ -18,6 +18,15 @@ declare module 'swup' {
 	export interface Visit {
 		fragmentVisit?: FragmentVisit;
 	}
+}
+
+// The interface for an augmented Fragment Element
+export interface FragmentElement extends Element {
+	__swupFragment?: {
+		url?: string;
+		selector?: string;
+		modalShown?: boolean;
+	};
 }
 
 /**
@@ -31,7 +40,7 @@ export type Route = {
 export type RuleOptions = {
 	from: Path;
 	to: Path;
-	fragments: string[];
+	containers: string[];
 	name?: string;
 };
 
@@ -47,7 +56,7 @@ type ParsedOptions = Required<Options>;
  */
 export type FragmentVisit = {
 	rule: Rule;
-	fragments: string[];
+	containers: string[];
 };
 
 /**
@@ -85,7 +94,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		if (this.options.debug) this.logger = new Logger();
 
 		this.rules = this.options.rules.map(
-			({ from, to, fragments, name }) => new Rule(from, to, fragments, name, this.logger)
+			({ from, to, containers, name }) => new Rule(from, to, containers, name, this.logger)
 		);
 	}
 
@@ -123,14 +132,14 @@ export default class SwupFragmentPlugin extends PluginBase {
 		// Bail early if no rule matched
 		if (!rule) return;
 
-		// Validate the fragments from the matched rule
-		const fragments = getFragmentsForVisit(route, rule.fragments, logger);
-		// Bail early if there are no valid fragments for the rule
-		if (!fragments.length) return;
+		// Validate the containers from the matched rule
+		const containers = getFragmentsForVisit(route, rule.containers, logger);
+		// Bail early if there are no valid containers for the rule
+		if (!containers.length) return;
 
 		const visit: FragmentVisit = {
 			rule,
-			fragments
+			containers
 		};
 
 		return visit;
@@ -160,13 +169,13 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		/**
 		 * Bail early if the current route doesn't match
-		 * a rule or wouldn't replace any fragments
+		 * a rule or wouldn't replace any fragment elements
 		 */
 		if (!fragmentVisit) return;
 
 		visit.fragmentVisit = fragmentVisit;
 
-		this.logger?.log(`fragment visit: ${highlight(visit.fragmentVisit.fragments.join(', '))}`);
+		this.logger?.log(`fragment visit: ${highlight(visit.fragmentVisit.containers.join(', '))}`);
 
 		// Disable the out animation if there are only placeholders
 		// visit.animation.animate = fragmentVisit.animate;
@@ -174,26 +183,26 @@ export default class SwupFragmentPlugin extends PluginBase {
 		// Disable scrolling for this transition
 		visit.scroll.reset = false;
 
-		// Add the transition classes directly to the fragments for this visit
-		visit.animation.scope = visit.fragmentVisit.fragments;
+		// Add the transition classes directly to the containers for this visit
+		visit.animation.scope = visit.fragmentVisit.containers;
 
 		// Overwrite the containers for this visit
-		visit.containers = visit.fragmentVisit.fragments;
+		visit.containers = visit.fragmentVisit.containers;
 
 		// Overwrite the animationSelector for this visit
-		visit.animation.selector = visit.fragmentVisit.fragments.join(',');
+		visit.animation.selector = visit.fragmentVisit.containers.join(',');
 
 		addRuleNameClasses(visit);
 	};
 
 	/**
-	 * Skips the out-animation for empty fragments
+	 * Skips the out-animation for <template> fragment elements
 	 */
 	maybeSkipOutAnimation: Handler<'animation:out:await'> = (visit, args) => {
 		if (visit.fragmentVisit && shouldSkipAnimation(this)) {
 			this.logger?.log(
 				`${highlight('out')}-animation skipped for ${highlight(
-					visit.fragmentVisit?.fragments.toString()
+					visit.fragmentVisit?.containers.toString()
 				)}`
 			);
 			args.skip = true;
@@ -201,13 +210,13 @@ export default class SwupFragmentPlugin extends PluginBase {
 	};
 
 	/**
-	 * Skips the in-animation for empty fragments
+	 * Skips the in-animation for <template> fragment elements
 	 */
 	maybeSkipInAnimation: Handler<'animation:in:await'> = (visit, args) => {
 		if (visit.fragmentVisit && shouldSkipAnimation(this)) {
 			this.logger?.log(
 				`${highlight('in')}-animation skipped for ${highlight(
-					visit.fragmentVisit?.fragments.toString()
+					visit.fragmentVisit?.containers.toString()
 				)}`
 			);
 			args.skip = true;
@@ -220,11 +229,11 @@ export default class SwupFragmentPlugin extends PluginBase {
 	onContentReplace: Handler<'content:replace'> = (visit) => {
 		addRuleNameClasses(visit);
 		handlePageView(this);
-		cacheForeignFragments(this);
+		cacheForeignFragmentElements(this);
 	};
 
 	/**
-	 * Remove the rule name from fragments
+	 * Remove the rule name from fragment elements
 	 */
 	onVisitEnd: Handler<'visit:end'> = (visit) => {
 		if (visit.fragmentVisit) removeRuleNameFromFragments(visit.fragmentVisit);

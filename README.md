@@ -1,11 +1,11 @@
 # Swup Fragment Plugin
 
-A [swup](https://swup.js.org) plugin for selectively updating fragments based on routes 🧩
+A [swup](https://swup.js.org) plugin for selectively replacing containers based on rules 🧩
 
 > **Note** Fragment Plugin hasn't reached the first stable version, yet. If you want to give it a
 > try, we'd love to get your feedback about how it went in the plugin's [issues section](https://github.com/swup/fragment-plugin/issues)
 
-- Replace dynamic fragments instead of the main content container, based on custom rules
+- Selectively replace containers instead of the main swup containers, based on custom rules
 - Improve orientation by animating only the parts of the page that have actually changed
 - Give your site the polish and snappiness of a single-page app
 
@@ -43,12 +43,12 @@ Or include the minified production file from a CDN:
 
 When a visit is determined to be a fragment visit, the plugin will:
 
-- **update only** the contents of the elements matching the rule's `fragments`
+- **update only** the contents of the elements matching the rule's `containers`
 - **not update** the default [containers](https://swup.js.org/options/#containers) replaced on all other visits
 - **wait** for CSS transitions on those fragment elements using [scoped animations](https://swup.js.org/options/#animation-scope)
 - **preserve** the current scroll position upon navigation
 - add a `to-[name]` class to the elements if the current `rule` has a `name` key
-- **ignore** fragments that already match the current visit's URL
+- **ignore** elements that already match the current visit's URL
 
 ## Example
 
@@ -92,7 +92,7 @@ const swup = new Swup({
         {
           from: '/users/:filter?',
           to: '/users/:filter?',
-          fragments: ['#users']
+          containers: ['#users']
         }
       ]
     })
@@ -132,7 +132,7 @@ export type Options = {
   rules: Array<{
     from: string | string[];
     to: string | string[];
-    fragments: string[];
+    containers: string[];
     name?: string;
   }>;
   debug?: boolean;
@@ -142,7 +142,7 @@ export type Options = {
 ### rules
 
 The rules that define whether a visit will be considered a fragment visit. Each rule consists of
-mandatory `from` and `to` URL paths, an array `fragments` of selectors, as well as an optional
+mandatory `from` and `to` URL paths, an array of selectors `containers`, as well as an optional
 `name` of this rule to allow scoped styling.
 
 The rule's `from`/`to` paths are converted to a regular expression by [path-to-regexp](https://github.com/pillarjs/path-to-regexp) and matched against the current browser URL. If you want to create an either/or path, you can also provide an array of paths, for example `['/users/', '/users/filter/:filter']`.
@@ -153,7 +153,7 @@ The rule's `from`/`to` paths are converted to a regular expression by [path-to-r
     {
       from: '/users/:filter?',
       to: '/users/:filter?',
-      fragments: ['#users'],
+      containers: ['#users'],
       name: 'list'
     }
   ];
@@ -168,7 +168,7 @@ Required, Type: `string | string[]` – The path(s) to match against the previou
 
 Required, Type: `string | string[]` – The path(s) to match against the next URL
 
-#### rule.fragments
+#### rule.containers
 
 Required, Type: `string[]` – Selectors of containers to be replaced if the visit matches.
 
@@ -196,20 +196,20 @@ Type: `boolean`. Set to `true` for debug information in the console. Defaults to
 
 ## How fragment containers are found
 
-- The `fragments` of the matching rule need to be present in **both the current and the incoming document**
-- For each selector in the `fragments` array, the **first** matching element in the DOM will be selected
-- The plugin will check if a fragment already matches the new URL before replacing it
+- The `containers` of the matching rule **need to be shared between the current and the incoming document**
+- For each selector in the `containers` array, the **first** matching element in the DOM will be selected
+- The plugin will check if an element already matches the new URL before replacing it
 
 ## Advanced use cases
 
 Creating the rules for your fragment visits should be enough to enable dynamic updates on most
 sites. However, there are some advanced use cases that require adding certain attributes to the
-fragments themselves or to links on the page. These tend to be situations where overlays are
+fragment elements themselves or to links on the page. These tend to be situations where overlays are
 involved and swup doesn't know which page the overlay was opened from.
 
 ### Fragment URL
 
-Use the `data-swup-fragment-url` attribute to uniquely identify fragments.
+Use the `data-swup-fragment-url` attribute to uniquely identify fragment elements.
 
 In scenarios where overlays are rendered on top of other content, leaving or closing the overlay to
 the same URL it was opened from should ideally not update the content below the overlay as
@@ -268,6 +268,35 @@ tracked URL of the fragment matching the selector provided by the attribute. The
 <a
 + href="/users/"
   data-swup-link-to-fragment="#list">Close</a>
+```
+
+## Skip out/in animations using `<template>`
+
+If all elements of a visit are `<template>` elements, the `out`/`in`-animation will automatically be skipped. This can come in handy for modals:
+
+```js
+{
+  from: '/overview/',
+  to: '/detail/:id',
+  containers: ['#modal']
+},
+{
+  from: '/detail/:id',
+  to: '/overview/',
+  containers: ['#modal']
+}
+```
+
+```html
+<!-- /overview/: provide a <template> as a placeholder for the modal -->
+<template id="modal"></template>
+```
+
+```html
+<!-- /detail/1 -->
+<main id="modal">
+  <h1>Detail 1</h1>
+</main>
 ```
 
 ## Modals as children of `transform`ed parents
@@ -334,6 +363,6 @@ You have two options to fix this:
 + </dialog>
 ```
 
-Fragment Plugin will detect `<detail>` fragments automatically on every page view and run [`showModal()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/showModal) on them, putting them on the [top layer](https://developer.mozilla.org/en-US/docs/Glossary/Top_layer) and thus allows them to not be affected by parent element styles, anymore.
+Fragment Plugin will detect `<detail>` fragment elements automatically on every page view and run [`showModal()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/showModal) on them, putting them on the [top layer](https://developer.mozilla.org/en-US/docs/Glossary/Top_layer) and thus allows them to not be affected by parent element styles, anymore.
 
 > **Note** The second solution will produce [semantically incorrect markup](https://stackoverflow.com/a/75007908/586823), so you should only use it if you think you really have to. It's the cleanest solution for now, until the [Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API) reaches [wider browser support](https://caniuse.com/?search=popover).
