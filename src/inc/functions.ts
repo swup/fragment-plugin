@@ -279,7 +279,7 @@ export const cacheForeignFragmentElements = ({ swup, logger }: SwupFragmentPlugi
 	// Update the cache of the current page with the updated html
 	cache.update(currentUrl, {
 		...currentCache,
-		html: currentCachedDocument.documentElement.outerHTML
+		fragmentHtml: currentCachedDocument.documentElement.outerHTML,
 	});
 
 	updatedFragments.forEach((el) => {

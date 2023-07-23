@@ -18,6 +18,10 @@ declare module 'swup' {
 	export interface Visit {
 		fragmentVisit?: FragmentVisit;
 	}
+	export interface PageData {
+		fragmentHtml?: string;
+		htmlBeforeVisit?: string;
+	}
 }
 
 // The interface for an augmented Fragment Element
@@ -108,6 +112,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		this.on('visit:start', this.onVisitStart);
 		this.before('animation:out:await', this.maybeSkipOutAnimation);
 		this.before('animation:in:await', this.maybeSkipInAnimation);
+		this.before('content:replace', this.beforeContentReplace);
 		this.on('content:replace', this.onContentReplace);
 		this.on('visit:end', this.onVisitEnd);
 
@@ -218,6 +223,17 @@ export default class SwupFragmentPlugin extends PluginBase {
 			);
 			args.skip = true;
 		}
+	};
+
+	/**
+	 * Runs directly before replacing the content
+	 */
+	beforeContentReplace: Handler<'content:replace'> = (visit, args) => {
+		if (!(visit.trigger.event instanceof PopStateEvent)) return;
+		const { fragmentHtml } = args.page;
+		if (!fragmentHtml) return;
+		args.page.html = fragmentHtml;
+		this.logger?.log(`fragment cache used for ${highlight(visit.to.url!)}`);
 	};
 
 	/**
