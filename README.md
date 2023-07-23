@@ -272,17 +272,30 @@ tracked URL of the fragment matching the selector provided by the attribute. The
 
 ## Skip out/in animations using `<template>`
 
-If you use a `<temlate>` element for a fragment element, Fragment Plugin will automatically skip the `out`/ìn`-animation for you. This can come in handy for modals:
+If all elements of a visit are `<template>` elements, the `out`/`in`-animation will automatically be skipped. This can come in handy for modals:
+
+```js
+{
+  from: '/overview/',
+  to: '/detail/:id',
+  containers: ['#modal']
+},
+{
+  from: '/detail/:id',
+  to: '/overview/',
+  containers: ['#modal']
+}
+```
 
 ```html
-<!-- overview.html -->
+<!-- /overview/: provide a <template> as a placeholder for the modal -->
 <template id="modal"></template>
 ```
 
 ```html
-<!-- detail.html -->
+<!-- /detail/1 -->
 <main id="modal">
-  <h1>Detail</h1>
+  <h1>Detail 1</h1>
 </main>
 ```
 
