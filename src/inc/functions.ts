@@ -1,16 +1,8 @@
 import { Location } from 'swup';
 import type { Visit } from 'swup';
-import type { Rule, Route, FragmentVisit } from '../SwupFragmentPlugin.js';
+import type { Rule, Route, FragmentVisit, FragmentElement } from '../SwupFragmentPlugin.js';
 import SwupFragmentPlugin from '../SwupFragmentPlugin.js';
 import Logger, { highlight } from './Logger.js';
-
-interface FragmentElement extends Element {
-	__swupFragment?: {
-		url?: string;
-		selector?: string;
-		modalShown?: boolean;
-	};
-}
 
 /**
  * Handles a page view. Runs on `mount` as well as on every content:replace

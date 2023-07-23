@@ -20,6 +20,15 @@ declare module 'swup' {
 	}
 }
 
+// The interface for an augmented Fragment Element
+export interface FragmentElement extends Element {
+	__swupFragment?: {
+		url?: string;
+		selector?: string;
+		modalShown?: boolean;
+	};
+}
+
 /**
  * Represents a route from one to another URL
  */
