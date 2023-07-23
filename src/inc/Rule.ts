@@ -37,7 +37,7 @@ export default class Rule {
 		if (!Array.isArray(rawContainers)) {
 			logger?.error(`Every fragment rule must contain an array of containers`, this);
 			return [];
-		};
+		}
 		// trim selectors
 		const containers = rawContainers.map((selector) => selector.trim());
 		containers.forEach((selector) => {
