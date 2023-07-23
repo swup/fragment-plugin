@@ -2,7 +2,6 @@ import { Location } from 'swup';
 import type { Visit } from 'swup';
 import type { Rule, Route, FragmentVisit } from '../SwupFragmentPlugin.js';
 import SwupFragmentPlugin from '../SwupFragmentPlugin.js';
-import { redBright } from 'console-log-colors';
 import Logger, { highlight } from './Logger.js';
 
 interface FragmentElement extends Element {
@@ -76,7 +75,7 @@ function handleLinksToFragments({ logger, swup }: SwupFragmentPlugin): void {
 }
 
 /**
- * Adds attributes and properties to fragments
+ * Adds attributes and properties to fragment elements
  */
 function prepareFragmentElements({ rules, swup, logger }: SwupFragmentPlugin): void {
 	const currentUrl = swup.getCurrentUrl();
@@ -84,7 +83,7 @@ function prepareFragmentElements({ rules, swup, logger }: SwupFragmentPlugin): v
 	rules
 		.filter((rule) => rule.matchesFrom(currentUrl) || rule.matchesTo(currentUrl))
 		.forEach((rule) => {
-			rule.fragments.forEach((selector) => {
+			rule.containers.forEach((selector) => {
 				const el = document.querySelector(
 					`${selector}:not([data-swup-fragment])`
 				) as FragmentElement | null;
@@ -110,7 +109,7 @@ function prepareFragmentElements({ rules, swup, logger }: SwupFragmentPlugin): v
 }
 
 /**
- * Get all fragments that should be replaced for a given visit's route
+ * Get all containers that should be replaced for a given visit's route
  */
 export const getFragmentsForVisit = (route: Route, selectors: string[], logger?: Logger) => {
 	return selectors.filter((selector) => {
@@ -171,7 +170,7 @@ const normalizeUrl = (url: string) => {
 };
 
 /**
- * Removes all fragment traces from all fragments
+ * Removes all fragment traces from all fragment elements
  */
 export const cleanupFragmentElements = () => {
 	document.querySelectorAll<FragmentElement>('[data-swup-fragment]').forEach((el) => {
@@ -191,25 +190,25 @@ export const getRoute = (visit: Visit): Route | undefined => {
 };
 
 /**
- * Add the rule name to fragments
+ * Add the rule name to fragment elements
  */
 export const addRuleNameClasses = (visit: Visit): void => {
 	if (!visit.fragmentVisit) return;
 
-	const { rule, fragments } = visit.fragmentVisit;
+	const { rule, containers } = visit.fragmentVisit;
 	if (!rule.name) return;
 
-	fragments.forEach((selector) => {
+	containers.forEach((selector) => {
 		document.querySelector(selector)?.classList.add(`to-${rule.name}`);
 	});
 };
 
 /**
- * Remove the rule name from fragments
+ * Remove the rule name from fragment elements
  */
-export const removeRuleNameFromFragments = ({ rule, fragments }: FragmentVisit): void => {
+export const removeRuleNameFromFragments = ({ rule, containers }: FragmentVisit): void => {
 	if (!rule.name) return;
-	fragments.forEach((selector) => {
+	containers.forEach((selector) => {
 		document.querySelector(selector)?.classList.remove(`to-${rule.name}`);
 	});
 };
@@ -222,9 +221,9 @@ export const getFirstMatchingRule = (route: Route, rules: Rule[]): Rule | undefi
 };
 
 /**
- * Makes sure unchanged fragments land in the cache of the current page
+ * Makes sure unchanged fragment elements land in the cache of the current page
  */
-export const cacheForeignFragments = ({ swup, logger }: SwupFragmentPlugin): void => {
+export const cacheForeignFragmentElements = ({ swup, logger }: SwupFragmentPlugin): void => {
 	const currentUrl = swup.getCurrentUrl();
 	const cache = swup.cache;
 
@@ -236,16 +235,16 @@ export const cacheForeignFragments = ({ swup, logger }: SwupFragmentPlugin): voi
 	// debug info
 	const updatedFragments: FragmentElement[] = [];
 
-	// We only want to handle fragments that don't fit the current URL
-	const foreignFragments = Array.from(
+	// We only want to handle fragment elements that don't fit the current URL
+	const foreignFragmentElements = Array.from(
 		document.querySelectorAll<FragmentElement>('[data-swup-fragment]')
 	).filter((el) => !elementMatchesFragmentUrl(el, currentUrl));
 
-	// Bail early if there are no foreign fragments
-	if (!foreignFragments.length) return;
+	// Bail early if there are no foreign fragment elements
+	if (!foreignFragmentElements.length) return;
 
-	foreignFragments.forEach((el) => {
-		// Don't cache the fragment if it contains fragments of it's own
+	foreignFragmentElements.forEach((el) => {
+		// Don't cache the fragment if it contains fragment elements
 		const containsFragments = el.querySelector('[data-swup-fragment]') != null;
 		if (containsFragments) return;
 
@@ -308,7 +307,7 @@ export function shouldSkipAnimation({ swup }: SwupFragmentPlugin): boolean {
 	const { fragmentVisit } = swup.visit;
 	if (!fragmentVisit) return false;
 
-	return fragmentVisit.fragments.every((selector) => {
+	return fragmentVisit.containers.every((selector) => {
 		const childNodes = Array.from(document.querySelector(selector)?.childNodes || []);
 		if (!childNodes.length) return true;
 		return childNodes.every((node) => {

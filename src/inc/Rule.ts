@@ -12,7 +12,7 @@ export default class Rule {
 
 	from: Path;
 	to: Path;
-	fragments: string[];
+	containers: string[];
 	name?: string;
 
 	constructor(from: Path, to: Path, rawFragments: string[], name?: string, logger?: Logger) {
@@ -20,21 +20,21 @@ export default class Rule {
 		this.to = to;
 		this.matchesFrom = matchPath(from);
 		this.matchesTo = matchPath(to);
-		this.fragments = this.parseFragments(rawFragments, logger);
+		this.containers = this.parseContainers(rawFragments, logger);
 		if (name) this.name = classify(name);
 	}
 
 	/**
-	 * Converts any provided fragments option into an array of fragment objects
+	 * Parse provided fragment containers
 	 */
-	parseFragments(rawFragments: string[], logger?: Logger): string[] {
+	parseContainers(rawFragments: string[], logger?: Logger): string[] {
 		// trim selectors
-		const fragments = rawFragments.map((selector) => selector.trim());
-		fragments.forEach((selector) => {
+		const containers = rawFragments.map((selector) => selector.trim());
+		containers.forEach((selector) => {
 			const result = this.validateSelector(selector);
 			if (result instanceof Error) logger?.error(result);
 		});
-		return dedupe(fragments);
+		return dedupe(containers);
 	}
 
 	/**
