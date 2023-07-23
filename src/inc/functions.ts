@@ -290,25 +290,14 @@ export const cacheForeignFragmentElements = ({ swup, logger }: SwupFragmentPlugi
 };
 
 /**
- * Skips the animation if all current containers either
- *
- * - are empty
- * - contain only comments and/or empty text nodes
+ * Skips the animation if all current containers are <template> elements
  */
 export function shouldSkipAnimation({ swup }: SwupFragmentPlugin): boolean {
 	const { fragmentVisit } = swup.visit;
 	if (!fragmentVisit) return false;
 
 	return fragmentVisit.containers.every((selector) => {
-		const childNodes = Array.from(document.querySelector(selector)?.childNodes || []);
-		if (!childNodes.length) return true;
-		return childNodes.every((node) => {
-			// Check for comments
-			if (node.nodeName === '#comment') return true;
-			// Check for empty text nodes
-			if (node.nodeName === '#text' && !Boolean(node.nodeValue?.trim())) return true;
-			return false;
-		});
+		return document.querySelector(selector)?.tagName?.toLowerCase() === 'template';
 	});
 }
 

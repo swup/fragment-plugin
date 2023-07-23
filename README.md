@@ -270,6 +270,22 @@ tracked URL of the fragment matching the selector provided by the attribute. The
   data-swup-link-to-fragment="#list">Close</a>
 ```
 
+## Skip out/in animations using `<template>`
+
+If you use a `<temlate>` element for a fragment element, Fragment Plugin will automatically skip the `out`/ìn`-animation for you. This can come in handy for modals:
+
+```html
+<!-- overview.html -->
+<template id="modal"></template>
+```
+
+```html
+<!-- detail.html -->
+<main id="modal">
+  <h1>Detail</h1>
+</main>
+```
+
 ## Modals as children of `transform`ed parents
 
 Suppose you have an overlay that you want to present like a modal, above all other content:

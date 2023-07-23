@@ -196,7 +196,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	};
 
 	/**
-	 * Skips the out-animation for empty fragment elements
+	 * Skips the out-animation for <template> fragment elements
 	 */
 	maybeSkipOutAnimation: Handler<'animation:out:await'> = (visit, args) => {
 		if (visit.fragmentVisit && shouldSkipAnimation(this)) {
@@ -210,7 +210,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	};
 
 	/**
-	 * Skips the in-animation for empty fragment elements
+	 * Skips the in-animation for <template> fragment elements
 	 */
 	maybeSkipInAnimation: Handler<'animation:in:await'> = (visit, args) => {
 		if (visit.fragmentVisit && shouldSkipAnimation(this)) {
