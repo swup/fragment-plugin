@@ -8,7 +8,7 @@ const bold = (s: string): string => wrapInEscapeSequence(s, 1, 22);
 // @see https://github.com/lzwme/console-log-colors/blob/56a41b352bf9ed327cc864f588b831d92ee6390e/src/index.js#L23
 export const highlight = (s: string): string => wrapInEscapeSequence(s, 91, 39);
 
-const prepare = (s: string): string => bold(`🧩 ${s}`);
+const prepare = (s: string): string => `🧩 ${bold(s)}`;
 
 /**
  * A slim wrapper around console statements
