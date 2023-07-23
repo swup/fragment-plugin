@@ -1,8 +1,8 @@
 {
   "name": "@swup/fragment-plugin",
   "amdName": "SwupFragmentPlugin",
-  "version": "0.1.31",
-  "description": "A swup plugin for replacing dynamic fragments",
+  "version": "0.1.32",
+  "description": "A swup plugin for dynamically replacing containers based on rules",
   "type": "module",
   "source": "src/index.ts",
   "main": "./dist/index.cjs",
