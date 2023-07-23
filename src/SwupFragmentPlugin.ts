@@ -177,9 +177,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		this.logger?.log(`fragment visit: ${highlight(visit.fragmentVisit.containers.join(', '))}`);
 
-		// Disable the out animation if there are only placeholders
-		// visit.animation.animate = fragmentVisit.animate;
-
 		// Disable scrolling for this transition
 		visit.scroll.reset = false;
 

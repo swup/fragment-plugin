@@ -15,21 +15,31 @@ export default class Rule {
 	containers: string[];
 	name?: string;
 
-	constructor(from: Path, to: Path, rawFragments: string[], name?: string, logger?: Logger) {
-		this.from = from;
-		this.to = to;
+	constructor(from: Path, to: Path, rawContainers: string[], name?: string, logger?: Logger) {
+		this.from = from || '';
+		this.to = to || '';
+
+		if (name) this.name = classify(name);
+
+		this.containers = this.parseContainers(rawContainers, logger);
+
+		if (!to) logger?.error(`Every fragment rule must contain a 'to' path`, this);
+		if (!from) logger?.error(`Every fragment rule must contain a 'from' path`, this);
+
 		this.matchesFrom = matchPath(from);
 		this.matchesTo = matchPath(to);
-		this.containers = this.parseContainers(rawFragments, logger);
-		if (name) this.name = classify(name);
 	}
 
 	/**
 	 * Parse provided fragment containers
 	 */
-	parseContainers(rawFragments: string[], logger?: Logger): string[] {
+	parseContainers(rawContainers: string[], logger?: Logger): string[] {
+		if (!Array.isArray(rawContainers)) {
+			logger?.error(`Every fragment rule must contain an array of containers`, this);
+			return [];
+		}
 		// trim selectors
-		const containers = rawFragments.map((selector) => selector.trim());
+		const containers = rawContainers.map((selector) => selector.trim());
 		containers.forEach((selector) => {
 			const result = this.validateSelector(selector);
 			if (result instanceof Error) logger?.error(result);
