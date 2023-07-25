@@ -2,8 +2,7 @@ import { matchPath, classify, type Path } from 'swup';
 import type { Route } from '../SwupFragmentPlugin.js';
 import { dedupe } from './functions.js';
 import Logger from './Logger.js';
-
-const __DEV__ = process.env.NODE_ENV !== 'production';
+import { __DEV__ } from './env.js';
 
 /**
  * Represents a Rule

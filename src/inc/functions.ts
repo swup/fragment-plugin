@@ -4,7 +4,7 @@ import { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
 import type { Rule, Route, FragmentVisit, FragmentElement } from '../SwupFragmentPlugin.js';
 import Logger, { highlight } from './Logger.js';
 
-const __DEV__ = process.env.NODE_ENV !== 'production';
+import { __DEV__ } from './env.js';
 
 /**
  * Handles a page view. Runs on `mount` as well as on every content:replace

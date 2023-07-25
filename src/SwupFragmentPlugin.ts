@@ -11,7 +11,7 @@ import {
 
 import * as handlers from './inc/handlers.js';
 
-const __DEV__ = process.env.NODE_ENV !== 'production';
+import { __DEV__ } from './inc/env.js';
 
 declare module 'swup' {
 	export interface Visit {
@@ -96,7 +96,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 		if (__DEV__) {
 			if (this.options.debug) this.logger = new Logger();
 		}
-
 
 		this.rules = this.options.rules.map(
 			({ from, to, containers, name }) => new Rule(from, to, containers, name, this.logger)

@@ -12,7 +12,7 @@ import {
 	shouldSkipAnimation
 } from './functions.js';
 
-const __DEV__ = process.env.NODE_ENV !== 'production';
+import { __DEV__ } from './env.js';
 
 /**
  * Do not scroll if clicking on a link to the same page

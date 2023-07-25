@@ -45,7 +45,7 @@
     "url": "https://github.com/swup/fragment-plugin.git"
   },
   "dependencies": {
-    "@swup/plugin": "^3.0.0-rc.25"
+    "@swup/plugin": "^3.0.0-rc.27"
   },
   "browserslist": [
     "extends @swup/browserslist-config"
