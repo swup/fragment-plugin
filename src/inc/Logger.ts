@@ -25,17 +25,14 @@ const __DEV__ = process.env.NODE_ENV !== 'production';
  */
 export default class Logger {
 	log(...args: any) {
-		if (!__DEV__) return;
 		const msg = args.shift();
 		console.log(prepare(msg), ...args);
 	}
 	warn(...args: any) {
-		if (!__DEV__) return;
 		const msg = args.shift();
 		console.warn(prepare(msg), ...args);
 	}
 	error(...args: any) {
-		if (!__DEV__) return;
 		const msg = args.shift();
 		console.error(prepare(msg), ...args);
 	}

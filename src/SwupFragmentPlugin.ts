@@ -93,7 +93,10 @@ export default class SwupFragmentPlugin extends PluginBase {
 		super();
 
 		this.options = { ...this.defaults, ...options };
-		if (this.options.debug) this.logger = new Logger();
+		if (__DEV__) {
+			if (this.options.debug) this.logger = new Logger();
+		}
+
 
 		this.rules = this.options.rules.map(
 			({ from, to, containers, name }) => new Rule(from, to, containers, name, this.logger)
