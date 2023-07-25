@@ -18,6 +18,8 @@ performing a full page transition:
 
 [See the plugin in action](https://swup-fragment-plugin.netlify.app) in this interactive demo.
 
+https://github.com/swup/fragment-plugin/assets/869813/1d12f061-2a9c-443b-9bf0-e37a7e559852
+
 ## Installation
 
 Install the plugin from npm and import it into your bundle.
