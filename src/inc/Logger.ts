@@ -18,8 +18,6 @@ const redBright = (s: string): string => wrapInEscapeSequence(s, 91, 39);
 const prepare = (s: string): string => `🧩 ${bold(s)}`;
 export const highlight = (s: string): string => redBright(s);
 
-const __DEV__ = process.env.NODE_ENV !== 'production';
-
 /**
  * A slim wrapper around console statements
  */
