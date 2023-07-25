@@ -16,7 +16,7 @@ performing a full page transition:
 
 ## Demo
 
-[See the plugin in action](https://swup-fragment-plugin.netlify.app) in this interactive demo.
+See the plugin in action in [this interactive demo](https://swup-fragment-plugin.netlify.app)
 
 https://github.com/swup/fragment-plugin/assets/869813/1d12f061-2a9c-443b-9bf0-e37a7e559852
 
