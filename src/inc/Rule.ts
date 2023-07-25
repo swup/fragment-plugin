@@ -3,6 +3,8 @@ import type { Route } from '../SwupFragmentPlugin.js';
 import { dedupe } from './functions.js';
 import Logger from './Logger.js';
 
+const __DEV__ = process.env.NODE_ENV !== 'production';
+
 /**
  * Represents a Rule
  */
@@ -23,8 +25,10 @@ export default class Rule {
 
 		this.containers = this.parseContainers(rawContainers, logger);
 
-		if (!to) logger?.error(`Every fragment rule must contain a 'to' path`, this);
-		if (!from) logger?.error(`Every fragment rule must contain a 'from' path`, this);
+		if (__DEV__) {
+			logger?.errorIf(!to, `Every fragment rule must contain a 'to' path`, this);
+			logger?.errorIf(!from, `Every fragment rule must contain a 'from' path`, this);
+		}
 
 		this.matchesFrom = matchPath(from);
 		this.matchesTo = matchPath(to);
@@ -35,7 +39,7 @@ export default class Rule {
 	 */
 	parseContainers(rawContainers: string[], logger?: Logger): string[] {
 		if (!Array.isArray(rawContainers)) {
-			logger?.error(`Every fragment rule must contain an array of containers`, this);
+			if (__DEV__) logger?.error(`Every fragment rule must contain an array of containers`, this);
 			return [];
 		}
 		// trim selectors
