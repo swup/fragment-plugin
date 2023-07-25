@@ -18,20 +18,34 @@ const redBright = (s: string): string => wrapInEscapeSequence(s, 91, 39);
 const prepare = (s: string): string => `🧩 ${bold(s)}`;
 export const highlight = (s: string): string => redBright(s);
 
+const __DEV__ = process.env.NODE_ENV !== 'production';
+
 /**
  * A slim wrapper around console statements
  */
 export default class Logger {
 	log(...args: any) {
+		if (!__DEV__) return;
 		const msg = args.shift();
 		console.log(prepare(msg), ...args);
 	}
 	warn(...args: any) {
+		if (!__DEV__) return;
 		const msg = args.shift();
 		console.warn(prepare(msg), ...args);
 	}
 	error(...args: any) {
+		if (!__DEV__) return;
 		const msg = args.shift();
 		console.error(prepare(msg), ...args);
+	}
+	logIf(condition: boolean, ...args: any) {
+		if (condition) this.log(...args);
+	}
+	warnIf(condition: boolean, ...args: any) {
+		if (condition) this.warn(...args);
+	}
+	errorIf(condition: boolean, ...args: any) {
+		if (condition) this.error(...args);
 	}
 }

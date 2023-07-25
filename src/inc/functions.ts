@@ -4,6 +4,8 @@ import { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
 import type { Rule, Route, FragmentVisit, FragmentElement } from '../SwupFragmentPlugin.js';
 import Logger, { highlight } from './Logger.js';
 
+const __DEV__ = process.env.NODE_ENV !== 'production';
+
 /**
  * Handles a page view. Runs on `mount` as well as on every content:replace
  */
@@ -23,7 +25,8 @@ function showDialogs({ logger }: FragmentPlugin): void {
 		.querySelectorAll<HTMLDialogElement & FragmentElement>('dialog[data-swup-fragment]')
 		.forEach((el) => {
 			if (!el.__swupFragment) {
-				return logger?.warn(`fragment properties missing on element:`, el);
+				if (__DEV__) logger?.warn(`fragment properties missing on element:`, el);
+				return;
 			}
 			if (el.__swupFragment.modalShown) return;
 			el.__swupFragment.modalShown = true;
@@ -42,24 +45,30 @@ function handleLinksToFragments({ logger, swup }: FragmentPlugin): void {
 	links.forEach((el) => {
 		const selector = el.getAttribute(targetAttribute);
 		if (!selector) {
-			return logger?.warn(`[${targetAttribute}] needs to contain a valid fragment selector`);
+			if (__DEV__)
+				logger?.warn(`[${targetAttribute}] needs to contain a valid fragment selector`);
+			return;
 		}
 
 		const fragment = document.querySelector(selector) as FragmentElement;
 		if (!fragment) {
-			return logger?.warn(`no element found for [${targetAttribute}="${selector}"]`);
+			if (__DEV__) logger?.warn(`no element found for [${targetAttribute}="${selector}"]`);
+			return;
 		}
 
 		const fragmentUrl = fragment.__swupFragment?.url;
 		if (!fragmentUrl) {
-			return logger?.warn(`no fragment infos found on ${selector}`);
+			if (__DEV__) logger?.warn(`no fragment infos found on ${selector}`);
+			return;
 		}
 
 		// Help finding suspicious fragment urls
 		if (isEqualUrl(fragmentUrl, swup.getCurrentUrl())) {
-			return logger?.warn(
-				`The fragment URL of ${selector} is identical to the current URL. This could mean that [data-swup-fragment-url] needs to be provided by the server.`
-			);
+			if (__DEV__)
+				logger?.warn(
+					`The fragment URL of ${selector} is identical to the current URL. This could mean that [data-swup-fragment-url] needs to be provided by the server.`
+				);
+			return;
 		}
 
 		el.href = fragmentUrl;
@@ -83,11 +92,13 @@ function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void 
 				if (!el) return;
 				const providedFragmentUrl = el.getAttribute('data-swup-fragment-url');
 				if (providedFragmentUrl) {
-					logger?.log(
-						`fragment url ${highlight(providedFragmentUrl)} for ${highlight(
-							selector
-						)} provided by server`
-					);
+					if (__DEV__) {
+						logger?.log(
+							`fragment url ${highlight(providedFragmentUrl)} for ${highlight(
+								selector
+							)} provided by server`
+						);
+					}
 				}
 				// Get the fragment URL
 				const { url } = Location.fromUrl(providedFragmentUrl || currentUrl);
@@ -108,12 +119,12 @@ export const getFragmentsForVisit = (route: Route, selectors: string[], logger?:
 		const el = document.querySelector(selector) as FragmentElement;
 
 		if (!el) {
-			logger?.log(`fragment "${selector}" missing in current document`);
+			if (__DEV__) logger?.log(`fragment "${selector}" missing in current document`);
 			return false;
 		}
 
 		if (elementMatchesFragmentUrl(el, route.to)) {
-			logger?.log(
+			if (__DEV__) logger?.log(
 				`ignored fragment ${highlight(selector)} as it already matches the current URL`
 			);
 			return false;
@@ -240,7 +251,8 @@ export const cacheForeignFragmentElements = ({ swup, logger }: FragmentPlugin): 
 	if (!foreignFragmentElements.length) return;
 
 	if (!swup.options.cache) {
-		return logger?.warn(`can't cache foreign fragment elements without swup's cache`);
+		if (__DEV__) logger?.warn(`can't cache foreign fragment elements without swup's cache`);
+		return;
 	}
 
 	foreignFragmentElements.forEach((el) => {
@@ -250,12 +262,14 @@ export const cacheForeignFragmentElements = ({ swup, logger }: FragmentPlugin): 
 
 		const fragmentUrl = el.__swupFragment?.url;
 		if (!fragmentUrl) {
-			return logger?.warn(`no fragment url found:`, el);
+			if (__DEV__) logger?.warn(`no fragment url found:`, el);
+			return;
 		}
 
 		const fragmentSelector = el.__swupFragment?.selector;
 		if (!fragmentSelector) {
-			return logger?.warn(`no fragment selector found:`, el);
+			if (__DEV__) logger?.warn(`no fragment selector found:`, el);
+			return;
 		}
 
 		// Get the cache entry for the fragment URL, bail early if it doesn't exist
@@ -293,7 +307,7 @@ export const cacheForeignFragmentElements = ({ swup, logger }: FragmentPlugin): 
 	updatedFragments.forEach((el) => {
 		const url = el.__swupFragment?.url || '';
 		const selector = el.__swupFragment?.selector || '';
-		logger?.log(`updated cache with ${highlight(selector)} from ${highlight(url)}`);
+		if (__DEV__) logger?.log(`updated cache with ${highlight(selector)} from ${highlight(url)}`);
 	});
 };
 

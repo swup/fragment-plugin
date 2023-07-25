@@ -6,10 +6,12 @@ import {
 	handlePageView,
 	cleanupFragmentElements,
 	getFragmentsForVisit,
-	getFirstMatchingRule,
+	getFirstMatchingRule
 } from './inc/functions.js';
 
 import * as handlers from './inc/handlers.js';
+
+const __DEV__ = process.env.NODE_ENV !== 'production';
 
 declare module 'swup' {
 	export interface Visit {
@@ -112,8 +114,11 @@ export default class SwupFragmentPlugin extends PluginBase {
 		this.on('content:replace', handlers.onContentReplace);
 		this.on('visit:end', handlers.onVisitEnd);
 
-		if (!swup.options.cache) {
-			this.logger?.warn(`fragment caching will only work with swup's cache being active`);
+		if (__DEV__) {
+			this.logger?.warnIf(
+				swup.options.cache,
+				`fragment caching will only work with swup's cache being active`
+			);
 		}
 
 		handlePageView(this);

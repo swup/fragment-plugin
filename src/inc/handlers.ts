@@ -12,6 +12,8 @@ import {
 	shouldSkipAnimation
 } from './functions.js';
 
+const __DEV__ = process.env.NODE_ENV !== 'production';
+
 /**
  * Do not scroll if clicking on a link to the same page
  * and the route matches a fragment rule
@@ -45,7 +47,7 @@ export const onVisitStart: Handler<'visit:start'> = async function (
 
 	visit.fragmentVisit = fragmentVisit;
 
-	this.logger?.log(`fragment visit: ${highlight(visit.fragmentVisit.containers.join(', '))}`);
+	if (__DEV__) this.logger?.log(`fragment visit: ${highlight(visit.fragmentVisit.containers.join(', '))}`);
 
 	// Disable scrolling for this transition
 	visit.scroll.reset = false;
@@ -71,7 +73,7 @@ export const maybeSkipOutAnimation: Handler<'animation:out:await'> = function (
 	args
 ) {
 	if (visit.fragmentVisit && shouldSkipAnimation(this)) {
-		this.logger?.log(
+		if (__DEV__) this.logger?.log(
 			`${highlight('out')}-animation skipped for ${highlight(
 				visit.fragmentVisit?.containers.toString()
 			)}`
@@ -89,7 +91,7 @@ export const maybeSkipInAnimation: Handler<'animation:in:await'> = function (
 	args
 ) {
 	if (visit.fragmentVisit && shouldSkipAnimation(this)) {
-		this.logger?.log(
+		if (__DEV__) this.logger?.log(
 			`${highlight('in')}-animation skipped for ${highlight(
 				visit.fragmentVisit?.containers.toString()
 			)}`
@@ -116,7 +118,7 @@ export const beforeContentReplace: Handler<'content:replace'> = function (
 	if (!cache || !cache.fragmentHtml) return;
 
 	args.page.html = cache.fragmentHtml;
-	this.logger?.log(`fragment cache used for ${highlight(visit.to.url!)}`);
+	if (__DEV__) this.logger?.log(`fragment cache used for ${highlight(visit.to.url!)}`);
 };
 
 /**
