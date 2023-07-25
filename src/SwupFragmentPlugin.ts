@@ -1,26 +1,22 @@
 import PluginBase from '@swup/plugin';
 import Rule from './inc/Rule.js';
-import type { Path, Handler, Visit } from 'swup';
-import Logger, { highlight } from './inc/Logger.js';
+import type { Path } from 'swup';
+import Logger from './inc/Logger.js';
 import {
 	handlePageView,
 	cleanupFragmentElements,
 	getFragmentsForVisit,
-	getRoute,
-	addRuleNameClasses,
-	removeRuleNameFromFragments,
 	getFirstMatchingRule,
-	cacheForeignFragmentElements,
-	shouldSkipAnimation
 } from './inc/functions.js';
+
+import * as handlers from './inc/handlers.js';
 
 declare module 'swup' {
 	export interface Visit {
 		fragmentVisit?: FragmentVisit;
 	}
-	export interface PageData {
+	export interface CacheData {
 		fragmentHtml?: string;
-		htmlBeforeVisit?: string;
 	}
 }
 
@@ -108,13 +104,17 @@ export default class SwupFragmentPlugin extends PluginBase {
 	mount() {
 		const swup = this.swup;
 
-		this.before('link:self', this.onLinkToSelf);
-		this.on('visit:start', this.onVisitStart);
-		this.before('animation:out:await', this.maybeSkipOutAnimation);
-		this.before('animation:in:await', this.maybeSkipInAnimation);
-		this.before('content:replace', this.beforeContentReplace);
-		this.on('content:replace', this.onContentReplace);
-		this.on('visit:end', this.onVisitEnd);
+		this.before('link:self', handlers.onLinkToSelf);
+		this.on('visit:start', handlers.onVisitStart);
+		this.before('animation:out:await', handlers.maybeSkipOutAnimation);
+		this.before('animation:in:await', handlers.maybeSkipInAnimation);
+		this.before('content:replace', handlers.beforeContentReplace);
+		this.on('content:replace', handlers.onContentReplace);
+		this.on('visit:end', handlers.onVisitEnd);
+
+		if (!swup.options.cache) {
+			this.logger?.warn(`fragment caching will only work with swup's cache being active`);
+		}
 
 		handlePageView(this);
 	}
@@ -129,7 +129,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	}
 
 	/**
-	 * Get the state for a given route
+	 * Get the fragment visit object for a given route
 	 */
 	getFragmentVisit(route: Route, logger?: Logger): FragmentVisit | undefined {
 		const rule = getFirstMatchingRule(route, this.rules);
@@ -149,107 +149,4 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		return visit;
 	}
-
-	/**
-	 * Do not scroll if clicking on a link to the same page
-	 * and the route matches a fragment rule
-	 */
-	onLinkToSelf: Handler<'link:self'> = (visit) => {
-		const route = getRoute(visit);
-		if (!route) return;
-
-		const rule = getFirstMatchingRule(route, this.rules);
-
-		if (rule) visit.scroll.reset = false;
-	};
-
-	/**
-	 * Do special things if this is a fragment visit
-	 */
-	onVisitStart: Handler<'visit:start'> = async (visit) => {
-		const route = getRoute(visit);
-		if (!route) return;
-
-		const fragmentVisit = this.getFragmentVisit(route, this.logger);
-
-		/**
-		 * Bail early if the current route doesn't match
-		 * a rule or wouldn't replace any fragment elements
-		 */
-		if (!fragmentVisit) return;
-
-		visit.fragmentVisit = fragmentVisit;
-
-		this.logger?.log(`fragment visit: ${highlight(visit.fragmentVisit.containers.join(', '))}`);
-
-		// Disable scrolling for this transition
-		visit.scroll.reset = false;
-
-		// Add the transition classes directly to the containers for this visit
-		visit.animation.scope = visit.fragmentVisit.containers;
-
-		// Overwrite the containers for this visit
-		visit.containers = visit.fragmentVisit.containers;
-
-		// Overwrite the animationSelector for this visit
-		visit.animation.selector = visit.fragmentVisit.containers.join(',');
-
-		addRuleNameClasses(visit);
-	};
-
-	/**
-	 * Skips the out-animation for <template> fragment elements
-	 */
-	maybeSkipOutAnimation: Handler<'animation:out:await'> = (visit, args) => {
-		if (visit.fragmentVisit && shouldSkipAnimation(this)) {
-			this.logger?.log(
-				`${highlight('out')}-animation skipped for ${highlight(
-					visit.fragmentVisit?.containers.toString()
-				)}`
-			);
-			args.skip = true;
-		}
-	};
-
-	/**
-	 * Skips the in-animation for <template> fragment elements
-	 */
-	maybeSkipInAnimation: Handler<'animation:in:await'> = (visit, args) => {
-		if (visit.fragmentVisit && shouldSkipAnimation(this)) {
-			this.logger?.log(
-				`${highlight('in')}-animation skipped for ${highlight(
-					visit.fragmentVisit?.containers.toString()
-				)}`
-			);
-			args.skip = true;
-		}
-	};
-
-	/**
-	 * Runs directly before replacing the content
-	 */
-	beforeContentReplace: Handler<'content:replace'> = (visit, args) => {
-		if (!(visit.trigger.event instanceof PopStateEvent)) return;
-		const { fragmentHtml } = args.page;
-		if (!fragmentHtml) return;
-		args.page.html = fragmentHtml;
-		this.logger?.log(`fragment cache used for ${highlight(visit.to.url!)}`);
-	};
-
-	/**
-	 * Runs after the content was replaced
-	 */
-	onContentReplace: Handler<'content:replace'> = (visit) => {
-		addRuleNameClasses(visit);
-		handlePageView(this);
-		cacheForeignFragmentElements(this);
-	};
-
-	/**
-	 * Remove the rule name from fragment elements
-	 */
-	onVisitEnd: Handler<'visit:end'> = (visit) => {
-		if (visit.fragmentVisit) removeRuleNameFromFragments(visit.fragmentVisit);
-		visit.fragmentVisit = undefined;
-	};
 }
