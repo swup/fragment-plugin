@@ -18,7 +18,7 @@ performing a full page transition:
 
 See the plugin in action in [this interactive demo](https://swup-fragment-plugin.netlify.app)
 
-<div class="video-wrapper">
+<div x-data="Video">
   
 https://user-images.githubusercontent.com/869813/256012207-1d12f061-2a9c-443b-9bf0-e37a7e559852.mp4
 
