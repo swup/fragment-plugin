@@ -5,7 +5,7 @@
 const wrapInEscapeSequence = (s: string, open: number, close: number): string => {
 	if (s == null) return s;
 	return `\x1b[${open}m${String(s)}\x1b[${close}m`;
-}
+};
 /**
  * @see https://github.com/lzwme/console-log-colors/blob/56a41b352bf9ed327cc864f588b831d92ee6390e/src/index.js#L4C3-L4C16
  */

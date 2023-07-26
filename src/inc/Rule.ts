@@ -38,7 +38,8 @@ export default class Rule {
 	 */
 	parseContainers(rawContainers: string[], logger?: Logger): string[] {
 		if (!Array.isArray(rawContainers)) {
-			if (__DEV__) logger?.error(`Every fragment rule must contain an array of containers`, this);
+			if (__DEV__)
+				logger?.error(`Every fragment rule must contain an array of containers`, this);
 			return [];
 		}
 		// trim selectors

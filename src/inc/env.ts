@@ -8,7 +8,7 @@ declare global {
 /**
  * Make sure process.env is defined in the browser
  */
-if (!window.process) window.process = {}
+if (!window.process) window.process = {};
 if (!window.process.env) window.process.env = {};
 
 /**
