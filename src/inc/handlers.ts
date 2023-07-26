@@ -30,10 +30,7 @@ export const onLinkToSelf: Handler<'link:self'> = function (this: FragmentPlugin
 /**
  * Prepare fragment visits
  */
-export const onVisitStart: Handler<'visit:start'> = async function (
-	this: FragmentPlugin,
-	visit
-) {
+export const onVisitStart: Handler<'visit:start'> = async function (this: FragmentPlugin, visit) {
 	const route = getRoute(visit);
 	if (!route) return;
 
@@ -47,7 +44,8 @@ export const onVisitStart: Handler<'visit:start'> = async function (
 
 	visit.fragmentVisit = fragmentVisit;
 
-	if (__DEV__) this.logger?.log(`fragment visit: ${highlight(visit.fragmentVisit.containers.join(', '))}`);
+	if (__DEV__)
+		this.logger?.log(`fragment visit: ${highlight(visit.fragmentVisit.containers.join(', '))}`);
 
 	// Disable scrolling for this transition
 	visit.scroll.reset = false;
@@ -73,11 +71,12 @@ export const maybeSkipOutAnimation: Handler<'animation:out:await'> = function (
 	args
 ) {
 	if (visit.fragmentVisit && shouldSkipAnimation(this)) {
-		if (__DEV__) this.logger?.log(
-			`${highlight('out')}-animation skipped for ${highlight(
-				visit.fragmentVisit?.containers.toString()
-			)}`
-		);
+		if (__DEV__)
+			this.logger?.log(
+				`${highlight('out')}-animation skipped for ${highlight(
+					visit.fragmentVisit?.containers.toString()
+				)}`
+			);
 		args.skip = true;
 	}
 };
@@ -91,11 +90,12 @@ export const maybeSkipInAnimation: Handler<'animation:in:await'> = function (
 	args
 ) {
 	if (visit.fragmentVisit && shouldSkipAnimation(this)) {
-		if (__DEV__) this.logger?.log(
-			`${highlight('in')}-animation skipped for ${highlight(
-				visit.fragmentVisit?.containers.toString()
-			)}`
-		);
+		if (__DEV__)
+			this.logger?.log(
+				`${highlight('in')}-animation skipped for ${highlight(
+					visit.fragmentVisit?.containers.toString()
+				)}`
+			);
 		args.skip = true;
 	}
 };
@@ -124,10 +124,7 @@ export const beforeContentReplace: Handler<'content:replace'> = function (
 /**
  * Runs after the content was replaced
  */
-export const onContentReplace: Handler<'content:replace'> = function (
-	this: FragmentPlugin,
-	visit
-) {
+export const onContentReplace: Handler<'content:replace'> = function (this: FragmentPlugin, visit) {
 	addRuleNameClasses(visit);
 	handlePageView(this);
 	cacheForeignFragmentElements(this);

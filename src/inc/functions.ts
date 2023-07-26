@@ -124,9 +124,10 @@ export const getFragmentsForVisit = (route: Route, selectors: string[], logger?:
 		}
 
 		if (elementMatchesFragmentUrl(el, route.to)) {
-			if (__DEV__) logger?.log(
-				`ignored fragment ${highlight(selector)} as it already matches the current URL`
-			);
+			if (__DEV__)
+				logger?.log(
+					`ignored fragment ${highlight(selector)} as it already matches the current URL`
+				);
 			return false;
 		}
 
@@ -307,7 +308,8 @@ export const cacheForeignFragmentElements = ({ swup, logger }: FragmentPlugin): 
 	updatedFragments.forEach((el) => {
 		const url = el.__swupFragment?.url || '';
 		const selector = el.__swupFragment?.selector || '';
-		if (__DEV__) logger?.log(`updated cache with ${highlight(selector)} from ${highlight(url)}`);
+		if (__DEV__)
+			logger?.log(`updated cache with ${highlight(selector)} from ${highlight(url)}`);
 	});
 };
 
