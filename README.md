@@ -224,6 +224,10 @@ the overlaid content corresponds to. Hence, we need to tell it manually so it ca
 updates without changes.
 
 ```diff
+<main id="overlay">
+  <h1>User 1</h1>
+  <p>Lorem ipsum dolor sit amet...</p>
+</main>
 <section id="list"
 +  data-swup-fragment-url="/users/">
   <ul>
@@ -232,10 +236,6 @@ updates without changes.
     <li>User 3</li>
   </ul>
 </section>
-<article id="overlay">
-  <h1>User 1</h1>
-  <p>Lorem ipsum dolor sit amet...</p>
-</article>
 ```
 
 ### Link to fragment
@@ -259,12 +259,12 @@ tracked URL of the fragment matching the selector provided by the attribute. The
     <li>User 3</li>
   </ul>
 </section>
-<article id="overlay">
+<main id="overlay">
   <!-- `href` will be synced to the fragment URL of #list at runtime: -->
-+  <a href="" data-swup-link-to-fragment="#list">Close</a>
++ <a href="" data-swup-link-to-fragment="#list">Close</a>
   <h1>User 1</h1>
   <p>Lorem ipsum dolor sit amet...</p>
-</article>
+</main>
 ```
 
 > **Note** To keep your markup semantic and accessible, we recommend you **always provide a default value** for the link's `href` attribute, even though it will be updated automatically at runtime:
@@ -295,6 +295,12 @@ If all elements of a visit are `<template>` elements, the `out`/`in`-animation w
 ```html
 <!-- /overview/: provide a <template> as a placeholder for the modal -->
 <template id="modal"></template>
+<main>
+  <ul>
+    <!-- list of items that will open in the #modal -->
+  </ul>
+</main>
+
 ```
 
 ```html
@@ -302,6 +308,11 @@ If all elements of a visit are `<template>` elements, the `out`/`in`-animation w
 <main id="modal">
   <h1>Detail 1</h1>
 </main>
+<div>
+  <ul>
+    <!-- list of items that will open in the #modal -->
+  </ul>
+</div>
 ```
 
 ## Modals as children of `transform`ed parents
@@ -310,6 +321,12 @@ Suppose you have an overlay that you want to present like a modal, above all oth
 
 ```html
 <div id="swup" class="transition-main">
+  <!-- This should be placed above everything else, like a modal -->
+  <main id="user" class="modal">
+    <h1>User 1</h1>
+    <p>Lorem ipsum dolor...</p>
+  </main>
+  <!-- The list of users, overlayed by the modal above -->
   <section>
     <ul>
       <li><a href="/user/1/">User 1</a></li>
@@ -317,13 +334,6 @@ Suppose you have an overlay that you want to present like a modal, above all oth
       <li><a href="/user/3/">User 3</a></li>
     </ul>
   </section>
-  <!-- This should be placed above everything else -->
-  <div id="user" class="modal">
-    <main>
-      <h1>User 1</h1>
-      <p>Lorem ipsum dolor...</p>
-    </main>
-  </div>
 </div>
 ```
 
@@ -350,7 +360,7 @@ html.is-animating .transition-main {
 }
 ```
 
-The reason for this is that `transform` establishes a [containing block for all descendants](https://www.w3.org/TR/css-transforms-1/#containing-block-for-all-descendants).
+The reason for this is that a CSS `transform` establishes a [containing block for all descendants](https://www.w3.org/TR/css-transforms-1/#containing-block-for-all-descendants).
 
 You have two options to fix this:
 
@@ -358,16 +368,31 @@ You have two options to fix this:
 2. Use `<detail open>` for the modal:
 
 ```diff
-- <div id="overlay" class="modal">
+- <main id="overlay" class="modal">
 + <dialog open id="overlay" aria-role="article">
-    <main>
++   <main>
       <h1>User 1</h1>
       <p>Lorem ipsum dolor...</p>
-    </main>
-- </div>
+- </main>
++   </main>
 + </dialog>
 ```
 
 Fragment Plugin will detect `<detail>` fragment elements automatically on every page view and run [`showModal()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/showModal) on them, putting them on the [top layer](https://developer.mozilla.org/en-US/docs/Glossary/Top_layer) and thus allows them to not be affected by parent element styles, anymore.
 
-> **Note** The second solution will produce [semantically incorrect markup](https://stackoverflow.com/a/75007908/586823), so you should only use it if you think you really have to. It's the cleanest solution for now, until the [Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API) reaches [wider browser support](https://caniuse.com/?search=popover).
+## Modals and Accessibility
+
+### Element order
+
+The first `<main>` element in a document will be considered the main content by assistive technology. If you are using the [A11y Plugin](https://swup.js.org/plugins/a11y-plugin/), that's also the element that will automatically be focused upon page visits. For that reason, **you should always put your modal before any overlayed content**, if it should be considered the primary content of a page.
+
+### Pros and cons of using the dialog element for modals
+
+**Pros**:
+
+- The modal's positioning won't be affected by `transform` animations on any of it's parents.
+- Focus trapping will be natively available for the modal without you having to do anything.
+
+**Cons**:
+
+- Wrapping your `<main>` content inside a `<dialog>` will produce [semantically incorrect markup](https://stackoverflow.com/a/75007908/586823). We still think it's the cleanest approach for now, until the [Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API) reaches [wider browser support](https://caniuse.com/?search=popover).
