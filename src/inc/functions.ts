@@ -114,7 +114,7 @@ function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void 
 /**
  * Get all containers that should be replaced for a given visit's route
  */
-export const getFragmentsForVisit = (route: Route, selectors: string[], logger?: Logger) => {
+export const getContainersForVisit = (route: Route, selectors: string[], logger?: Logger) => {
 	return selectors.filter((selector) => {
 		const el = document.querySelector(selector) as FragmentElement;
 
@@ -345,9 +345,9 @@ export function getFragmentVisit(
 	// Bail early if no rule matched
 	if (!rule) return;
 
-	// Validate the containers from the matched rule
-	const containers = getFragmentsForVisit(route, rule.containers, logger);
-	// Bail early if there are no valid containers for the rule
+	// Get containers that should be replaced for this visit
+	const containers = getContainersForVisit(route, rule.containers, logger);
+	// Bail early if there are no containers to be replaced for this visit
 	if (!containers.length) return;
 
 	const visit: FragmentVisit = {
