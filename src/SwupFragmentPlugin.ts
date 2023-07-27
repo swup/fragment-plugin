@@ -5,8 +5,7 @@ import Logger from './inc/Logger.js';
 import {
 	handlePageView,
 	cleanupFragmentElements,
-	getFragmentsForVisit,
-	getFirstMatchingRule
+	getFragmentVisit
 } from './inc/functions.js';
 
 import * as handlers from './inc/handlers.js';
@@ -19,6 +18,9 @@ declare module 'swup' {
 	}
 	export interface CacheData {
 		fragmentHtml?: string;
+	}
+	export class Swup {
+		getFragmentVisit?: (this: SwupFragmentPlugin, route: Route) => FragmentVisit | undefined;
 	}
 }
 
@@ -116,6 +118,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 		this.on('content:replace', handlers.onContentReplace);
 		this.on('visit:end', handlers.onVisitEnd);
 
+		swup.getFragmentVisit = getFragmentVisit.bind(this);
+
 		if (__DEV__) {
 			this.logger?.warnIf(
 				swup.options.cache,
@@ -132,28 +136,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	unmount() {
 		super.unmount();
 		this.logger = undefined;
+		this.swup.getFragmentVisit = undefined;
 		cleanupFragmentElements();
-	}
-
-	/**
-	 * Get the fragment visit object for a given route
-	 */
-	getFragmentVisit(route: Route, logger?: Logger): FragmentVisit | undefined {
-		const rule = getFirstMatchingRule(route, this.rules);
-
-		// Bail early if no rule matched
-		if (!rule) return;
-
-		// Validate the containers from the matched rule
-		const containers = getFragmentsForVisit(route, rule.containers, logger);
-		// Bail early if there are no valid containers for the rule
-		if (!containers.length) return;
-
-		const visit: FragmentVisit = {
-			rule,
-			containers
-		};
-
-		return visit;
 	}
 }
