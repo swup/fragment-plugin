@@ -24,6 +24,20 @@ https://github.com/swup/fragment-plugin/assets/869813/ecaf15d7-ec72-43e8-898a-64
 
 </div>
 
+
+## Table of contents
+
+- [Installation](#installation)
+- [How it works](#how-it-works)
+- [Example](#example)
+- [Options](#options)
+- [How rules are matched](#how-rules-are-matched)
+- [How fragment containers are found](#how-fragment-containers-are-found)
+- [Advanced use cases](#advanced-use-cases)
+- [Skip out/in animations using `<template>`](#skip-out-in-animations-using-template)
+- [Modals as children of `transform`ed parents](#modals-as-children-of-transformed-parents)
+- [Modals and Accessibility](#modals-and-accessibility)
+
 ## Installation
 
 Install the plugin from npm and import it into your bundle.
@@ -380,7 +394,7 @@ You have two options to fix this:
 
 Fragment Plugin will detect `<detail>` fragment elements automatically on every page view and run [`showModal()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/showModal) on them, putting them on the [top layer](https://developer.mozilla.org/en-US/docs/Glossary/Top_layer) and thus allows them to not be affected by parent element styles, anymore.
 
-## Modals and Accessibility
+## Modals and accessibility
 
 ### Element order
 
