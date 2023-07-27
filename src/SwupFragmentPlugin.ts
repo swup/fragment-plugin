@@ -122,7 +122,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		if (__DEV__) {
 			this.logger?.warnIf(
-				swup.options.cache,
+				!swup.options.cache,
 				`fragment caching will only work with swup's cache being active`
 			);
 		}
