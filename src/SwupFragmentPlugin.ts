@@ -2,11 +2,7 @@ import PluginBase from '@swup/plugin';
 import Rule from './inc/Rule.js';
 import type { Path } from 'swup';
 import Logger from './inc/Logger.js';
-import {
-	handlePageView,
-	cleanupFragmentElements,
-	getFragmentVisit
-} from './inc/functions.js';
+import { handlePageView, cleanupFragmentElements, getFragmentVisit } from './inc/functions.js';
 
 import * as handlers from './inc/handlers.js';
 

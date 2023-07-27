@@ -335,7 +335,11 @@ export function dedupe<T>(arr: Array<T>): Array<T> {
 /**
  * Get the fragment visit object for a given route
  */
-export function getFragmentVisit(this: SwupFragmentPlugin, route: Route, logger?: Logger): FragmentVisit | undefined {
+export function getFragmentVisit(
+	this: SwupFragmentPlugin,
+	route: Route,
+	logger?: Logger
+): FragmentVisit | undefined {
 	const rule = getFirstMatchingRule(route, this.rules);
 
 	// Bail early if no rule matched
