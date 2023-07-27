@@ -135,7 +135,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 */
 	unmount() {
 		super.unmount();
-		this.logger = undefined;
 		this.swup.getFragmentVisit = undefined;
 		cleanupFragmentElements();
 	}
