@@ -1,6 +1,6 @@
 import { Location } from 'swup';
 import type { Visit } from 'swup';
-import { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
+import SwupFragmentPlugin, { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
 import type { Rule, Route, FragmentVisit, FragmentElement } from '../SwupFragmentPlugin.js';
 import Logger, { highlight } from './Logger.js';
 
@@ -114,7 +114,7 @@ function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void 
 /**
  * Get all containers that should be replaced for a given visit's route
  */
-export const getFragmentsForVisit = (route: Route, selectors: string[], logger?: Logger) => {
+export const getContainersForVisit = (route: Route, selectors: string[], logger?: Logger) => {
 	return selectors.filter((selector) => {
 		const el = document.querySelector(selector) as FragmentElement;
 
@@ -330,4 +330,30 @@ export function shouldSkipAnimation({ swup }: FragmentPlugin): boolean {
  */
 export function dedupe<T>(arr: Array<T>): Array<T> {
 	return [...new Set<T>(arr)];
+}
+
+/**
+ * Get the fragment visit object for a given route
+ */
+export function getFragmentVisit(
+	this: SwupFragmentPlugin,
+	route: Route,
+	logger?: Logger
+): FragmentVisit | undefined {
+	const rule = getFirstMatchingRule(route, this.rules);
+
+	// Bail early if no rule matched
+	if (!rule) return;
+
+	// Get containers that should be replaced for this visit
+	const containers = getContainersForVisit(route, rule.containers, logger);
+	// Bail early if there are no containers to be replaced for this visit
+	if (!containers.length) return;
+
+	const visit: FragmentVisit = {
+		rule,
+		containers
+	};
+
+	return visit;
 }

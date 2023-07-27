@@ -9,7 +9,8 @@ import {
 	removeRuleNameFromFragments,
 	getFirstMatchingRule,
 	cacheForeignFragmentElements,
-	shouldSkipAnimation
+	shouldSkipAnimation,
+	getFragmentVisit
 } from './functions.js';
 
 import { __DEV__ } from './env.js';
@@ -34,7 +35,7 @@ export const onVisitStart: Handler<'visit:start'> = async function (this: Fragme
 	const route = getRoute(visit);
 	if (!route) return;
 
-	const fragmentVisit = this.getFragmentVisit(route, this.logger);
+	const fragmentVisit = getFragmentVisit.call(this, route, this.logger);
 
 	/**
 	 * Bail early if the current route doesn't match
