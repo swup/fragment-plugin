@@ -9,14 +9,14 @@ import * as handlers from './inc/handlers.js';
 import { __DEV__ } from './inc/env.js';
 
 declare module 'swup' {
+	export interface Swup {
+		getFragmentVisit?: (route: Route) => FragmentVisit | undefined;
+	}
 	export interface Visit {
 		fragmentVisit?: FragmentVisit;
 	}
 	export interface CacheData {
 		fragmentHtml?: string;
-	}
-	export class Swup {
-		getFragmentVisit?: (this: SwupFragmentPlugin, route: Route) => FragmentVisit | undefined;
 	}
 }
 
@@ -46,10 +46,12 @@ export type RuleOptions = {
 
 export type Options = {
 	rules: RuleOptions[];
-	debug?: boolean;
+	debug: boolean;
 };
 
-type ParsedOptions = Required<Options>;
+type InitOptions = Partial<Options> & {
+	rules: RuleOptions[];
+};
 
 /**
  * The state of the current visit
@@ -74,9 +76,9 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 	rules: Rule[] = [];
 
-	options: ParsedOptions;
+	options: Options;
 
-	defaults: ParsedOptions = {
+	defaults: Options = {
 		rules: [],
 		debug: false
 	};
@@ -87,7 +89,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * Plugin Constructor
 	 * The options are NOT optional and need to contain at least a `rules` property
 	 */
-	constructor(options: Options) {
+	constructor(options: InitOptions) {
 		super();
 
 		this.options = { ...this.defaults, ...options };
