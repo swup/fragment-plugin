@@ -1,5 +1,5 @@
 import PluginBase from '@swup/plugin';
-import Rule from './inc/Rule.js';
+import ParsedRule from './inc/ParsedRule.js';
 import type { Path } from 'swup';
 import Logger from './inc/Logger.js';
 import { handlePageView, cleanupFragmentElements, getFragmentVisit } from './inc/functions.js';
@@ -37,7 +37,7 @@ export type Route = {
 	to: string;
 };
 
-export type RuleOptions = {
+export type Rule = {
 	from: Path;
 	to: Path;
 	containers: string[];
@@ -45,26 +45,24 @@ export type RuleOptions = {
 };
 
 export type Options = {
-	rules: RuleOptions[];
+	rules: Rule[];
 	debug: boolean;
 };
-
-type InitOptions = Partial<Options> & {
-	rules: RuleOptions[];
-};
+type RequireKeys<T, K extends keyof T> = Partial<T> & Pick<T, K>;
+type InitOptions = RequireKeys<Options, 'rules'>;
 
 /**
  * The state of the current visit
  */
 export type FragmentVisit = {
-	rule: Rule;
+	rule: ParsedRule;
 	containers: string[];
 };
 
 /**
  * Re-exports
  */
-export type { Rule };
+export type { ParsedRule };
 
 /**
  * The main plugin class
@@ -74,7 +72,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 	requires = { swup: '>=4' };
 
-	rules: Rule[] = [];
+	rules: ParsedRule[] = [];
 
 	options: Options;
 
@@ -98,7 +96,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		}
 
 		this.rules = this.options.rules.map(
-			({ from, to, containers, name }) => new Rule(from, to, containers, name, this.logger)
+			({ from, to, containers, name }) => new ParsedRule(from, to, containers, name, this.logger)
 		);
 	}
 
