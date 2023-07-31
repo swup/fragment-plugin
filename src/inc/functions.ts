@@ -1,7 +1,7 @@
 import { Location } from 'swup';
 import type { Visit } from 'swup';
 import SwupFragmentPlugin, { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
-import type { Rule, Route, FragmentVisit, FragmentElement } from '../SwupFragmentPlugin.js';
+import type { ParsedRule, Route, FragmentVisit, FragmentElement } from '../SwupFragmentPlugin.js';
 import Logger, { highlight } from './Logger.js';
 
 import { __DEV__ } from './env.js';
@@ -220,7 +220,7 @@ export const removeRuleNameFromFragments = ({ rule, containers }: FragmentVisit)
 /**
  * Get the first matching rule for a given route
  */
-export const getFirstMatchingRule = (route: Route, rules: Rule[]): Rule | undefined => {
+export const getFirstMatchingRule = (route: Route, rules: ParsedRule[]): ParsedRule | undefined => {
 	return rules.find((rule) => rule.matches(route));
 };
 
