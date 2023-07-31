@@ -8,11 +8,13 @@ A [swup](https://swup.js.org) plugin for dynamically replacing containers based 
 
 ## Use cases
 
-Both of the following two scenarios require updating only a small content fragment instead of
+All of the following scenarios require updating only a small content fragment instead of
 performing a full page transition:
 
 - a filter UI that live-updates its list of results on every interaction
 - a detail overlay that shows on top of the currently open content
+- a tab group that should update only itself when selecting one of the tabs
+- a form that should only update itself on `submit`
 
 ## Demo
 
@@ -400,7 +402,7 @@ Fragment Plugin will detect `<detail>` fragment elements automatically on every 
 
 The first `<main>` element in a document will be considered the main content by assistive technology. If you are using the [A11y Plugin](https://swup.js.org/plugins/a11y-plugin/), that's also the element that will automatically be focused upon page visits. For that reason, **you should always put your modal before any overlayed content**, if it should be considered the primary content of a page.
 
-### Pros and cons of using the dialog element for modals
+### Pros and cons of using a `<dialog open>` element for modals
 
 **Pros**:
 
