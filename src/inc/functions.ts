@@ -365,10 +365,7 @@ export function getFragmentVisit(
 /**
  * Adjusts visit.scroll based on given fragment visit
  */
-export function adjustVisitScroll(
-	fragmentVisit: FragmentVisit,
-	scroll: VisitScroll
-): VisitScroll {
+export function adjustVisitScroll(fragmentVisit: FragmentVisit, scroll: VisitScroll): VisitScroll {
 	if (typeof fragmentVisit.scroll === 'boolean') {
 		return { ...scroll, reset: fragmentVisit.scroll };
 	}
