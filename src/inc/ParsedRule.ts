@@ -7,7 +7,7 @@ import { __DEV__ } from './env.js';
 /**
  * Represents a Rule
  */
-export default class Rule {
+export default class ParsedRule {
 	readonly matchesFrom;
 	readonly matchesTo;
 
@@ -15,12 +15,21 @@ export default class Rule {
 	to: Path;
 	containers: string[];
 	name?: string;
+	scroll: boolean | string = false;
 
-	constructor(from: Path, to: Path, rawContainers: string[], name?: string, logger?: Logger) {
+	constructor(
+		from: Path,
+		to: Path,
+		rawContainers: string[],
+		name?: string,
+		scroll?: boolean | string,
+		logger?: Logger
+	) {
 		this.from = from || '';
 		this.to = to || '';
 
 		if (name) this.name = classify(name);
+		if (typeof scroll !== 'undefined') this.scroll = scroll;
 
 		this.containers = this.parseContainers(rawContainers, logger);
 

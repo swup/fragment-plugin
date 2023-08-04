@@ -10,7 +10,8 @@ import {
 	getFirstMatchingRule,
 	cacheForeignFragmentElements,
 	shouldSkipAnimation,
-	getFragmentVisit
+	getFragmentVisit,
+	adjustVisitScroll
 } from './functions.js';
 
 import { __DEV__ } from './env.js';
@@ -45,11 +46,11 @@ export const onVisitStart: Handler<'visit:start'> = async function (this: Fragme
 
 	visit.fragmentVisit = fragmentVisit;
 
-	if (__DEV__)
+	if (__DEV__) {
 		this.logger?.log(`fragment visit: ${highlight(visit.fragmentVisit.containers.join(', '))}`);
+	}
 
-	// Disable scrolling for this transition
-	visit.scroll.reset = false;
+	visit.scroll = adjustVisitScroll(fragmentVisit, visit.scroll);
 
 	// Add the transition classes directly to the containers for this visit
 	visit.animation.scope = visit.fragmentVisit.containers;
