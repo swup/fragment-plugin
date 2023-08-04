@@ -26,7 +26,6 @@ https://github.com/swup/fragment-plugin/assets/869813/ecaf15d7-ec72-43e8-898a-64
 
 </div>
 
-
 ## Table of contents
 
 - [Installation](#installation)
@@ -171,11 +170,11 @@ The rule's `from`/`to` paths are converted to a regular expression by [path-to-r
 {
   rules: [
     {
-      from: '/users/:filter?',  // required
-      to: '/users/:filter?',    // required
-      containers: ['#users'],   // required
-      name: 'list',             // optional, default empty string
-      scroll: true              // optional, default false
+      from: '/users/:filter?', // required
+      to: '/users/:filter?', // required
+      containers: ['#users'], // required
+      name: 'list', // optional, default: empty string
+      scroll: true // optional, default: false
     }
   ];
 }
@@ -326,7 +325,6 @@ If all elements of a visit are `<template>` elements, the `out`/`in`-animation w
     <!-- list of items that will open in the #modal -->
   </ul>
 </main>
-
 ```
 
 ```html
