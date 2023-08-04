@@ -55,7 +55,7 @@ type InitOptions = RequireKeys<Options, 'rules'>;
  * The state of the current visit
  */
 export type FragmentVisit = {
-	name?: string,
+	name?: string;
 	containers: string[];
 };
 
@@ -96,7 +96,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 		}
 
 		this.rules = this.options.rules.map(
-			({ from, to, containers, name }) => new ParsedRule(from, to, containers, name, this.logger)
+			({ from, to, containers, name }) =>
+				new ParsedRule(from, to, containers, name, this.logger)
 		);
 	}
 
