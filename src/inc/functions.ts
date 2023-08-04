@@ -1,5 +1,5 @@
 import { Location } from 'swup';
-import type { Visit } from 'swup';
+import type { Visit, VisitScroll } from 'swup';
 import SwupFragmentPlugin, { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
 import type { ParsedRule, Route, FragmentVisit, FragmentElement } from '../SwupFragmentPlugin.js';
 import Logger, { highlight } from './Logger.js';
@@ -350,10 +350,30 @@ export function getFragmentVisit(
 	// Bail early if there are no containers to be replaced for this visit
 	if (!containers.length) return;
 
+	// Pick properties from the current rule that should be projected into the fragmentVisit object
+	const { name, scroll } = rule;
+
 	const visit: FragmentVisit = {
-		name: rule.name,
-		containers
+		containers,
+		name,
+		scroll
 	};
 
 	return visit;
+}
+
+/**
+ * Adjusts visit.scroll based on given fragment visit
+ */
+export function adjustVisitScroll(
+	fragmentVisit: FragmentVisit,
+	scroll: VisitScroll
+): VisitScroll {
+	if (typeof fragmentVisit.scroll === 'boolean') {
+		return { ...scroll, reset: fragmentVisit.scroll };
+	}
+	if (typeof fragmentVisit.scroll === 'string' && !scroll.target) {
+		return { ...scroll, target: fragmentVisit.scroll };
+	}
+	return scroll;
 }
