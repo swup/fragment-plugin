@@ -136,5 +136,4 @@ export const onContentReplace: Handler<'content:replace'> = function (this: Frag
  */
 export const onVisitEnd: Handler<'visit:end'> = function (this: FragmentPlugin, visit) {
 	if (visit.fragmentVisit) removeRuleNameFromFragments(visit.fragmentVisit);
-	visit.fragmentVisit = undefined;
 };
