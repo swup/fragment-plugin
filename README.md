@@ -171,10 +171,11 @@ The rule's `from`/`to` paths are converted to a regular expression by [path-to-r
 {
   rules: [
     {
-      from: '/users/:filter?',
-      to: '/users/:filter?',
-      containers: ['#users'],
-      name: 'list'
+      from: '/users/:filter?',  // required
+      to: '/users/:filter?',    // required
+      containers: ['#users'],   // required
+      name: 'list',             // optional, default empty string
+      scroll: true              // optional, default false
     }
   ];
 }
