@@ -55,7 +55,7 @@ type InitOptions = RequireKeys<Options, 'rules'>;
  * The state of the current visit
  */
 export type FragmentVisit = {
-	rule: ParsedRule;
+	name?: string,
 	containers: string[];
 };
 

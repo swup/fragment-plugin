@@ -199,21 +199,21 @@ export const getRoute = (visit: Visit): Route | undefined => {
 export const addRuleNameClasses = (visit: Visit): void => {
 	if (!visit.fragmentVisit) return;
 
-	const { rule, containers } = visit.fragmentVisit;
-	if (!rule.name) return;
+	const { name, containers } = visit.fragmentVisit;
+	if (!name) return;
 
 	containers.forEach((selector) => {
-		document.querySelector(selector)?.classList.add(`to-${rule.name}`);
+		document.querySelector(selector)?.classList.add(`to-${name}`);
 	});
 };
 
 /**
  * Remove the rule name from fragment elements
  */
-export const removeRuleNameFromFragments = ({ rule, containers }: FragmentVisit): void => {
-	if (!rule.name) return;
+export const removeRuleNameFromFragments = ({ name, containers }: FragmentVisit): void => {
+	if (!name) return;
 	containers.forEach((selector) => {
-		document.querySelector(selector)?.classList.remove(`to-${rule.name}`);
+		document.querySelector(selector)?.classList.remove(`to-${name}`);
 	});
 };
 
@@ -351,7 +351,7 @@ export function getFragmentVisit(
 	if (!containers.length) return;
 
 	const visit: FragmentVisit = {
-		rule,
+		name: rule.name,
 		containers
 	};
 
