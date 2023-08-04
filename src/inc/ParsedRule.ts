@@ -1,4 +1,5 @@
-import { matchPath, classify, type Path } from 'swup';
+import { matchPath, classify, Location } from 'swup';
+import type { Path } from 'swup';
 import type { Route } from '../SwupFragmentPlugin.js';
 import { dedupe } from './functions.js';
 import Logger from './Logger.js';
@@ -78,6 +79,8 @@ export default class ParsedRule {
 	 * Checks if a given route matches a this rule
 	 */
 	public matches(route: Route): boolean {
-		return this.matchesFrom(route.from) !== false && this.matchesTo(route.to) !== false;
+		const { url: fromUrl } = Location.fromUrl(route.from);
+		const { url: toUrl } = Location.fromUrl(route.to);
+		return this.matchesFrom(fromUrl) !== false && this.matchesTo(toUrl) !== false;
 	}
 }
