@@ -26,7 +26,6 @@ https://github.com/swup/fragment-plugin/assets/869813/ecaf15d7-ec72-43e8-898a-64
 
 </div>
 
-
 ## Table of contents
 
 - [Installation](#installation)
@@ -153,6 +152,7 @@ export type Options = {
     to: string | string[];
     containers: string[];
     name?: string;
+    scroll?: boolean | string;
   }>;
   debug?: boolean;
 };
@@ -170,10 +170,11 @@ The rule's `from`/`to` paths are converted to a regular expression by [path-to-r
 {
   rules: [
     {
-      from: '/users/:filter?',
-      to: '/users/:filter?',
-      containers: ['#users'],
-      name: 'list'
+      from: '/users/:filter?', // required
+      to: '/users/:filter?', // required
+      containers: ['#users'], // required
+      name: 'list', // optional, default: empty string
+      scroll: true // optional, default: false
     }
   ];
 }
@@ -197,6 +198,14 @@ Required, Type: `string[]` – Selectors of containers to be replaced if the vis
 #### rule.name
 
 Optional, Type: `string` – A name for this rule to allow scoped styling, ideally in kebab-case
+
+#### rule.scroll
+
+Optional, Type: `boolean | string` – By default, scrolling will be disabled for fragment visits.
+Using this option, you can re-enable it for selected visits:
+
+- `true` will scroll to the top
+- `'#my-element'` will scroll to the first element matching the selector
 
 ### debug
 
@@ -316,7 +325,6 @@ If all elements of a visit are `<template>` elements, the `out`/`in`-animation w
     <!-- list of items that will open in the #modal -->
   </ul>
 </main>
-
 ```
 
 ```html
