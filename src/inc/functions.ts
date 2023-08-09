@@ -115,6 +115,8 @@ function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void 
  * Get all containers that should be replaced for a given visit's route
  */
 export const getContainersForVisit = (route: Route, selectors: string[], logger?: Logger) => {
+	const isReload = isEqualUrl(route.from, route.to);
+
 	return selectors.filter((selector) => {
 		const el = document.querySelector(selector) as FragmentElement;
 
@@ -123,7 +125,7 @@ export const getContainersForVisit = (route: Route, selectors: string[], logger?
 			return false;
 		}
 
-		if (elementMatchesFragmentUrl(el, route.to)) {
+		if (!isReload && elementMatchesFragmentUrl(el, route.to)) {
 			if (__DEV__)
 				logger?.log(
 					`ignored fragment ${highlight(selector)} as it already matches the current URL`
