@@ -14,7 +14,9 @@ performing a full page transition:
 - a filter UI that live-updates its list of results on every interaction
 - a detail overlay that shows on top of the currently open content
 - a tab group that should update only itself when selecting one of the tabs
-- a form that should only update itself on `submit`
+
+If you are looking for selectively replacing forms on submission, you should have a look at
+[Forms Plugin](https://swup.js.org/plugins/forms-plugin/#inline-forms).
 
 ## Demo
 
