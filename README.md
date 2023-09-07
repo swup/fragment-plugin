@@ -155,6 +155,7 @@ export type Options = {
     containers: string[];
     name?: string;
     scroll?: boolean | string;
+    focus?: boolean | string;
   }>;
   debug?: boolean;
 };
@@ -208,6 +209,10 @@ Using this option, you can re-enable it for selected visits:
 
 - `true` will scroll to the top
 - `'#my-element'` will scroll to the first element matching the selector
+
+#### rule.focus
+
+Optional, Type: `boolean | string` – If you have [Accessibility Plugin](https://github.com/swup/a11y-plugin/) installed, you can adjust wich element to focus for the visit [as described here](https://github.com/swup/a11y-plugin/#visita11yfocus).
 
 ### debug
 
