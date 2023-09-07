@@ -52,6 +52,19 @@ export const onVisitStart: Handler<'visit:start'> = async function (this: Fragme
 
 	visit.scroll = adjustVisitScroll(fragmentVisit, visit.scroll);
 
+	// Fragment Plugin can't know if Accesssibilty Plugin is installed
+	// @ts-expect-error
+	const a11y = visit.a11y as { focus?: boolean | string };
+	if (typeof fragmentVisit.focus !== 'undefined') {
+		if (__DEV__) {
+			this.logger?.errorIf(
+				!a11y,
+				"Can't set visit.a11y.focus. Is @swup/a11y-plugin installed?"
+			);
+		}
+		if (a11y) a11y.focus = fragmentVisit.focus;
+	}
+
 	// Add the transition classes directly to the containers for this visit
 	visit.animation.scope = visit.fragmentVisit.containers;
 

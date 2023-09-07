@@ -43,6 +43,7 @@ export type Rule = {
 	containers: string[];
 	name?: string;
 	scroll?: boolean | string;
+	focus?: boolean | string;
 };
 
 export type Options = {
@@ -59,6 +60,7 @@ export type FragmentVisit = {
 	name?: string;
 	containers: string[];
 	scroll: boolean | string;
+	focus?: boolean | string;
 };
 
 /**
@@ -98,8 +100,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 		}
 
 		this.rules = this.options.rules.map(
-			({ from, to, containers, name, scroll }) =>
-				new ParsedRule(from, to, containers, name, scroll, this.logger)
+			({ from, to, containers, name, scroll, focus }) =>
+				new ParsedRule(from, to, containers, name, scroll, focus, this.logger)
 		);
 	}
 

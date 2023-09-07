@@ -353,12 +353,13 @@ export function getFragmentVisit(
 	if (!containers.length) return;
 
 	// Pick properties from the current rule that should be projected into the fragmentVisit object
-	const { name, scroll } = rule;
+	const { name, scroll, focus } = rule;
 
 	const visit: FragmentVisit = {
 		containers,
 		name,
-		scroll
+		scroll,
+		focus
 	};
 
 	return visit;
