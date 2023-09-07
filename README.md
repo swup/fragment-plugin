@@ -212,7 +212,7 @@ Using this option, you can re-enable it for selected visits:
 
 #### rule.focus
 
-Optional, Type: `boolean | string` – If you have [Accessibility Plugin](https://github.com/swup/a11y-plugin/) installed, you can adjust wich element to focus for the visit [as described here](https://github.com/swup/a11y-plugin/#visita11yfocus).
+Optional, Type: `boolean | string` – If you have [Accessibility Plugin](https://github.com/swup/a11y-plugin/) installed, you can adjust which element to focus for the visit [as described here](https://github.com/swup/a11y-plugin/#visita11yfocus).
 
 ### debug
 
