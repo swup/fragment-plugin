@@ -17,6 +17,7 @@ export default class ParsedRule {
 	containers: string[];
 	name?: string;
 	scroll: boolean | string = false;
+	focus?: boolean | string;
 
 	constructor(
 		from: Path,
@@ -24,6 +25,7 @@ export default class ParsedRule {
 		rawContainers: string[],
 		name?: string,
 		scroll?: boolean | string,
+		focus?: boolean | string,
 		logger?: Logger
 	) {
 		this.from = from || '';
@@ -31,12 +33,14 @@ export default class ParsedRule {
 
 		if (name) this.name = classify(name);
 		if (typeof scroll !== 'undefined') this.scroll = scroll;
+		if (typeof focus !== 'undefined') this.focus = focus;
 
 		this.containers = this.parseContainers(rawContainers, logger);
 
 		if (__DEV__) {
 			logger?.errorIf(!to, `Every fragment rule must contain a 'to' path`, this);
 			logger?.errorIf(!from, `Every fragment rule must contain a 'from' path`, this);
+
 		}
 
 		this.matchesFrom = matchPath(from);
