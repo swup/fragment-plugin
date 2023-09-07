@@ -40,7 +40,6 @@ export default class ParsedRule {
 		if (__DEV__) {
 			logger?.errorIf(!to, `Every fragment rule must contain a 'to' path`, this);
 			logger?.errorIf(!from, `Every fragment rule must contain a 'from' path`, this);
-
 		}
 
 		this.matchesFrom = matchPath(from);
