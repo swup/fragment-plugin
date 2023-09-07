@@ -2,6 +2,10 @@
 
 <!-- ## [Unreleased] -->
 
+## [0.3.0] - 2023-09-07
+
+- Make `visit.a11y.focus` adjustable
+
 ## [0.2.6] - 2023-08-09
 
 - Support for fragment visits to the current URL (handy for @swup/forms-plugin)
@@ -27,8 +31,9 @@
 
 - Initial Release
 
-[Unreleased]: https://github.com/swup/forms-plugin/compare/0.2.6...HEAD
+[Unreleased]: https://github.com/swup/forms-plugin/compare/0.3.0...HEAD
 
+[0.3.0]: https://github.com/swup/forms-plugin/releases/tag/0.3.0
 [0.2.6]: https://github.com/swup/forms-plugin/releases/tag/0.2.6
 [0.2.5]: https://github.com/swup/forms-plugin/releases/tag/0.2.5
 [0.2.4]: https://github.com/swup/forms-plugin/releases/tag/0.2.4
