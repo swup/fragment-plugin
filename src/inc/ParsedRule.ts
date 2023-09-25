@@ -97,9 +97,8 @@ export default class ParsedRule {
 				if (__DEV__) {
 					this.logger?.logIf(
 						isMissing,
-						`skipping fragment rule since ${highlight(
-							selector
-						)} doesn't match anything`,
+						`skipping fragment rule since ${highlight(selector)}
+						doesn't match anything`,
 						route
 					);
 				}
