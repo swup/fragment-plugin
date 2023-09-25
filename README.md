@@ -176,8 +176,8 @@ The rule's `from`/`to` paths are converted to a regular expression by [path-to-r
       from: '/users/:filter?', // required
       to: '/users/:filter?', // required
       containers: ['#users'], // required
+      if: (visit) => visit.to.url !== '/users/my-exception/', // optional, default: () => true
       name: 'list', // optional, default: empty string
-      if: (visit) => new Date().getHours() > 20 // optional, default: () => true
       scroll: true // optional, default: false
       focus: '#my-fragment' // optional, default inherited in a11y plugin
     }
@@ -200,13 +200,13 @@ Required, Type: `string[]` – Selectors of containers to be replaced if the vis
 > **Note** **only IDs and no nested selectors are allowed**. `#my-element` is valid, while
 > `.my-element` or `#wrap #child` both will throw an error.
 
-#### rule.name
-
-Optional, Type: `string` – A name for this rule to allow scoped styling, ideally in kebab-case
-
 #### rule.if
 
 Optional, Type: `(visit: Visit) => boolean` – Returning `false` from this callback will ignore the rule for the current visit.
+
+#### rule.name
+
+Optional, Type: `string` – A name for this rule to allow scoped styling, ideally in kebab-case
 
 #### rule.scroll
 
