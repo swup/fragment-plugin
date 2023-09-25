@@ -177,7 +177,9 @@ The rule's `from`/`to` paths are converted to a regular expression by [path-to-r
       to: '/users/:filter?', // required
       containers: ['#users'], // required
       name: 'list', // optional, default: empty string
+      if: (visit) => new Date().getHours() > 20 // optional, default: () => true
       scroll: true // optional, default: false
+      focus: '#my-fragment' // optional, default inherited in a11y plugin
     }
   ];
 }
@@ -201,6 +203,10 @@ Required, Type: `string[]` – Selectors of containers to be replaced if the vis
 #### rule.name
 
 Optional, Type: `string` – A name for this rule to allow scoped styling, ideally in kebab-case
+
+#### rule.if
+
+Optional, Type: `(visit: Visit) => boolean` – Returning `false` from this callback will ignore the rule for the current visit.
 
 #### rule.scroll
 
