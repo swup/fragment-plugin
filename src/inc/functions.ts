@@ -222,8 +222,8 @@ export const removeRuleNameFromFragments = ({ name, containers }: FragmentVisit)
 /**
  * Get the first matching rule for a given route
  */
-export const getFirstMatchingRule = (route: Route, rules: ParsedRule[]): ParsedRule | undefined => {
-	return rules.find((rule) => rule.matches(route));
+export const getFirstMatchingRule = (route: Route, rules: ParsedRule[], visit: Visit): ParsedRule | undefined => {
+	return rules.find((rule) => rule.matches(route, visit));
 };
 
 /**
@@ -342,7 +342,7 @@ export function getFragmentVisit(
 	route: Route,
 	logger?: Logger
 ): FragmentVisit | undefined {
-	const rule = getFirstMatchingRule(route, this.rules);
+	const rule = getFirstMatchingRule(route, this.rules, this.swup.visit);
 
 	// Bail early if no rule matched
 	if (!rule) return;

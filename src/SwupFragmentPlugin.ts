@@ -1,6 +1,6 @@
 import PluginBase from '@swup/plugin';
 import ParsedRule from './inc/ParsedRule.js';
-import type { Path } from 'swup';
+import type { Path, Visit } from 'swup';
 import Logger from './inc/Logger.js';
 import { handlePageView, cleanupFragmentElements, getFragmentVisit } from './inc/functions.js';
 
@@ -37,6 +37,8 @@ export type Route = {
 	to: string;
 };
 
+export type RuleConditionCallback = (visit: Visit) => boolean;
+
 export type Rule = {
 	from: Path;
 	to: Path;
@@ -44,6 +46,7 @@ export type Rule = {
 	name?: string;
 	scroll?: boolean | string;
 	focus?: boolean | string;
+	if?: RuleConditionCallback
 };
 
 export type Options = {
@@ -100,8 +103,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 		}
 
 		this.rules = this.options.rules.map(
-			({ from, to, containers, name, scroll, focus }) =>
-				new ParsedRule(from, to, containers, name, scroll, focus, this.logger)
+			({ from, to, containers, name, scroll, focus, if: condition }) =>
+				new ParsedRule(from, to, containers, name, scroll, focus, condition, this.logger)
 		);
 	}
 
