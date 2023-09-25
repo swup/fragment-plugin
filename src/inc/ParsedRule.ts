@@ -24,8 +24,8 @@ export default class ParsedRule {
 		from: Path,
 		to: Path,
 		rawContainers: string[],
-		name?: string,
 		condition?: RuleConditionCallback,
+		name?: string,
 		scroll?: boolean | string,
 		focus?: boolean | string,
 		logger?: Logger

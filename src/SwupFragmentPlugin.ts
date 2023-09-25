@@ -103,13 +103,13 @@ export default class SwupFragmentPlugin extends PluginBase {
 		}
 
 		this.rules = this.options.rules.map(
-			({ from, to, containers, name, scroll, focus, if: condition }) => {
+			({ from, to, containers, if: condition, name, scroll, focus }) => {
 				return new ParsedRule(
 					from,
 					to,
 					containers,
-					name,
 					condition,
+					name,
 					scroll,
 					focus,
 					this.logger
