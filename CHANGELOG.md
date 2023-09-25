@@ -1,6 +1,8 @@
 # Changelog
 
-<!-- ## [Unreleased] -->
+## [0.3.1] - 2023-09-25
+
+- Ignore fragment rules where any of the `containers` doesn't return a match
 
 ## [0.3.0] - 2023-09-07
 
@@ -31,8 +33,9 @@
 
 - Initial Release
 
-[Unreleased]: https://github.com/swup/forms-plugin/compare/0.3.0...HEAD
+[Unreleased]: https://github.com/swup/forms-plugin/compare/0.3.1...HEAD
 
+[0.3.1]: https://github.com/swup/forms-plugin/releases/tag/0.3.1
 [0.3.0]: https://github.com/swup/forms-plugin/releases/tag/0.3.0
 [0.2.6]: https://github.com/swup/forms-plugin/releases/tag/0.2.6
 [0.2.5]: https://github.com/swup/forms-plugin/releases/tag/0.2.5
