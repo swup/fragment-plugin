@@ -2,7 +2,7 @@ import { matchPath, classify, Location } from 'swup';
 import type { Path, Visit } from 'swup';
 import type { Route, RuleConditionCallback } from '../SwupFragmentPlugin.js';
 import { dedupe } from './functions.js';
-import Logger from './Logger.js';
+import Logger, { highlight } from './Logger.js';
 import { __DEV__ } from './env.js';
 
 /**
@@ -16,9 +16,10 @@ export default class ParsedRule {
 	to: Path;
 	containers: string[];
 	name?: string;
-	condition: RuleConditionCallback = () => true;
+	if: RuleConditionCallback = () => true;
 	scroll: boolean | string = false;
 	focus?: boolean | string;
+	logger?: Logger;
 
 	constructor(
 		from: Path,
@@ -32,13 +33,14 @@ export default class ParsedRule {
 	) {
 		this.from = from || '';
 		this.to = to || '';
+		this.logger = logger;
 
 		if (name) this.name = classify(name);
 		if (typeof scroll !== 'undefined') this.scroll = scroll;
 		if (typeof focus !== 'undefined') this.focus = focus;
-		if (typeof condition !== 'undefined') this.condition = condition;
+		if (typeof condition !== 'undefined') this.if = condition;
 
-		this.containers = this.parseContainers(rawContainers, logger);
+		this.containers = this.parseContainers(rawContainers);
 
 		if (__DEV__) {
 			logger?.errorIf(!to, `Every fragment rule must contain a 'to' path`, this);
@@ -52,17 +54,17 @@ export default class ParsedRule {
 	/**
 	 * Parse provided fragment containers
 	 */
-	parseContainers(rawContainers: string[], logger?: Logger): string[] {
+	parseContainers(rawContainers: string[]): string[] {
 		if (!Array.isArray(rawContainers)) {
 			if (__DEV__)
-				logger?.error(`Every fragment rule must contain an array of containers`, this);
+				this.logger?.error(`Every fragment rule must contain an array of containers`, this);
 			return [];
 		}
 		// trim selectors
 		const containers = rawContainers.map((selector) => selector.trim());
 		containers.forEach((selector) => {
 			const result = this.validateSelector(selector);
-			if (result instanceof Error) logger?.error(result);
+			if (result instanceof Error) this.logger?.error(result);
 		});
 		return dedupe(containers);
 	}
@@ -85,7 +87,12 @@ export default class ParsedRule {
 	 * Checks if a given route matches a this rule
 	 */
 	public matches(route: Route, visit: Visit): boolean {
-		if (!this.condition(visit)) return false;
+		if (!this.if(visit)) {
+			if (__DEV__) {
+				this.logger?.log(`ignored fragment rule due to custom rule.if:`, this);
+			}
+			return false;
+		}
 
 		const { url: fromUrl } = Location.fromUrl(route.from);
 		const { url: toUrl } = Location.fromUrl(route.to);
