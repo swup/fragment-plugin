@@ -31,9 +31,9 @@ export default class ParsedRule {
 		focus?: boolean | string,
 		logger?: Logger
 	) {
+		this.logger = logger;
 		this.from = from || '';
 		this.to = to || '';
-		this.logger = logger;
 
 		if (name) this.name = classify(name);
 		if (typeof scroll !== 'undefined') this.scroll = scroll;
@@ -64,7 +64,7 @@ export default class ParsedRule {
 		const containers = rawContainers.map((selector) => selector.trim());
 		containers.forEach((selector) => {
 			const result = this.validateSelector(selector);
-			if (result instanceof Error) this.logger?.error(result);
+			this.logger?.errorIf(result instanceof Error, result);
 		});
 		return dedupe(containers);
 	}
@@ -97,6 +97,26 @@ export default class ParsedRule {
 		const { url: fromUrl } = Location.fromUrl(route.from);
 		const { url: toUrl } = Location.fromUrl(route.to);
 
-		return this.matchesFrom(fromUrl) !== false && this.matchesTo(toUrl) !== false;
+		const matches = !!this.matchesFrom(fromUrl) && !!this.matchesTo(toUrl);
+		if (!matches) return false;
+
+		/** Don't match if any of the selectors doesn't match an element */
+		if (
+			this.containers.find((selector) => {
+				const isMissing = document.querySelector(selector) === null;
+				if (__DEV__) {
+					this.logger?.logIf(
+						isMissing,
+						`skipping fragment rule since ` +
+							`${highlight(selector)} doesn't match anything`,
+						route
+					);
+				}
+				return isMissing;
+			})
+		)
+			return false;
+
+		return true;
 	}
 }
