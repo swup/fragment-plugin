@@ -46,7 +46,7 @@ export type Rule = {
 	name?: string;
 	scroll?: boolean | string;
 	focus?: boolean | string;
-	if?: RuleConditionCallback
+	if?: RuleConditionCallback;
 };
 
 export type Options = {
@@ -103,8 +103,18 @@ export default class SwupFragmentPlugin extends PluginBase {
 		}
 
 		this.rules = this.options.rules.map(
-			({ from, to, containers, name, scroll, focus, if: condition }) =>
-				new ParsedRule(from, to, containers, name, scroll, focus, condition, this.logger)
+			({ from, to, containers, name, scroll, focus, if: condition }) => {
+				return new ParsedRule(
+					from,
+					to,
+					containers,
+					name,
+					condition,
+					scroll,
+					focus,
+					this.logger
+				);
+			}
 		);
 	}
 

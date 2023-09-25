@@ -16,18 +16,18 @@ export default class ParsedRule {
 	to: Path;
 	containers: string[];
 	name?: string;
+	condition: RuleConditionCallback = () => true;
 	scroll: boolean | string = false;
 	focus?: boolean | string;
-	condition: RuleConditionCallback = () => true;
 
 	constructor(
 		from: Path,
 		to: Path,
 		rawContainers: string[],
 		name?: string,
+		condition?: RuleConditionCallback,
 		scroll?: boolean | string,
 		focus?: boolean | string,
-		condition?: RuleConditionCallback,
 		logger?: Logger
 	) {
 		this.from = from || '';
