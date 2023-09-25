@@ -2,7 +2,7 @@ import { matchPath, classify, Location } from 'swup';
 import type { Path } from 'swup';
 import type { Route } from '../SwupFragmentPlugin.js';
 import { dedupe } from './functions.js';
-import Logger from './Logger.js';
+import Logger, { highlight } from './Logger.js';
 import { __DEV__ } from './env.js';
 
 /**
@@ -18,6 +18,7 @@ export default class ParsedRule {
 	name?: string;
 	scroll: boolean | string = false;
 	focus?: boolean | string;
+	logger?: Logger;
 
 	constructor(
 		from: Path,
@@ -28,6 +29,7 @@ export default class ParsedRule {
 		focus?: boolean | string,
 		logger?: Logger
 	) {
+		this.logger = logger;
 		this.from = from || '';
 		this.to = to || '';
 
@@ -35,7 +37,7 @@ export default class ParsedRule {
 		if (typeof scroll !== 'undefined') this.scroll = scroll;
 		if (typeof focus !== 'undefined') this.focus = focus;
 
-		this.containers = this.parseContainers(rawContainers, logger);
+		this.containers = this.parseContainers(rawContainers);
 
 		if (__DEV__) {
 			logger?.errorIf(!to, `Every fragment rule must contain a 'to' path`, this);
@@ -49,17 +51,17 @@ export default class ParsedRule {
 	/**
 	 * Parse provided fragment containers
 	 */
-	parseContainers(rawContainers: string[], logger?: Logger): string[] {
+	parseContainers(rawContainers: string[]): string[] {
 		if (!Array.isArray(rawContainers)) {
 			if (__DEV__)
-				logger?.error(`Every fragment rule must contain an array of containers`, this);
+				this.logger?.error(`Every fragment rule must contain an array of containers`, this);
 			return [];
 		}
 		// trim selectors
 		const containers = rawContainers.map((selector) => selector.trim());
 		containers.forEach((selector) => {
 			const result = this.validateSelector(selector);
-			if (result instanceof Error) logger?.error(result);
+			this.logger?.errorIf(result instanceof Error, result);
 		});
 		return dedupe(containers);
 	}
@@ -84,6 +86,19 @@ export default class ParsedRule {
 	public matches(route: Route): boolean {
 		const { url: fromUrl } = Location.fromUrl(route.from);
 		const { url: toUrl } = Location.fromUrl(route.to);
-		return this.matchesFrom(fromUrl) !== false && this.matchesTo(toUrl) !== false;
+
+		const matches = !!this.matchesFrom(fromUrl) && !!this.matchesTo(toUrl);
+		if (!matches) return false;
+
+		/** Don't match if any of the selectors doesn't match an element */
+		if (this.containers.find((selector) => {
+			const isMissing = document.querySelector(selector) === null;
+			if (__DEV__) {
+				this.logger?.logIf(isMissing, `skipping fragment rule since ${highlight(selector)} doesn't match anything`, route);
+			}
+			return isMissing;
+		})) return false;
+
+		return true;
 	}
 }
