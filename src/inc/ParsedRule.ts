@@ -91,13 +91,22 @@ export default class ParsedRule {
 		if (!matches) return false;
 
 		/** Don't match if any of the selectors doesn't match an element */
-		if (this.containers.find((selector) => {
-			const isMissing = document.querySelector(selector) === null;
-			if (__DEV__) {
-				this.logger?.logIf(isMissing, `skipping fragment rule since ${highlight(selector)} doesn't match anything`, route);
-			}
-			return isMissing;
-		})) return false;
+		if (
+			this.containers.find((selector) => {
+				const isMissing = document.querySelector(selector) === null;
+				if (__DEV__) {
+					this.logger?.logIf(
+						isMissing,
+						`skipping fragment rule since ${highlight(
+							selector
+						)} doesn't match anything`,
+						route
+					);
+				}
+				return isMissing;
+			})
+		)
+			return false;
 
 		return true;
 	}
