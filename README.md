@@ -195,8 +195,11 @@ Required, Type: `string | string[]` – The path(s) to match against the next UR
 
 Required, Type: `string[]` – Selectors of containers to be replaced if the visit matches.
 
-> **Note** **only IDs and no nested selectors are allowed**. `#my-element` is valid, while
-> `.my-element` or `#wrap #child` both will throw an error.
+**Notes**
+
+- **only IDs and no nested selectors are allowed**. `#my-element` is valid, while
+`.my-element` or `#wrap #child` both will throw an error.
+- if **any** of the selectors in `containers` doesn't return a match in the current document, the rule will be skipped.
 
 #### rule.name
 
@@ -409,7 +412,7 @@ You have two options to fix this:
 + </dialog>
 ```
 
-Fragment Plugin will detect `<detail>` fragment elements automatically on every page view and run [`showModal()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/showModal) on them, putting them on the [top layer](https://developer.mozilla.org/en-US/docs/Glossary/Top_layer) and thus allows them to not be affected by parent element styles, anymore.
+Fragment Plugin will detect `<dialog open>`-fragment elements automatically on every page view and run [`showModal()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/showModal) on them, putting them on the [top layer](https://developer.mozilla.org/en-US/docs/Glossary/Top_layer) and thus allows them to not be affected by parent element styles, anymore.
 
 ## Modals and accessibility
 
