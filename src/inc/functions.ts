@@ -2,7 +2,7 @@ import { Location } from 'swup';
 import type { Visit, VisitScroll } from 'swup';
 import type { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
 import type { Route, FragmentVisit, FragmentElement } from './types.js';
-import type ParsedRule from './ParsedRule.js'
+import type ParsedRule from './ParsedRule.js';
 import Logger, { highlight } from './Logger.js';
 
 import { __DEV__ } from './env.js';
