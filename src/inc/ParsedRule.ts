@@ -1,6 +1,6 @@
 import { matchPath, classify, Location } from 'swup';
 import type { Path } from 'swup';
-import type { Route } from '../SwupFragmentPlugin.js';
+import type { Route } from './types.js';
 import { dedupe } from './functions.js';
 import Logger, { highlight } from './Logger.js';
 import { __DEV__ } from './env.js';

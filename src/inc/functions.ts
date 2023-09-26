@@ -1,7 +1,8 @@
 import { Location } from 'swup';
 import type { Visit, VisitScroll } from 'swup';
-import SwupFragmentPlugin, { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
-import type { ParsedRule, Route, FragmentVisit, FragmentElement } from '../SwupFragmentPlugin.js';
+import type { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
+import type { Route, FragmentVisit, FragmentElement } from './types.js';
+import type ParsedRule from './ParsedRule.js'
 import Logger, { highlight } from './Logger.js';
 
 import { __DEV__ } from './env.js';
@@ -338,7 +339,7 @@ export function dedupe<T>(arr: Array<T>): Array<T> {
  * Get the fragment visit object for a given route
  */
 export function getFragmentVisit(
-	this: SwupFragmentPlugin,
+	this: FragmentPlugin,
 	route: Route,
 	logger?: Logger
 ): FragmentVisit | undefined {
