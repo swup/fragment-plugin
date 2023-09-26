@@ -48,7 +48,7 @@
     "@swup/plugin": "^4.0.0"
   },
   "devDependencies": {
-    "@swup/cli": "^5.0.0"
+    "@swup/cli": "^5.0.1"
   },
   "peerDependencies": {
     "swup": "^4.0.0"
