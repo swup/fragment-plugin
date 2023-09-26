@@ -1,7 +1,7 @@
 {
   "name": "@swup/fragment-plugin",
   "amdName": "SwupFragmentPlugin",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A swup plugin for dynamically replacing containers based on rules",
   "type": "module",
   "source": "src/index.ts",
@@ -33,10 +33,10 @@
     "src"
   ],
   "scripts": {
-    "build": "swup-plugin build",
-    "dev": "swup-plugin dev",
-    "lint": "swup-plugin lint",
-    "format": "swup-plugin format",
+    "build": "swup package:build",
+    "dev": "swup package:dev",
+    "lint": "swup package:lint",
+    "format": "swup package:format",
     "prepublishOnly": "npm run build"
   },
   "license": "MIT",
@@ -45,7 +45,10 @@
     "url": "https://github.com/swup/fragment-plugin.git"
   },
   "dependencies": {
-    "@swup/plugin": "^3.0.1"
+    "@swup/plugin": "^4.0.0"
+  },
+  "devDependencies": {
+    "@swup/cli": "^5.0.0"
   },
   "peerDependencies": {
     "swup": "^4.0.0"
