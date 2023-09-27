@@ -1,8 +1,8 @@
 import PluginBase from '@swup/plugin';
 import ParsedRule from './inc/ParsedRule.js';
-import type { Path, Visit } from 'swup';
 import Logger from './inc/Logger.js';
 import { handlePageView, cleanupFragmentElements, getFragmentVisit } from './inc/functions.js';
+import type { Route, Options, FragmentVisit } from './inc/types.js';
 
 import * as handlers from './inc/handlers.js';
 
@@ -20,56 +20,8 @@ declare module 'swup' {
 	}
 }
 
-// The interface for an augmented Fragment Element
-export interface FragmentElement extends Element {
-	__swupFragment?: {
-		url?: string;
-		selector?: string;
-		modalShown?: boolean;
-	};
-}
-
-/**
- * Represents a route from one to another URL
- */
-export type Route = {
-	from: string;
-	to: string;
-};
-
-export type RuleConditionCallback = (visit: Visit) => boolean;
-
-export type Rule = {
-	from: Path;
-	to: Path;
-	containers: string[];
-	name?: string;
-	scroll?: boolean | string;
-	focus?: boolean | string;
-	if?: RuleConditionCallback;
-};
-
-export type Options = {
-	rules: Rule[];
-	debug: boolean;
-};
 type RequireKeys<T, K extends keyof T> = Partial<T> & Pick<T, K>;
 type InitOptions = RequireKeys<Options, 'rules'>;
-
-/**
- * The state of the current visit
- */
-export type FragmentVisit = {
-	name?: string;
-	containers: string[];
-	scroll: boolean | string;
-	focus?: boolean | string;
-};
-
-/**
- * Re-exports
- */
-export type { ParsedRule };
 
 /**
  * The main plugin class

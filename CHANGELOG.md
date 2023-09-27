@@ -1,6 +1,12 @@
 # Changelog
 
-<!-- ## [Unreleased] -->
+## [0.3.2] - 2023-09-26
+
+- Use `@swup/cli` for bundling
+
+## [0.3.1] - 2023-09-25
+
+- Ignore fragment rules where any of the `containers` doesn't return a match
 
 ## [0.3.0] - 2023-09-07
 
@@ -8,7 +14,7 @@
 
 ## [0.2.6] - 2023-08-09
 
-- Support for fragment visits to the current URL (handy for @swup/forms-plugin)
+- Support for fragment visits to the current URL (handy for @swup/fragment-plugin)
 
 ## [0.2.5] - 2023-08-04
 
@@ -31,12 +37,12 @@
 
 - Initial Release
 
-[Unreleased]: https://github.com/swup/forms-plugin/compare/0.3.0...HEAD
-
-[0.3.0]: https://github.com/swup/forms-plugin/releases/tag/0.3.0
-[0.2.6]: https://github.com/swup/forms-plugin/releases/tag/0.2.6
-[0.2.5]: https://github.com/swup/forms-plugin/releases/tag/0.2.5
-[0.2.4]: https://github.com/swup/forms-plugin/releases/tag/0.2.4
-[0.2.3]: https://github.com/swup/forms-plugin/releases/tag/0.2.3
-[0.2.2]: https://github.com/swup/forms-plugin/releases/tag/0.2.2
-[0.2.1]: https://github.com/swup/forms-plugin/releases/tag/0.2.1
+[0.3.2]: https://github.com/swup/fragment-plugin/releases/tag/0.3.2
+[0.3.1]: https://github.com/swup/fragment-plugin/releases/tag/0.3.1
+[0.3.0]: https://github.com/swup/fragment-plugin/releases/tag/0.3.0
+[0.2.6]: https://github.com/swup/fragment-plugin/releases/tag/0.2.6
+[0.2.5]: https://github.com/swup/fragment-plugin/releases/tag/0.2.5
+[0.2.4]: https://github.com/swup/fragment-plugin/releases/tag/0.2.4
+[0.2.3]: https://github.com/swup/fragment-plugin/releases/tag/0.2.3
+[0.2.2]: https://github.com/swup/fragment-plugin/releases/tag/0.2.2
+[0.2.1]: https://github.com/swup/fragment-plugin/releases/tag/0.2.1

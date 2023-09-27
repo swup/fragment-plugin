@@ -1,7 +1,8 @@
 import { Location } from 'swup';
 import type { Visit, VisitScroll } from 'swup';
-import SwupFragmentPlugin, { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
-import type { ParsedRule, Route, FragmentVisit, FragmentElement } from '../SwupFragmentPlugin.js';
+import type { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
+import type { Route, FragmentVisit, FragmentElement } from './types.js';
+import type ParsedRule from './ParsedRule.js';
 import Logger, { highlight } from './Logger.js';
 
 import { __DEV__ } from './env.js';
@@ -45,8 +46,8 @@ function handleLinksToFragments({ logger, swup }: FragmentPlugin): void {
 	links.forEach((el) => {
 		const selector = el.getAttribute(targetAttribute);
 		if (!selector) {
-			if (__DEV__)
-				logger?.warn(`[${targetAttribute}] needs to contain a valid fragment selector`);
+			// prettier-ignore
+			if (__DEV__) logger?.warn(`[${targetAttribute}] needs to contain a valid fragment selector`);
 			return;
 		}
 
@@ -64,10 +65,8 @@ function handleLinksToFragments({ logger, swup }: FragmentPlugin): void {
 
 		// Help finding suspicious fragment urls
 		if (isEqualUrl(fragmentUrl, swup.getCurrentUrl())) {
-			if (__DEV__)
-				logger?.warn(
-					`The fragment URL of ${selector} is identical to the current URL. This could mean that [data-swup-fragment-url] needs to be provided by the server.`
-				);
+			// prettier-ignore
+			if (__DEV__) logger?.warn(`The fragment URL of ${selector} is identical to the current URL. This could mean that [data-swup-fragment-url] needs to be provided by the server.`);
 			return;
 		}
 
@@ -93,11 +92,8 @@ function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void 
 				const providedFragmentUrl = el.getAttribute('data-swup-fragment-url');
 				if (providedFragmentUrl) {
 					if (__DEV__) {
-						logger?.log(
-							`fragment url ${highlight(providedFragmentUrl)} for ${highlight(
-								selector
-							)} provided by server`
-						);
+						// prettier-ignore
+						logger?.log(`fragment url ${highlight(providedFragmentUrl)} for ${highlight(selector)} provided by server`);
 					}
 				}
 				// Get the fragment URL
@@ -127,9 +123,8 @@ export const getContainersForVisit = (route: Route, selectors: string[], logger?
 
 		if (!isReload && elementMatchesFragmentUrl(el, route.to)) {
 			if (__DEV__)
-				logger?.log(
-					`ignored fragment ${highlight(selector)} as it already matches the current URL`
-				);
+				// prettier-ignore
+				logger?.log(`ignored fragment ${highlight(selector)} as it already matches the current URL`);
 			return false;
 		}
 
@@ -314,8 +309,8 @@ export const cacheForeignFragmentElements = ({ swup, logger }: FragmentPlugin): 
 	updatedFragments.forEach((el) => {
 		const url = el.__swupFragment?.url || '';
 		const selector = el.__swupFragment?.selector || '';
-		if (__DEV__)
-			logger?.log(`updated cache with ${highlight(selector)} from ${highlight(url)}`);
+		// prettier-ignore
+		if (__DEV__) logger?.log(`updated cache with ${highlight(selector)} from ${highlight(url)}`);
 	});
 };
 
@@ -342,7 +337,7 @@ export function dedupe<T>(arr: Array<T>): Array<T> {
  * Get the fragment visit object for a given route
  */
 export function getFragmentVisit(
-	this: SwupFragmentPlugin,
+	this: FragmentPlugin,
 	route: Route,
 	logger?: Logger
 ): FragmentVisit | undefined {

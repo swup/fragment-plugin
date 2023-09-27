@@ -1,6 +1,6 @@
 import { matchPath, classify, Location } from 'swup';
-import type { Path, Visit } from 'swup';
-import type { Route, RuleConditionCallback } from '../SwupFragmentPlugin.js';
+import type { Path } from 'swup';
+import type { Route } from './types.js';
 import { dedupe } from './functions.js';
 import Logger, { highlight } from './Logger.js';
 import { __DEV__ } from './env.js';
@@ -84,6 +84,18 @@ export default class ParsedRule {
 	}
 
 	/**
+	 * Get debug info for logging
+	 */
+	getDebugInfo() {
+		const { from, to, containers } = this;
+		return {
+			from: String(from),
+			to: String(to),
+			containers: String(containers)
+		};
+	}
+
+	/**
 	 * Checks if a given route matches a this rule
 	 */
 	public matches(route: Route, visit: Visit): boolean {
@@ -101,21 +113,21 @@ export default class ParsedRule {
 		if (!matches) return false;
 
 		/** Don't match if any of the selectors doesn't match an element */
-		if (
-			this.containers.find((selector) => {
-				const isMissing = document.querySelector(selector) === null;
-				if (__DEV__) {
-					this.logger?.logIf(
-						isMissing,
-						`skipping fragment rule since ` +
-							`${highlight(selector)} doesn't match anything`,
-						route
+		const missingContainers = this.containers.filter(
+			(selector) => !document.querySelector(selector)
+		);
+		if (missingContainers.length) {
+			if (__DEV__) {
+				missingContainers.forEach((selector) => {
+					this.logger?.log(
+						// prettier-ignore
+						`skipping rule since ${highlight(selector)} didn't match anything:`,
+						this.getDebugInfo()
 					);
-				}
-				return isMissing;
-			})
-		)
+				});
+			}
 			return false;
+		}
 
 		return true;
 	}

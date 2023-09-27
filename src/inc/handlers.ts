@@ -1,6 +1,6 @@
 import type { Handler } from 'swup';
 import { highlight } from './Logger.js';
-import { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
+import type { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
 
 import {
 	handlePageView,
