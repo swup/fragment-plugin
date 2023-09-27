@@ -153,6 +153,7 @@ export type Options = {
     from: string | string[];
     to: string | string[];
     containers: string[];
+    if: (visit) => boolean;
     name?: string;
     scroll?: boolean | string;
     focus?: boolean | string;
