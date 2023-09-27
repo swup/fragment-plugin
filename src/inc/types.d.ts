@@ -1,4 +1,4 @@
-import type { Path } from 'swup';
+export type { Path, Visit, VisitScroll } from 'swup';
 
 /** Represents a route from one to another URL */
 export type Route = {
@@ -15,6 +15,8 @@ export interface FragmentElement extends Element {
 	};
 }
 
+export type RuleConditionCallback = (visit: Visit) => boolean;
+
 /** A fragment rule */
 export type Rule = {
 	from: Path;
@@ -23,6 +25,7 @@ export type Rule = {
 	name?: string;
 	scroll?: boolean | string;
 	focus?: boolean | string;
+	if?: RuleConditionCallback
 };
 
 /** The plugin options */
