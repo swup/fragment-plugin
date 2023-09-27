@@ -167,17 +167,15 @@ The rules that define whether a visit will be considered a fragment visit. Each 
 mandatory `from` and `to` URL paths, an array of selectors `containers`, as well as an optional
 `name` of this rule to allow scoped styling.
 
-The rule's `from`/`to` paths are converted to a regular expression by [path-to-regexp](https://github.com/pillarjs/path-to-regexp) and matched against the current browser URL. If you want to create an either/or path, you can also provide an array of paths, for example `['/users/', '/users/filter/:filter']`.
+The rule's `from`/`to` paths are converted to a regular expression by [path-to-regexp](https://github.com/pillarjs/path-to-regexp) and matched against the current browser URL. If you want to create an either/or path, you can also provide an array of paths, for example:
 
 ```js
 {
   rules: [
     {
-      from: '/users/:filter?', // required
-      to: '/users/:filter?', // required
-      containers: ['#users'], // required
-      name: 'list', // optional, default: empty string
-      scroll: true // optional, default: false
+      from: ['/users', '/users/:filter?'],
+      to: ['/users', '/users/:filter?'],
+      containers: ['#user-list'],
     }
   ];
 }
