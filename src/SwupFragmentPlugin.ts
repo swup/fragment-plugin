@@ -65,7 +65,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		this.on('content:replace', handlers.onContentReplace);
 		this.on('visit:end', handlers.onVisitEnd);
 
-		swup.getFragmentVisit = this.getFragmentVisit;
+		swup.getFragmentVisit = this.getFragmentVisit.bind(this);
 
 		if (__DEV__) {
 			this.logger?.warnIf(
