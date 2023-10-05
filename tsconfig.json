@@ -12,7 +12,6 @@
     "moduleDetection": "force",
     /* Strictness */
     "strict": true,
-    // "noUncheckedIndexedAccess": true,
     /* If transpiling with TypeScript: */
     "moduleResolution": "NodeNext",
     "module": "NodeNext",

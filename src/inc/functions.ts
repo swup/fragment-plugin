@@ -1,7 +1,7 @@
 import { Location } from 'swup';
 import type { Visit, VisitScroll } from 'swup';
 import type { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
-import type { Route, FragmentVisit, FragmentElement } from './types.js';
+import type { Route, FragmentVisit, FragmentElement } from './defs.js';
 import type ParsedRule from './ParsedRule.js';
 import Logger, { highlight } from './Logger.js';
 
@@ -327,37 +327,6 @@ export function shouldSkipAnimation({ swup }: FragmentPlugin): boolean {
  */
 export function dedupe<T>(arr: Array<T>): Array<T> {
 	return [...new Set<T>(arr)];
-}
-
-/**
- * Get the fragment visit object for a given route
- */
-export function getFragmentVisit(
-	this: FragmentPlugin,
-	route: Route,
-	logger?: Logger
-): FragmentVisit | undefined {
-	const rule = getFirstMatchingRule(route, this.rules);
-
-	// Bail early if no rule matched
-	if (!rule) return;
-
-	// Get containers that should be replaced for this visit
-	const containers = getContainersForVisit(route, rule.containers, logger);
-	// Bail early if there are no containers to be replaced for this visit
-	if (!containers.length) return;
-
-	// Pick properties from the current rule that should be projected into the fragmentVisit object
-	const { name, scroll, focus } = rule;
-
-	const visit: FragmentVisit = {
-		containers,
-		name,
-		scroll,
-		focus
-	};
-
-	return visit;
 }
 
 /**

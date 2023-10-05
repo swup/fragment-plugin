@@ -1,24 +1,15 @@
 import PluginBase from '@swup/plugin';
 import ParsedRule from './inc/ParsedRule.js';
 import Logger from './inc/Logger.js';
-import { handlePageView, cleanupFragmentElements, getFragmentVisit } from './inc/functions.js';
-import type { Route, Options, FragmentVisit } from './inc/types.js';
-
+import {
+	handlePageView,
+	cleanupFragmentElements,
+	getFirstMatchingRule,
+	getContainersForVisit
+} from './inc/functions.js';
+import type { Options, Route, FragmentVisit } from './inc/defs.js';
 import * as handlers from './inc/handlers.js';
-
 import { __DEV__ } from './inc/env.js';
-
-declare module 'swup' {
-	export interface Swup {
-		getFragmentVisit?: (route: Route) => FragmentVisit | undefined;
-	}
-	export interface Visit {
-		fragmentVisit?: FragmentVisit;
-	}
-	export interface CacheData {
-		fragmentHtml?: string;
-	}
-}
 
 type RequireKeys<T, K extends keyof T> = Partial<T> & Pick<T, K>;
 type InitOptions = RequireKeys<Options, 'rules'>;
@@ -74,7 +65,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		this.on('content:replace', handlers.onContentReplace);
 		this.on('visit:end', handlers.onVisitEnd);
 
-		swup.getFragmentVisit = getFragmentVisit.bind(this);
+		swup.getFragmentVisit = this.getFragmentVisit.bind(this);
 
 		if (__DEV__) {
 			this.logger?.warnIf(
@@ -93,5 +84,32 @@ export default class SwupFragmentPlugin extends PluginBase {
 		super.unmount();
 		this.swup.getFragmentVisit = undefined;
 		cleanupFragmentElements();
+	}
+
+	/**
+	 * Get the fragment visit object for a given route
+	 */
+	getFragmentVisit(route: Route): FragmentVisit | undefined {
+		const rule = getFirstMatchingRule(route, this.rules);
+
+		// Bail early if no rule matched
+		if (!rule) return;
+
+		// Get containers that should be replaced for this visit
+		const containers = getContainersForVisit(route, rule.containers, this.logger);
+		// Bail early if there are no containers to be replaced for this visit
+		if (!containers.length) return;
+
+		// Pick properties from the current rule that should be projected into the fragmentVisit object
+		const { name, scroll, focus } = rule;
+
+		const fragmentVisit: FragmentVisit = {
+			containers,
+			name,
+			scroll,
+			focus
+		};
+
+		return fragmentVisit;
 	}
 }
