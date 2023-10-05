@@ -2,23 +2,11 @@ import PluginBase from '@swup/plugin';
 import ParsedRule from './inc/ParsedRule.js';
 import Logger from './inc/Logger.js';
 import { handlePageView, cleanupFragmentElements, getFragmentVisit } from './inc/functions.js';
-import type { Route, Options, FragmentVisit } from './inc/types.js';
+import type { Options } from './inc/defs.js';
 
 import * as handlers from './inc/handlers.js';
 
 import { __DEV__ } from './inc/env.js';
-
-declare module 'swup' {
-	export interface Swup {
-		getFragmentVisit?: (route: Route) => FragmentVisit | undefined;
-	}
-	export interface Visit {
-		fragmentVisit?: FragmentVisit;
-	}
-	export interface CacheData {
-		fragmentHtml?: string;
-	}
-}
 
 type RequireKeys<T, K extends keyof T> = Partial<T> & Pick<T, K>;
 type InitOptions = RequireKeys<Options, 'rules'>;
