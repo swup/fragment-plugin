@@ -36,7 +36,7 @@ export const onVisitStart: Handler<'visit:start'> = async function (this: Fragme
 	const route = getRoute(visit);
 	if (!route) return;
 
-	const fragmentVisit = getFragmentVisit.call(this, route, this.logger);
+	const fragmentVisit = getFragmentVisit.call(this, route);
 
 	/**
 	 * Bail early if the current route doesn't match

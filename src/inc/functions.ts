@@ -335,7 +335,6 @@ export function dedupe<T>(arr: Array<T>): Array<T> {
 export function getFragmentVisit(
 	this: FragmentPlugin,
 	route: Route,
-	logger?: Logger
 ): FragmentVisit | undefined {
 	const rule = getFirstMatchingRule(route, this.rules);
 
@@ -343,7 +342,7 @@ export function getFragmentVisit(
 	if (!rule) return;
 
 	// Get containers that should be replaced for this visit
-	const containers = getContainersForVisit(route, rule.containers, logger);
+	const containers = getContainersForVisit(route, rule.containers, this.logger);
 	// Bail early if there are no containers to be replaced for this visit
 	if (!containers.length) return;
 
