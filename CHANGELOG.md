@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.3] - 2023-10-05
+
+- Refactor exports
+- Ensure all type definitions make it into `/dist`
+- Fix return type of `swup.getFragmentVisit()`
+
 ## [0.3.2] - 2023-09-26
 
 - Use `@swup/cli` for bundling
@@ -37,6 +43,7 @@
 
 - Initial Release
 
+[0.3.3]: https://github.com/swup/fragment-plugin/releases/tag/0.3.3
 [0.3.2]: https://github.com/swup/fragment-plugin/releases/tag/0.3.2
 [0.3.1]: https://github.com/swup/fragment-plugin/releases/tag/0.3.1
 [0.3.0]: https://github.com/swup/fragment-plugin/releases/tag/0.3.0
