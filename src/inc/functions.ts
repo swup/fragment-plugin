@@ -330,36 +330,6 @@ export function dedupe<T>(arr: Array<T>): Array<T> {
 }
 
 /**
- * Get the fragment visit object for a given route
- */
-export function getFragmentVisit(
-	this: FragmentPlugin,
-	route: Route,
-): FragmentVisit | undefined {
-	const rule = getFirstMatchingRule(route, this.rules);
-
-	// Bail early if no rule matched
-	if (!rule) return;
-
-	// Get containers that should be replaced for this visit
-	const containers = getContainersForVisit(route, rule.containers, this.logger);
-	// Bail early if there are no containers to be replaced for this visit
-	if (!containers.length) return;
-
-	// Pick properties from the current rule that should be projected into the fragmentVisit object
-	const { name, scroll, focus } = rule;
-
-	const visit: FragmentVisit = {
-		containers,
-		name,
-		scroll,
-		focus
-	};
-
-	return visit;
-}
-
-/**
  * Adjusts visit.scroll based on given fragment visit
  */
 export function adjustVisitScroll(fragmentVisit: FragmentVisit, scroll: VisitScroll): VisitScroll {
