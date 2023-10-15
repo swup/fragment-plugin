@@ -1,7 +1,7 @@
 import Swup, { matchPath, classify, Location } from 'swup';
 import type { Path } from 'swup';
 import type { Route } from './defs.js';
-import { dedupe, fragmentIsOutOfBounds, queryFragmentElement } from './functions.js';
+import { dedupe, queryFragmentElement } from './functions.js';
 import Logger, { highlight } from './Logger.js';
 import { __DEV__ } from './env.js';
 import type SwupFragmentPlugin from '../SwupFragmentPlugin.js';
@@ -75,6 +75,7 @@ export default class ParsedRule {
 	 *
 	 * - only IDs are allowed
 	 * - no nested selectors
+	 * - no fragments outside of swup's default containers
 	 */
 	validateSelector(selector: string): true | Error {
 		if (!selector.startsWith('#')) {
@@ -85,10 +86,8 @@ export default class ParsedRule {
 			return new Error(`fragment selectors must not be nested: ${selector}`);
 		}
 
-		if (fragmentIsOutOfBounds(selector, this.swup)) {
-			return new Error(
-				`${highlight(selector)} is outside of swup's default containers`
-			);
+		if (document.querySelector(selector) && !queryFragmentElement(selector, this.swup)) {
+			return new Error(`${highlight(selector)} is outside of swup's default containers`);
 		}
 
 		return true;

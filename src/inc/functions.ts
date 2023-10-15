@@ -130,14 +130,14 @@ export const getFragmentVisitContainers = (
 		const el = document.querySelector<FragmentElement>(selector);
 
 		if (!el) {
-			if (__DEV__) logger?.log(`fragment "${selector}" missing in current document`);
+			if (__DEV__) logger?.log(`${highlight(selector)} missing in current document`);
 			return false;
 		}
 
-		if (fragmentIsOutOfBounds(selector, swup)) {
+		if (!queryFragmentElement(selector, swup)) {
 			if (__DEV__) {
 				// prettier-ignore
-				logger?.error(`ignoring ${highlight(selector)} as it is outside of swup's default containers`);
+				logger?.error(`${highlight(selector)} is outside of swup's default containers`);
 			}
 			return false;
 		}
@@ -370,7 +370,10 @@ export function adjustVisitScroll(fragmentVisit: FragmentVisit, scroll: VisitScr
 }
 
 /**
- * Queries a fragment element, only looking inside swup's containers
+ * Queries a fragment element. Needs to be either:
+ *
+ * - one of swup's default containers
+ * - inside of one of swup's default containers
  */
 export function queryFragmentElement(fragmentSelector: string, swup: Swup): FragmentElement | null {
 	for (const containerSelector of swup.options.containers) {
@@ -381,14 +384,4 @@ export function queryFragmentElement(fragmentSelector: string, swup: Swup): Frag
 		if (fragment) return fragment;
 	}
 	return null;
-}
-
-/**
- * Checks if a fragment element is outside of a swup's main containers
- */
-export function fragmentIsOutOfBounds(selector: string, swup: Swup): boolean {
-	/** Only check if the element exists at all */
-	if (!document.querySelector(selector)) return false;
-
-	return !queryFragmentElement(selector, swup);
 }
