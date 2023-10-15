@@ -53,7 +53,11 @@ function handleLinksToFragments({ logger, swup }: FragmentPlugin): void {
 
 		const fragment = document.querySelector(selector) as FragmentElement;
 		if (!fragment) {
-			if (__DEV__) logger?.warn(`no element found for [${targetAttribute}="${selector}"]`);
+			if (__DEV__) {
+				logger?.log(
+					`ignoring ${highlight(`[${targetAttribute}="${selector}"]`)} since ${highlight(selector)} is missing`
+				);
+			}
 			return;
 		}
 
