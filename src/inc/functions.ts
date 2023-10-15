@@ -343,7 +343,9 @@ export function shouldSkipAnimation({ swup }: FragmentPlugin): boolean {
 	if (!fragmentVisit) return false;
 
 	return fragmentVisit.containers.every((selector) => {
-		return document.querySelector<FragmentElement>(selector)?.tagName?.toLowerCase() === 'template';
+		return (
+			document.querySelector<FragmentElement>(selector)?.tagName?.toLowerCase() === 'template'
+		);
 	});
 }
 
@@ -372,9 +374,10 @@ export function adjustVisitScroll(fragmentVisit: FragmentVisit, scroll: VisitScr
  */
 export function queryFragmentElement(fragmentSelector: string, swup: Swup): FragmentElement | null {
 	for (const containerSelector of swup.options.containers) {
-		const fragment = document
-			.querySelector(containerSelector)
-			?.querySelector<FragmentElement>(fragmentSelector);
+		const container = document.querySelector(containerSelector);
+		if (container?.matches(fragmentSelector)) return container;
+
+		const fragment = container?.querySelector<FragmentElement>(fragmentSelector);
 		if (fragment) return fragment;
 	}
 	return null;
