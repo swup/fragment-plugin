@@ -133,7 +133,7 @@ export const getFragmentVisitContainers = (
 		if (elementIsOutOfBounds(el, visit)) {
 			if (__DEV__) {
 				// prettier-ignore
-				logger?.warn(`ignoring fragment ${highlight(selector)} as it is outside of swup's default containers:`, el);
+				logger?.warn(`ignoring fragment ${highlight(selector)} as it is outside of the visit's default containers:`, el);
 			}
 			return false;
 		}
