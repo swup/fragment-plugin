@@ -198,6 +198,7 @@ Required, Type: `string[]` – Selectors of containers to be replaced if the vis
 - **only IDs and no nested selectors are allowed**. `#my-element` is valid, while
 `.my-element` or `#wrap #child` both will throw an error.
 - if **any** of the selectors in `containers` doesn't return a match in the current document, the rule will be skipped.
+- Fragment containers **must be children** of swup's main `containers`. Otherwise, they will be ignored.
 
 #### rule.name
 
