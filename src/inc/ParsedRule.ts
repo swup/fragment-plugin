@@ -126,7 +126,7 @@ export default class ParsedRule {
 	validateFragmentSelectorForMatch(selector: string): true | Error {
 		if (!document.querySelector(selector)) {
 			// prettier-ignore
-			return new Error(`skipping rule since ${highlight(selector)} doesn't exist in document`);
+			return new Error(`skipping rule since ${highlight(selector)} doesn't exist in the current document`);
 		}
 		if (!queryFragmentElement(selector, this.swup)) {
 			// prettier-ignore
