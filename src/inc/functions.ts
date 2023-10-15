@@ -55,6 +55,7 @@ function handleLinksToFragments({ logger, swup }: FragmentPlugin): void {
 		if (!fragment) {
 			if (__DEV__) {
 				logger?.log(
+					// prettier-ignore
 					`ignoring ${highlight(`[${targetAttribute}="${selector}"]`)} since ${highlight(selector)} is missing`
 				);
 			}
