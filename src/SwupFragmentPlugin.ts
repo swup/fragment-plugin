@@ -84,6 +84,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	unmount() {
 		super.unmount();
 		this.swup.getFragmentVisit = undefined;
+		this.rules = [];
 		cleanupFragmentElements();
 	}
 
