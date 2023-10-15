@@ -5,11 +5,12 @@ import {
 	handlePageView,
 	cleanupFragmentElements,
 	getFirstMatchingRule,
-	getContainersForVisit
+	getFragmentVisitContainers
 } from './inc/functions.js';
 import type { Options, Route, FragmentVisit } from './inc/defs.js';
 import * as handlers from './inc/handlers.js';
 import { __DEV__ } from './inc/env.js';
+import type { Visit } from 'swup';
 
 type RequireKeys<T, K extends keyof T> = Partial<T> & Pick<T, K>;
 type InitOptions = RequireKeys<Options, 'rules'>;
@@ -89,14 +90,14 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Get the fragment visit object for a given route
 	 */
-	getFragmentVisit(route: Route): FragmentVisit | undefined {
+	getFragmentVisit(route: Route, visit?: Visit): FragmentVisit | undefined {
 		const rule = getFirstMatchingRule(route, this.rules);
 
 		// Bail early if no rule matched
 		if (!rule) return;
 
 		// Get containers that should be replaced for this visit
-		const containers = getContainersForVisit(route, rule.containers, this.logger);
+		const containers = getFragmentVisitContainers(route, rule.containers, visit, this.logger);
 		// Bail early if there are no containers to be replaced for this visit
 		if (!containers.length) return;
 

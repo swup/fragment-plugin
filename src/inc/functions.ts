@@ -114,21 +114,34 @@ function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void 
 /**
  * Get all containers that should be replaced for a given visit's route
  */
-export const getContainersForVisit = (route: Route, selectors: string[], logger?: Logger) => {
+export const getFragmentVisitContainers = (
+	route: Route,
+	selectors: string[],
+	visit?: Visit,
+	logger?: Logger
+) => {
 	const isReload = isEqualUrl(route.from, route.to);
 
 	return selectors.filter((selector) => {
-		const el = document.querySelector(selector) as FragmentElement;
+		const el = document.querySelector<FragmentElement>(selector);
 
 		if (!el) {
 			if (__DEV__) logger?.log(`fragment "${selector}" missing in current document`);
 			return false;
 		}
 
+		if (elementIsOutOfBounds(el, visit)) {
+			if (__DEV__) {
+				// prettier-ignore
+				logger?.warn(`ignoring fragment ${highlight(selector)} as it is outside of swup's default containers:`, el);
+			}
+			return false;
+		}
+
 		if (!isReload && elementMatchesFragmentUrl(el, route.to)) {
 			if (__DEV__)
 				// prettier-ignore
-				logger?.log(`ignored fragment ${highlight(selector)} as it already matches the current URL`);
+				logger?.log(`ignoring fragment ${highlight(selector)} as it already matches the current URL`);
 			return false;
 		}
 
@@ -344,4 +357,16 @@ export function adjustVisitScroll(fragmentVisit: FragmentVisit, scroll: VisitScr
 		return { ...scroll, target: fragmentVisit.scroll };
 	}
 	return scroll;
+}
+
+/**
+ * Checks if a fragment element is inside of a visit's main containers
+ *
+ * Note: This check is not fully bullet-proof, as it only checks if
+ * any an element's parents match the one of the selectors. But it
+ * should catch most cases.
+ */
+function elementIsOutOfBounds(el: FragmentElement, visit?: Visit): boolean {
+	if (!visit) return false;
+	return !visit.containers.some((selector) => el.closest(selector) !== null);
 }
