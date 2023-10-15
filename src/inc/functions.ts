@@ -1,4 +1,4 @@
-import { Location } from 'swup';
+import Swup, { Location } from 'swup';
 import type { Visit, VisitScroll } from 'swup';
 import type { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
 import type { Route, FragmentVisit, FragmentElement } from './defs.js';
@@ -118,7 +118,7 @@ function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void 
 export const getFragmentVisitContainers = (
 	route: Route,
 	selectors: string[],
-	visit?: Visit,
+	swup: Swup,
 	logger?: Logger
 ) => {
 	const isReload = isEqualUrl(route.from, route.to);
@@ -131,10 +131,10 @@ export const getFragmentVisitContainers = (
 			return false;
 		}
 
-		if (elementIsOutOfBounds(el, visit)) {
+		if (fragmentIsOutOfBounds(selector, swup)) {
 			if (__DEV__) {
 				// prettier-ignore
-				logger?.warn(`ignoring fragment ${highlight(selector)} as it is outside of the visit's default containers:`, el);
+				logger?.warn(`ignoring fragment ${highlight(selector)} as it is outside of swup's default containers:`, el);
 			}
 			return false;
 		}
@@ -361,13 +361,10 @@ export function adjustVisitScroll(fragmentVisit: FragmentVisit, scroll: VisitScr
 }
 
 /**
- * Checks if a fragment element is inside of a visit's main containers
- *
- * Note: This check is not fully bullet-proof, as it only checks if
- * any an element's parents match the one of the selectors. But it
- * should catch most cases.
+ * Checks if a fragment element is outside of a swup's main containers
  */
-function elementIsOutOfBounds(el: FragmentElement, visit?: Visit): boolean {
-	if (!visit) return false;
-	return !visit.containers.some((selector) => el.closest(selector) !== null);
+function fragmentIsOutOfBounds(fragmentSelector: string, swup: Swup): boolean {
+	return !swup.options.containers.find(containerSelector => {
+		return document.querySelector(containerSelector)?.querySelector(fragmentSelector);
+	});
 }

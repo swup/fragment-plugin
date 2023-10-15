@@ -90,14 +90,14 @@ export default class SwupFragmentPlugin extends PluginBase {
 	/**
 	 * Get the fragment visit object for a given route
 	 */
-	getFragmentVisit(route: Route, visit?: Visit): FragmentVisit | undefined {
+	getFragmentVisit(route: Route): FragmentVisit | undefined {
 		const rule = getFirstMatchingRule(route, this.rules);
 
 		// Bail early if no rule matched
 		if (!rule) return;
 
 		// Get containers that should be replaced for this visit
-		const containers = getFragmentVisitContainers(route, rule.containers, visit, this.logger);
+		const containers = getFragmentVisitContainers(route, rule.containers, this.swup, this.logger);
 		// Bail early if there are no containers to be replaced for this visit
 		if (!containers.length) return;
 
