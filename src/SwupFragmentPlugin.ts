@@ -45,11 +45,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 		if (__DEV__) {
 			if (this.options.debug) this.logger = new Logger();
 		}
-
-		this.rules = this.options.rules.map(
-			({ from, to, containers, name, scroll, focus }) =>
-				new ParsedRule(from, to, containers, name, scroll, focus, this.logger)
-		);
 	}
 
 	/**
@@ -57,6 +52,11 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 */
 	mount() {
 		const swup = this.swup;
+
+		this.rules = this.options.rules.map(
+			({ from, to, containers, name, scroll, focus }) =>
+				new ParsedRule(from, to, containers, name, scroll, focus, this.logger)
+		);
 
 		this.before('link:self', handlers.onLinkToSelf);
 		this.on('visit:start', handlers.onVisitStart);
