@@ -1,9 +1,10 @@
-import { matchPath, classify, Location } from 'swup';
+import Swup, { matchPath, classify, Location } from 'swup';
 import type { Path } from 'swup';
 import type { Route } from './defs.js';
-import { dedupe } from './functions.js';
+import { dedupe, fragmentIsOutOfBounds, queryFragmentElement } from './functions.js';
 import Logger, { highlight } from './Logger.js';
 import { __DEV__ } from './env.js';
+import type SwupFragmentPlugin from '../SwupFragmentPlugin.js';
 
 /**
  * Represents a Rule
@@ -12,6 +13,7 @@ export default class ParsedRule {
 	readonly matchesFrom;
 	readonly matchesTo;
 
+	swup: Swup;
 	from: Path;
 	to: Path;
 	containers: string[];
@@ -21,6 +23,7 @@ export default class ParsedRule {
 	logger?: Logger;
 
 	constructor(
+		{ swup }: SwupFragmentPlugin,
 		from: Path,
 		to: Path,
 		rawContainers: string[],
@@ -29,6 +32,7 @@ export default class ParsedRule {
 		focus?: boolean | string,
 		logger?: Logger
 	) {
+		this.swup = swup;
 		this.logger = logger;
 		this.from = from || '';
 		this.to = to || '';
@@ -73,10 +77,20 @@ export default class ParsedRule {
 	 * - no nested selectors
 	 */
 	validateSelector(selector: string): true | Error {
-		if (!selector.startsWith('#'))
+		if (!selector.startsWith('#')) {
 			return new Error(`fragment selectors must be IDs: ${selector}`);
-		if (selector.match(/\s|>/))
+		}
+
+		if (selector.match(/\s|>/)) {
 			return new Error(`fragment selectors must not be nested: ${selector}`);
+		}
+
+		if (fragmentIsOutOfBounds(selector, this.swup)) {
+			return new Error(
+				`${highlight(selector)} is outside of swup's default containers`
+			);
+		}
+
 		return true;
 	}
 
@@ -103,12 +117,12 @@ export default class ParsedRule {
 		if (!matches) return false;
 
 		/** Don't match if any of the selectors doesn't match an element */
-		const missingContainers = this.containers.filter(
-			(selector) => !document.querySelector(selector)
+		const missingFragmentElements = this.containers.filter(
+			(selector) => !queryFragmentElement(selector, this.swup)
 		);
-		if (missingContainers.length) {
+		if (missingFragmentElements.length) {
 			if (__DEV__) {
-				missingContainers.forEach((selector) => {
+				missingFragmentElements.forEach((selector) => {
 					this.logger?.log(
 						// prettier-ignore
 						`skipping rule since ${highlight(selector)} didn't match anything:`,

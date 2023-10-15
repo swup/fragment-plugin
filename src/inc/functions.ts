@@ -51,12 +51,12 @@ function handleLinksToFragments({ logger, swup }: FragmentPlugin): void {
 			return;
 		}
 
-		const fragment = document.querySelector(selector) as FragmentElement;
+		const fragment = queryFragmentElement(selector, swup);
 		if (!fragment) {
 			if (__DEV__) {
 				logger?.log(
 					// prettier-ignore
-					`ignoring ${highlight(`[${targetAttribute}="${selector}"]`)} since ${highlight(selector)} is missing`
+					`ignoring ${highlight(`[${targetAttribute}="${selector}"]`)} as ${highlight(selector)} is missing`
 				);
 			}
 			return;
@@ -89,11 +89,12 @@ function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void 
 		.filter((rule) => rule.matchesFrom(currentUrl) || rule.matchesTo(currentUrl))
 		.forEach((rule) => {
 			rule.containers.forEach((selector) => {
-				const el = document.querySelector(
-					`${selector}:not([data-swup-fragment])`
-				) as FragmentElement | null;
+				const el = queryFragmentElement(`${selector}:not([data-swup-fragment])`, swup);
+
 				// No element
 				if (!el) return;
+
+				// Parse a provided fragment URL
 				const providedFragmentUrl = el.getAttribute('data-swup-fragment-url');
 				if (providedFragmentUrl) {
 					if (__DEV__) {
@@ -101,11 +102,13 @@ function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void 
 						logger?.log(`fragment url ${highlight(providedFragmentUrl)} for ${highlight(selector)} provided by server`);
 					}
 				}
+
 				// Get the fragment URL
 				const { url } = Location.fromUrl(providedFragmentUrl || currentUrl);
-				// el.removeAttribute('data-swup-fragment-url');
+
 				// Mark the element as a fragment
 				el.setAttribute('data-swup-fragment', '');
+
 				// Augment the element with the necessary properties
 				el.__swupFragment = { url, selector };
 			});
@@ -134,7 +137,7 @@ export const getFragmentVisitContainers = (
 		if (fragmentIsOutOfBounds(selector, swup)) {
 			if (__DEV__) {
 				// prettier-ignore
-				logger?.warn(`ignoring fragment ${highlight(selector)} as it is outside of swup's default containers:`, el);
+				logger?.error(`ignoring ${highlight(selector)} as it is outside of swup's default containers`);
 			}
 			return false;
 		}
@@ -254,7 +257,11 @@ export const cacheForeignFragmentElements = ({ swup, logger }: FragmentPlugin): 
 	// debug info
 	const updatedFragments: FragmentElement[] = [];
 
-	// We only want to handle fragment elements that don't fit the current URL
+	/**
+	 * We only want to handle fragment elements that
+	 *  - are not templates
+	 *  - don't fit the current URL
+	 */
 	const foreignFragmentElements = Array.from(
 		document.querySelectorAll<FragmentElement>('[data-swup-fragment]')
 	).filter((el) => {
@@ -336,7 +343,7 @@ export function shouldSkipAnimation({ swup }: FragmentPlugin): boolean {
 	if (!fragmentVisit) return false;
 
 	return fragmentVisit.containers.every((selector) => {
-		return document.querySelector(selector)?.tagName?.toLowerCase() === 'template';
+		return document.querySelector<FragmentElement>(selector)?.tagName?.toLowerCase() === 'template';
 	});
 }
 
@@ -361,10 +368,24 @@ export function adjustVisitScroll(fragmentVisit: FragmentVisit, scroll: VisitScr
 }
 
 /**
+ * Queries a fragment element, only looking inside swup's containers
+ */
+export function queryFragmentElement(fragmentSelector: string, swup: Swup): FragmentElement | null {
+	for (const containerSelector of swup.options.containers) {
+		const fragment = document
+			.querySelector(containerSelector)
+			?.querySelector<FragmentElement>(fragmentSelector);
+		if (fragment) return fragment;
+	}
+	return null;
+}
+
+/**
  * Checks if a fragment element is outside of a swup's main containers
  */
-function fragmentIsOutOfBounds(fragmentSelector: string, swup: Swup): boolean {
-	return !swup.options.containers.find(containerSelector => {
-		return document.querySelector(containerSelector)?.querySelector(fragmentSelector);
-	});
+export function fragmentIsOutOfBounds(selector: string, swup: Swup): boolean {
+	/** Only check if the element exists at all */
+	if (!document.querySelector(selector)) return false;
+
+	return !queryFragmentElement(selector, swup);
 }

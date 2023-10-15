@@ -55,7 +55,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 		this.rules = this.options.rules.map(
 			({ from, to, containers, name, scroll, focus }) =>
-				new ParsedRule(from, to, containers, name, scroll, focus, this.logger)
+				new ParsedRule(this, from, to, containers, name, scroll, focus, this.logger)
 		);
 
 		this.before('link:self', handlers.onLinkToSelf);
