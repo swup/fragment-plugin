@@ -57,17 +57,17 @@ export default class ParsedRule {
 	 */
 	parseContainers(rawContainers: string[]): string[] {
 		if (!Array.isArray(rawContainers)) {
-			if (__DEV__)
-				this.logger?.error(`Every fragment rule must contain an array of containers`, this);
+			// prettier-ignore
+			if (__DEV__) this.logger?.error(`Every fragment rule must contain an array of containers`, this);
 			return [];
 		}
 		// trim selectors
-		const containers = rawContainers.map((selector) => selector.trim());
+		const containers = dedupe(rawContainers.map((selector) => selector.trim()));
 		containers.forEach((selector) => {
 			const result = this.validateSelector(selector);
 			this.logger?.errorIf(result instanceof Error, result);
 		});
-		return dedupe(containers);
+		return containers;
 	}
 
 	/**
@@ -75,7 +75,6 @@ export default class ParsedRule {
 	 *
 	 * - only IDs are allowed
 	 * - no nested selectors
-	 * - no fragments outside of swup's default containers
 	 */
 	validateSelector(selector: string): true | Error {
 		if (!selector.startsWith('#')) {
@@ -85,11 +84,6 @@ export default class ParsedRule {
 		if (selector.match(/\s|>/)) {
 			return new Error(`fragment selectors must not be nested: ${selector}`);
 		}
-
-		if (document.querySelector(selector) && !queryFragmentElement(selector, this.swup)) {
-			return new Error(`${highlight(selector)} is outside of swup's default containers`);
-		}
-
 		return true;
 	}
 
@@ -112,26 +106,32 @@ export default class ParsedRule {
 		const { url: fromUrl } = Location.fromUrl(route.from);
 		const { url: toUrl } = Location.fromUrl(route.to);
 
-		const matches = !!this.matchesFrom(fromUrl) && !!this.matchesTo(toUrl);
-		if (!matches) return false;
+		const matchesRoute = !!this.matchesFrom(fromUrl) && !!this.matchesTo(toUrl);
+		if (!matchesRoute) return false;
 
-		/** Don't match if any of the selectors doesn't match an element */
-		const missingFragmentElements = this.containers.filter(
-			(selector) => !queryFragmentElement(selector, this.swup)
-		);
-		if (missingFragmentElements.length) {
-			if (__DEV__) {
-				missingFragmentElements.forEach((selector) => {
-					this.logger?.log(
-						// prettier-ignore
-						`skipping rule since ${highlight(selector)} didn't match anything:`,
-						this.getDebugInfo()
-					);
-				});
+		for (const selector of this.containers) {
+			const result = this.validateFragmentSelectorForMatch(selector);
+			if (result instanceof Error) {
+				if (__DEV__) this.logger?.error(result, this.getDebugInfo());
+				return false;
 			}
-			return false;
 		}
 
+		return true;
+	}
+
+	/**
+	 * Validates a fragment element at runtime when this rule's route matches
+	 */
+	validateFragmentSelectorForMatch(selector: string): true | Error {
+		if (!document.querySelector(selector)) {
+			// prettier-ignore
+			return new Error(`skipping rule since ${highlight(selector)} doesn't exist in document`);
+		}
+		if (!queryFragmentElement(selector, this.swup)) {
+			// prettier-ignore
+			return new Error(`skipping rule since ${highlight(selector)} is outside of swup's default containers`);
+		}
 		return true;
 	}
 }
