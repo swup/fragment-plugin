@@ -98,7 +98,12 @@ export default class SwupFragmentPlugin extends PluginBase {
 		if (!rule) return;
 
 		// Get containers that should be replaced for this visit
-		const containers = getFragmentVisitContainers(route, rule.containers, this.swup, this.logger);
+		const containers = getFragmentVisitContainers(
+			route,
+			rule.containers,
+			this.swup,
+			this.logger
+		);
 		// Bail early if there are no containers to be replaced for this visit
 		if (!containers.length) return;
 
