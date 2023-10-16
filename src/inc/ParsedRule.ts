@@ -1,5 +1,5 @@
-import Swup, { matchPath, classify, Location } from 'swup';
-import type { Path } from 'swup';
+import { matchPath, classify, Location } from 'swup';
+import type { Swup, Path } from 'swup';
 import type { Route } from './defs.js';
 import { dedupe, queryFragmentElement } from './functions.js';
 import Logger, { highlight } from './Logger.js';
