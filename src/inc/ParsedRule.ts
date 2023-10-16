@@ -1,9 +1,10 @@
-import { matchPath, classify, Location } from 'swup';
+import Swup, { matchPath, classify, Location } from 'swup';
 import type { Path } from 'swup';
 import type { Route } from './defs.js';
-import { dedupe } from './functions.js';
+import { dedupe, queryFragmentElement } from './functions.js';
 import Logger, { highlight } from './Logger.js';
 import { __DEV__ } from './env.js';
+import type SwupFragmentPlugin from '../SwupFragmentPlugin.js';
 
 /**
  * Represents a Rule
@@ -12,6 +13,7 @@ export default class ParsedRule {
 	readonly matchesFrom;
 	readonly matchesTo;
 
+	swup: Swup;
 	from: Path;
 	to: Path;
 	containers: string[];
@@ -21,6 +23,7 @@ export default class ParsedRule {
 	logger?: Logger;
 
 	constructor(
+		{ swup }: SwupFragmentPlugin,
 		from: Path,
 		to: Path,
 		rawContainers: string[],
@@ -29,6 +32,7 @@ export default class ParsedRule {
 		focus?: boolean | string,
 		logger?: Logger
 	) {
+		this.swup = swup;
 		this.logger = logger;
 		this.from = from || '';
 		this.to = to || '';
@@ -53,17 +57,17 @@ export default class ParsedRule {
 	 */
 	parseContainers(rawContainers: string[]): string[] {
 		if (!Array.isArray(rawContainers)) {
-			if (__DEV__)
-				this.logger?.error(`Every fragment rule must contain an array of containers`, this);
+			// prettier-ignore
+			if (__DEV__) this.logger?.error(`Every fragment rule must contain an array of containers`, this);
 			return [];
 		}
 		// trim selectors
-		const containers = rawContainers.map((selector) => selector.trim());
+		const containers = dedupe(rawContainers.map((selector) => selector.trim()));
 		containers.forEach((selector) => {
 			const result = this.validateSelector(selector);
 			this.logger?.errorIf(result instanceof Error, result);
 		});
-		return dedupe(containers);
+		return containers;
 	}
 
 	/**
@@ -73,10 +77,13 @@ export default class ParsedRule {
 	 * - no nested selectors
 	 */
 	validateSelector(selector: string): true | Error {
-		if (!selector.startsWith('#'))
+		if (!selector.startsWith('#')) {
 			return new Error(`fragment selectors must be IDs: ${selector}`);
-		if (selector.match(/\s|>/))
+		}
+
+		if (selector.match(/\s|>/)) {
 			return new Error(`fragment selectors must not be nested: ${selector}`);
+		}
 		return true;
 	}
 
@@ -99,26 +106,32 @@ export default class ParsedRule {
 		const { url: fromUrl } = Location.fromUrl(route.from);
 		const { url: toUrl } = Location.fromUrl(route.to);
 
-		const matches = !!this.matchesFrom(fromUrl) && !!this.matchesTo(toUrl);
-		if (!matches) return false;
+		const matchesRoute = !!this.matchesFrom(fromUrl) && !!this.matchesTo(toUrl);
+		if (!matchesRoute) return false;
 
-		/** Don't match if any of the selectors doesn't match an element */
-		const missingContainers = this.containers.filter(
-			(selector) => !document.querySelector(selector)
-		);
-		if (missingContainers.length) {
-			if (__DEV__) {
-				missingContainers.forEach((selector) => {
-					this.logger?.log(
-						// prettier-ignore
-						`skipping rule since ${highlight(selector)} didn't match anything:`,
-						this.getDebugInfo()
-					);
-				});
+		for (const selector of this.containers) {
+			const result = this.validateFragmentSelectorForMatch(selector);
+			if (result instanceof Error) {
+				if (__DEV__) this.logger?.error(result, this.getDebugInfo());
+				return false;
 			}
-			return false;
 		}
 
+		return true;
+	}
+
+	/**
+	 * Validates a fragment element at runtime when this rule's route matches
+	 */
+	validateFragmentSelectorForMatch(selector: string): true | Error {
+		if (!document.querySelector(selector)) {
+			// prettier-ignore
+			return new Error(`skipping rule since ${highlight(selector)} doesn't exist in the current document`);
+		}
+		if (!queryFragmentElement(selector, this.swup)) {
+			// prettier-ignore
+			return new Error(`skipping rule since ${highlight(selector)} is outside of swup's default containers`);
+		}
 		return true;
 	}
 }

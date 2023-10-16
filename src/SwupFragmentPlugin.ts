@@ -5,11 +5,12 @@ import {
 	handlePageView,
 	cleanupFragmentElements,
 	getFirstMatchingRule,
-	getContainersForVisit
+	getFragmentVisitContainers
 } from './inc/functions.js';
 import type { Options, Route, FragmentVisit } from './inc/defs.js';
 import * as handlers from './inc/handlers.js';
 import { __DEV__ } from './inc/env.js';
+import type { Visit } from 'swup';
 
 type RequireKeys<T, K extends keyof T> = Partial<T> & Pick<T, K>;
 type InitOptions = RequireKeys<Options, 'rules'>;
@@ -44,11 +45,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 		if (__DEV__) {
 			if (this.options.debug) this.logger = new Logger();
 		}
-
-		this.rules = this.options.rules.map(
-			({ from, to, containers, name, scroll, focus }) =>
-				new ParsedRule(from, to, containers, name, scroll, focus, this.logger)
-		);
 	}
 
 	/**
@@ -56,6 +52,11 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 */
 	mount() {
 		const swup = this.swup;
+
+		this.rules = this.options.rules.map(
+			({ from, to, containers, name, scroll, focus }) =>
+				new ParsedRule(this, from, to, containers, name, scroll, focus, this.logger)
+		);
 
 		this.before('link:self', handlers.onLinkToSelf);
 		this.on('visit:start', handlers.onVisitStart);
@@ -83,6 +84,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	unmount() {
 		super.unmount();
 		this.swup.getFragmentVisit = undefined;
+		this.rules = [];
 		cleanupFragmentElements();
 	}
 
@@ -96,7 +98,12 @@ export default class SwupFragmentPlugin extends PluginBase {
 		if (!rule) return;
 
 		// Get containers that should be replaced for this visit
-		const containers = getContainersForVisit(route, rule.containers, this.logger);
+		const containers = getFragmentVisitContainers(
+			route,
+			rule.containers,
+			this.swup,
+			this.logger
+		);
 		// Bail early if there are no containers to be replaced for this visit
 		if (!containers.length) return;
 

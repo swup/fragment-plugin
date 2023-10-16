@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.3.4] - 2023-10-15
+
+- Ignore fragment elements that are not children of swup's default `containers`
+
 ## [0.3.3] - 2023-10-05
 
 - Refactor exports
@@ -43,6 +47,7 @@
 
 - Initial Release
 
+[0.3.4]: https://github.com/swup/fragment-plugin/releases/tag/0.3.4
 [0.3.3]: https://github.com/swup/fragment-plugin/releases/tag/0.3.3
 [0.3.2]: https://github.com/swup/fragment-plugin/releases/tag/0.3.2
 [0.3.1]: https://github.com/swup/fragment-plugin/releases/tag/0.3.1

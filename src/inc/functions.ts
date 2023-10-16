@@ -1,4 +1,4 @@
-import { Location } from 'swup';
+import Swup, { Location } from 'swup';
 import type { Visit, VisitScroll } from 'swup';
 import type { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
 import type { Route, FragmentVisit, FragmentElement } from './defs.js';
@@ -51,9 +51,14 @@ function handleLinksToFragments({ logger, swup }: FragmentPlugin): void {
 			return;
 		}
 
-		const fragment = document.querySelector(selector) as FragmentElement;
+		const fragment = queryFragmentElement(selector, swup);
 		if (!fragment) {
-			if (__DEV__) logger?.warn(`no element found for [${targetAttribute}="${selector}"]`);
+			if (__DEV__) {
+				logger?.log(
+					// prettier-ignore
+					`ignoring ${highlight(`[${targetAttribute}="${selector}"]`)} as ${highlight(selector)} is missing`
+				);
+			}
 			return;
 		}
 
@@ -84,11 +89,12 @@ function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void 
 		.filter((rule) => rule.matchesFrom(currentUrl) || rule.matchesTo(currentUrl))
 		.forEach((rule) => {
 			rule.containers.forEach((selector) => {
-				const el = document.querySelector(
-					`${selector}:not([data-swup-fragment])`
-				) as FragmentElement | null;
+				const el = queryFragmentElement(`${selector}:not([data-swup-fragment])`, swup);
+
 				// No element
 				if (!el) return;
+
+				// Parse a provided fragment URL
 				const providedFragmentUrl = el.getAttribute('data-swup-fragment-url');
 				if (providedFragmentUrl) {
 					if (__DEV__) {
@@ -96,11 +102,13 @@ function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void 
 						logger?.log(`fragment url ${highlight(providedFragmentUrl)} for ${highlight(selector)} provided by server`);
 					}
 				}
+
 				// Get the fragment URL
 				const { url } = Location.fromUrl(providedFragmentUrl || currentUrl);
-				// el.removeAttribute('data-swup-fragment-url');
+
 				// Mark the element as a fragment
 				el.setAttribute('data-swup-fragment', '');
+
 				// Augment the element with the necessary properties
 				el.__swupFragment = { url, selector };
 			});
@@ -110,21 +118,34 @@ function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void 
 /**
  * Get all containers that should be replaced for a given visit's route
  */
-export const getContainersForVisit = (route: Route, selectors: string[], logger?: Logger) => {
+export const getFragmentVisitContainers = (
+	route: Route,
+	selectors: string[],
+	swup: Swup,
+	logger?: Logger
+) => {
 	const isReload = isEqualUrl(route.from, route.to);
 
 	return selectors.filter((selector) => {
-		const el = document.querySelector(selector) as FragmentElement;
+		const el = document.querySelector<FragmentElement>(selector);
 
 		if (!el) {
-			if (__DEV__) logger?.log(`fragment "${selector}" missing in current document`);
+			if (__DEV__) logger?.log(`${highlight(selector)} missing in current document`);
+			return false;
+		}
+
+		if (!queryFragmentElement(selector, swup)) {
+			if (__DEV__) {
+				// prettier-ignore
+				logger?.error(`${highlight(selector)} is outside of swup's default containers`);
+			}
 			return false;
 		}
 
 		if (!isReload && elementMatchesFragmentUrl(el, route.to)) {
 			if (__DEV__)
 				// prettier-ignore
-				logger?.log(`ignored fragment ${highlight(selector)} as it already matches the current URL`);
+				logger?.log(`ignoring fragment ${highlight(selector)} as it already matches the current URL`);
 			return false;
 		}
 
@@ -236,7 +257,11 @@ export const cacheForeignFragmentElements = ({ swup, logger }: FragmentPlugin): 
 	// debug info
 	const updatedFragments: FragmentElement[] = [];
 
-	// We only want to handle fragment elements that don't fit the current URL
+	/**
+	 * We only want to handle fragment elements that
+	 *  - are not templates
+	 *  - don't fit the current URL
+	 */
 	const foreignFragmentElements = Array.from(
 		document.querySelectorAll<FragmentElement>('[data-swup-fragment]')
 	).filter((el) => {
@@ -318,7 +343,9 @@ export function shouldSkipAnimation({ swup }: FragmentPlugin): boolean {
 	if (!fragmentVisit) return false;
 
 	return fragmentVisit.containers.every((selector) => {
-		return document.querySelector(selector)?.tagName?.toLowerCase() === 'template';
+		return (
+			document.querySelector<FragmentElement>(selector)?.tagName?.toLowerCase() === 'template'
+		);
 	});
 }
 
@@ -340,4 +367,21 @@ export function adjustVisitScroll(fragmentVisit: FragmentVisit, scroll: VisitScr
 		return { ...scroll, target: fragmentVisit.scroll };
 	}
 	return scroll;
+}
+
+/**
+ * Queries a fragment element. Needs to be either:
+ *
+ * - one of swup's default containers
+ * - inside of one of swup's default containers
+ */
+export function queryFragmentElement(fragmentSelector: string, swup: Swup): FragmentElement | null {
+	for (const containerSelector of swup.options.containers) {
+		const container = document.querySelector(containerSelector);
+		if (container?.matches(fragmentSelector)) return container;
+
+		const fragment = container?.querySelector<FragmentElement>(fragmentSelector);
+		if (fragment) return fragment;
+	}
+	return null;
 }
