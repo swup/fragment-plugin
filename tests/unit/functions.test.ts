@@ -25,7 +25,9 @@ describe('handlePageView()', () => {
 		);
 		handlePageView(fragmentPlugin);
 
-		const [fragment1, fragment2] = [...document.querySelectorAll<FragmentElement>('[data-swup-fragment]')];
+		const [fragment1, fragment2] = [
+			...document.querySelectorAll<FragmentElement>('[data-swup-fragment]')
+		];
 
 		expect(fragment1).toBeDefined();
 		expect(fragment2).toBeDefined();
@@ -68,5 +70,5 @@ describe('handlePageView()', () => {
 		const link = document.querySelector<HTMLAnchorElement>(`a[data-swup-link-to-fragment]`)!;
 
 		expect(link.pathname).toEqual('/other-url/');
-	})
+	});
 });
