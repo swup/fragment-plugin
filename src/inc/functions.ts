@@ -82,7 +82,7 @@ function handleLinksToFragments({ logger, swup }: FragmentPlugin): void {
 /**
  * Adds attributes and properties to fragment elements
  */
-export function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void {
+function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void {
 	const currentUrl = swup.getCurrentUrl();
 
 	rules
