@@ -59,7 +59,9 @@ describe('handlePageView()', () => {
 
 		const link = document.querySelector<HTMLAnchorElement>(`a[data-swup-link-to-fragment]`)!;
 
-		expect(console.log).toBeCalledWith(`fragment url /other-url/ for #fragment-1 provided by server`);
+		expect(console.log).toBeCalledWith(
+			`fragment url /other-url/ for #fragment-1 provided by server`
+		);
 
 		expect(link.pathname).toEqual('/other-url/');
 	});
