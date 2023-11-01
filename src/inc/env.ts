@@ -5,6 +5,7 @@ declare global {
 		process?: any;
 	}
 }
+
 /**
  * Make sure process.env is defined in the browser
  */
@@ -14,4 +15,4 @@ if (!window.process.env) window.process.env = {};
 /**
  * Export the __DEV__ variable. This will become false in production builds from consumers
  */
-export const __DEV__ = process.env.NODE_ENV === 'development';
+export const __DEV__ = ['development', 'test'].includes(String(process.env.NODE_ENV));

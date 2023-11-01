@@ -82,7 +82,7 @@ function handleLinksToFragments({ logger, swup }: FragmentPlugin): void {
 /**
  * Adds attributes and properties to fragment elements
  */
-function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void {
+export function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void {
 	const currentUrl = swup.getCurrentUrl();
 
 	rules
@@ -102,6 +102,7 @@ function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void 
 						logger?.log(`fragment url ${highlight(providedFragmentUrl)} for ${highlight(selector)} provided by server`);
 					}
 				}
+
 
 				// Get the fragment URL
 				const { url } = Location.fromUrl(providedFragmentUrl || currentUrl);
