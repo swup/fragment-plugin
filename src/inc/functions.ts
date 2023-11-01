@@ -32,7 +32,7 @@ function showDialogs({ logger }: FragmentPlugin): void {
 			if (el.__swupFragment.modalShown) return;
 			el.__swupFragment.modalShown = true;
 			el.removeAttribute('open');
-			el.showModal();
+			el.showModal?.();
 		});
 }
 
@@ -102,7 +102,6 @@ export function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin)
 						logger?.log(`fragment url ${highlight(providedFragmentUrl)} for ${highlight(selector)} provided by server`);
 					}
 				}
-
 
 				// Get the fragment URL
 				const { url } = Location.fromUrl(providedFragmentUrl || currentUrl);
