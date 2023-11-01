@@ -51,7 +51,7 @@ describe('handlePageView()', () => {
 				{
 					from: '(.*)',
 					to: '(.*)',
-					containers: ['#fragment-1', '#fragment-2']
+					containers: ['#fragment-1']
 				}
 			]
 		});
