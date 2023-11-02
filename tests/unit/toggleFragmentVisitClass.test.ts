@@ -27,4 +27,20 @@ describe('toggleFragmentVisitClass()', () => {
 		expect(document.querySelector('#fragment-1')?.classList.contains(`to-test`)).toBe(false);
 		expect(document.querySelector('#fragment-2')?.classList.contains(`to-test`)).toBe(false);
 	});
+
+	it('should\'t add classes if the current fragment visit doesn\'t have a \`name\`', () => {
+		stubGlobalDocument(
+			/*html*/ `
+			<div id="swup">
+				<div id="fragment-1"></div>
+			</div>`
+		);
+		const swup = new Swup();
+		const fragmentVisit:FragmentVisit = {
+			containers: ['#fragment-1', '#fragment-2'],
+			scroll: false
+		}
+		toggleFragmentVisitClass(fragmentVisit, true);
+		expect(document.querySelector('#fragment-1')?.classList.contains(`to-test`)).toBe(false);
+	});
 });
