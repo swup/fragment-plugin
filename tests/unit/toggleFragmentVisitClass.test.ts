@@ -5,7 +5,7 @@ import Swup from 'swup';
 import { FragmentVisit } from '../../src/index.js';
 
 describe('toggleFragmentVisitClass()', () => {
-	it('should add a rule\'s name class', () => {
+	it('should toggle a fragment visit\'s name on the classList of all fragment elements', () => {
 		stubGlobalDocument(
 			/*html*/ `
 			<div id="swup">
