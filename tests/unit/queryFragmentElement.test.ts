@@ -14,6 +14,5 @@ describe('queryFragmentElement()', () => {
 		expect(queryFragmentElement('#fragment-1', swup)).toBeDefined();
 		expect(queryFragmentElement('#missing', swup)).toBeUndefined();
 		expect(queryFragmentElement('#fragment-2', swup)).toBeUndefined();
-
 	});
 });
