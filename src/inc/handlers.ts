@@ -102,7 +102,7 @@ export const maybeSkipInAnimation: Handler<'animation:in:await'> = function (
 	visit,
 	args
 ) {
-	if (visit.fragmentVisit && shouldSkipAnimation(this)) {
+	if (visit.fragmentVisit && shouldSkipAnimation(visit.fragmentVisit)) {
 		if (__DEV__)
 			this.logger?.log(
 				`${highlight('in')}-animation skipped for ${highlight(
