@@ -1,10 +1,14 @@
-import { describe, expect, it, vi } from 'vitest';
-import { getPluginInstance, stubGlobalDocument } from './inc/helpers.js';
+import { describe, expect, it, vi, afterEach } from 'vitest';
+import { getPluginInstance, stubGlobalDocument, mockConsole } from './inc/helpers.js';
 import { getFragmentVisitContainers, handlePageView } from '../../src/inc/functions.js';
 import type { FragmentElement } from '../../src/index.js';
 
 describe('getFragmentVisitContainers()', () => {
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
 	it('should get the right fragments', () => {
+		const console = mockConsole();
 		const url = '/page-1/';
 		const fragmentPlugin = getPluginInstance({
 			rules: [
@@ -28,7 +32,6 @@ describe('getFragmentVisitContainers()', () => {
 		handlePageView(fragmentPlugin);
 
 		const f = document.querySelector<FragmentElement>('#fragment-3')!;
-		console.log(f.__swupFragment);
 
 		const visitContainers = getFragmentVisitContainers(
 			{ from: '/page-1/', to: '/page-2/' },

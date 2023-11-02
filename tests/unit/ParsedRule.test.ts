@@ -1,6 +1,7 @@
 import { describe, expect, it, afterEach, vi } from 'vitest';
 import ParsedRule from '../../src/inc/ParsedRule.js';
 import Logger from '../../src/inc/Logger.js';
+import { mockConsole } from './inc/helpers.js';
 import Swup from 'swup';
 
 describe('ParsedRule', () => {
@@ -57,7 +58,7 @@ describe('ParsedRule', () => {
 	});
 
 	it('should log an error if containers is empty', () => {
-		const errorLog = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+		const console = mockConsole();
 		new ParsedRule({
 			from: '(.*)',
 			to: '(.*)',
@@ -65,7 +66,7 @@ describe('ParsedRule', () => {
 			swup: new Swup(),
 			logger: new Logger()
 		});
-		expect(errorLog).toBeCalledWith(
+		expect(console.error).toBeCalledWith(
 			// expect.stringMatching(/^Every fragment rule must contain an array of containers/),
 			'Every fragment rule must contain an array of containers',
 			expect.any(Object)
@@ -73,7 +74,7 @@ describe('ParsedRule', () => {
 	});
 
 	it('should validate container selectors and log errors', () => {
-		const errorLog = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+		const console = mockConsole();
 		new ParsedRule({
 			from: '(.*)',
 			to: '(.*)',
@@ -81,9 +82,9 @@ describe('ParsedRule', () => {
 			swup: new Swup(),
 			logger: new Logger()
 		});
-		expect(errorLog).toBeCalledTimes(2);
+		expect(console.error).toBeCalledTimes(2);
 
-		expect(errorLog).toBeCalledWith(new Error(`fragment selectors must be IDs: .fragment-1`));
-		expect(errorLog).toBeCalledWith(new Error(`fragment selectors must not be nested: #swup #fragment-2`)); // prettier-ignore
+		expect(console.error).toBeCalledWith(new Error(`fragment selectors must be IDs: .fragment-1`));
+		expect(console.error).toBeCalledWith(new Error(`fragment selectors must not be nested: #swup #fragment-2`)); // prettier-ignore
 	});
 });

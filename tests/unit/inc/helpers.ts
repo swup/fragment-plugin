@@ -49,3 +49,20 @@ export const getPluginInstance = (options: Partial<Options> = {}): SwupFragmentP
 	new Swup({ plugins: [fragmentPlugin] });
 	return fragmentPlugin;
 };
+
+/**
+ * Mutes console calls
+ */
+export const mockConsole = (mute: boolean = true) => {
+	const console = {
+		log: vi.spyOn(global.console, 'log'),
+		warn: vi.spyOn(global.console, 'warn'),
+		error: vi.spyOn(global.console, 'error')
+	};
+	if (mute) {
+		for (const method of Object.keys(console)) {
+			console[method] = console[method].mockImplementation(() => undefined);
+		}
+	}
+	return console;
+};

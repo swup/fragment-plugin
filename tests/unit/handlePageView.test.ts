@@ -1,9 +1,12 @@
-import { describe, expect, it, vi } from 'vitest';
-import { getPluginInstance, stubGlobalDocument } from './inc/helpers.js';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getPluginInstance, mockConsole, stubGlobalDocument } from './inc/helpers.js';
 import { handlePageView } from '../../src/inc/functions.js';
 import type { FragmentElement } from '../../src/index.js';
 
 describe('handlePageView()', () => {
+	beforeEach(() => {
+		vi.restoreAllMocks();
+	});
 	it('should prepare fragment elements', () => {
 		const url = '/page/?foo=bar';
 		const containers = ['#fragment-1', '#fragment-2'];
@@ -37,6 +40,7 @@ describe('handlePageView()', () => {
 	});
 
 	it('should handle user-provided data attributes', () => {
+		const console = mockConsole();
 		const url = '/';
 		const fragmentPlugin = getPluginInstance({
 			rules: [
