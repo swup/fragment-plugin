@@ -10,7 +10,6 @@ import {
 import type { Options, Route, FragmentVisit } from './inc/defs.js';
 import * as handlers from './inc/handlers.js';
 import { __DEV__ } from './inc/env.js';
-import type { Visit } from 'swup';
 
 type RequireKeys<T, K extends keyof T> = Partial<T> & Pick<T, K>;
 type InitOptions = RequireKeys<Options, 'rules'>;
@@ -53,10 +52,18 @@ export default class SwupFragmentPlugin extends PluginBase {
 	mount() {
 		const swup = this.swup;
 
-		this.rules = this.options.rules.map(
-			({ from, to, containers, name, scroll, focus }) =>
-				new ParsedRule(this, from, to, containers, name, scroll, focus, this.logger)
-		);
+		this.rules = this.options.rules.map(({ from, to, containers, name, scroll, focus }) => {
+			return new ParsedRule({
+				from,
+				to,
+				containers,
+				name,
+				scroll,
+				focus,
+				logger: this.logger,
+				swup: this.swup
+			});
+		});
 
 		this.before('link:self', handlers.onLinkToSelf);
 		this.on('visit:start', handlers.onVisitStart);

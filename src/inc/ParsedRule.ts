@@ -4,7 +4,17 @@ import type { Route } from './defs.js';
 import { dedupe, queryFragmentElement } from './functions.js';
 import Logger, { highlight } from './Logger.js';
 import { __DEV__ } from './env.js';
-import type SwupFragmentPlugin from '../SwupFragmentPlugin.js';
+
+type Options = {
+	swup: Swup;
+	from: Path;
+	to: Path;
+	containers: string[];
+	name?: string;
+	scroll?: boolean | string;
+	focus?: boolean | string;
+	logger?: Logger;
+};
 
 /**
  * Represents a Rule
@@ -22,43 +32,34 @@ export default class ParsedRule {
 	focus?: boolean | string;
 	logger?: Logger;
 
-	constructor(
-		{ swup }: SwupFragmentPlugin,
-		from: Path,
-		to: Path,
-		rawContainers: string[],
-		name?: string,
-		scroll?: boolean | string,
-		focus?: boolean | string,
-		logger?: Logger
-	) {
-		this.swup = swup;
-		this.logger = logger;
-		this.from = from || '';
-		this.to = to || '';
+	constructor(options: Options) {
+		this.swup = options.swup;
+		this.logger = options.logger;
+		this.from = options.from || '';
+		this.to = options.to || '';
 
-		if (name) this.name = classify(name);
-		if (typeof scroll !== 'undefined') this.scroll = scroll;
-		if (typeof focus !== 'undefined') this.focus = focus;
+		if (options.name) this.name = classify(options.name);
+		if (typeof options.scroll !== 'undefined') this.scroll = options.scroll;
+		if (typeof options.focus !== 'undefined') this.focus = options.focus;
 
-		this.containers = this.parseContainers(rawContainers);
+		this.containers = this.parseContainers(options.containers);
 
 		if (__DEV__) {
-			logger?.errorIf(!to, `Every fragment rule must contain a 'to' path`, this);
-			logger?.errorIf(!from, `Every fragment rule must contain a 'from' path`, this);
+			this.logger?.errorIf(!this.to, `Every fragment rule must contain a 'to' path`, this);
+			this.logger?.errorIf(!this.from, `Every fragment rule must contain a 'from' path`, this);
 		}
 
-		this.matchesFrom = matchPath(from);
-		this.matchesTo = matchPath(to);
+		this.matchesFrom = matchPath(this.from);
+		this.matchesTo = matchPath(this.to);
 	}
 
 	/**
 	 * Parse provided fragment containers
 	 */
 	parseContainers(rawContainers: string[]): string[] {
-		if (!Array.isArray(rawContainers)) {
+		if (!Array.isArray(rawContainers) || !rawContainers.length) {
 			// prettier-ignore
-			if (__DEV__) this.logger?.error(`Every fragment rule must contain an array of containers`, this);
+			if (__DEV__) this.logger?.error(`Every fragment rule must contain an array of containers`, this.getDebugInfo());
 			return [];
 		}
 		// trim selectors
