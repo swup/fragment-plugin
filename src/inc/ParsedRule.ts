@@ -101,7 +101,7 @@ export default class ParsedRule {
 	}
 
 	/**
-	 * Checks if a given route matches a this rule
+	 * Checks if a given route matches this rule
 	 */
 	public matches(route: Route): boolean {
 		const { url: fromUrl } = Location.fromUrl(route.from);
