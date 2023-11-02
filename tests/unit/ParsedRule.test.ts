@@ -117,6 +117,5 @@ describe('ParsedRule', () => {
 		stubGlobalDocument(/*html*/ `<div id="swup"></div><div id="fragment-1"></div>`);
 		expect(rule.matches({ from: '/foo/', to: '/bar/' })).toBe(false);
 		expect(console.error).toBeCalledWith(new Error('skipping rule since #fragment-1 is outside of swup\'s default containers'), expect.any(Object)) // prettier-ignore
-
 	});
 });
