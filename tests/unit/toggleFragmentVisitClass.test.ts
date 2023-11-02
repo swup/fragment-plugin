@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { applyRuleNameClass } from '../../src/inc/functions.js';
+import { toggleFragmentVisitClass } from '../../src/inc/functions.js';
 import { stubGlobalDocument } from './inc/helpers.js';
 import Swup from 'swup';
+import { FragmentVisit } from '../../src/index.js';
 
-describe('applyRuleNameClass()', () => {
+describe('toggleFragmentVisitClass()', () => {
 	it('should add a rule\'s name class', () => {
 		stubGlobalDocument(
 			/*html*/ `
@@ -13,18 +14,16 @@ describe('applyRuleNameClass()', () => {
 			</div>`
 		);
 		const swup = new Swup();
-		// @ts-expect-error createVisit is protected
-		const visit = swup.createVisit({});
-		visit.fragmentVisit = {
+		const fragmentVisit:FragmentVisit = {
 			name: 'test',
 			containers: ['#fragment-1', '#fragment-2'],
 			scroll: false
 		}
-		applyRuleNameClass(visit, 'add');
+		toggleFragmentVisitClass(fragmentVisit, true);
 		expect(document.querySelector('#fragment-1')?.classList.contains(`to-test`)).toBe(true);
 		expect(document.querySelector('#fragment-2')?.classList.contains(`to-test`)).toBe(true);
 
-		applyRuleNameClass(visit, 'remove');
+		toggleFragmentVisitClass(fragmentVisit, false);
 		expect(document.querySelector('#fragment-1')?.classList.contains(`to-test`)).toBe(false);
 		expect(document.querySelector('#fragment-2')?.classList.contains(`to-test`)).toBe(false);
 	});

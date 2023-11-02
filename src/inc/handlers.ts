@@ -5,7 +5,7 @@ import type { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
 import {
 	handlePageView,
 	getRoute,
-	applyRuleNameClass,
+	toggleFragmentVisitClass,
 	getFirstMatchingRule,
 	cacheForeignFragmentElements,
 	shouldSkipAnimation,
@@ -72,7 +72,7 @@ export const onVisitStart: Handler<'visit:start'> = async function (this: Fragme
 	// Overwrite the animationSelector for this visit
 	visit.animation.selector = visit.fragmentVisit.containers.join(',');
 
-	applyRuleNameClass(visit, 'add');
+	toggleFragmentVisitClass(fragmentVisit, true);
 };
 
 /**
@@ -138,7 +138,7 @@ export const beforeContentReplace: Handler<'content:replace'> = function (
  * Runs after the content was replaced
  */
 export const onContentReplace: Handler<'content:replace'> = function (this: FragmentPlugin, visit) {
-	applyRuleNameClass(visit, 'add');
+	toggleFragmentVisitClass(visit.fragmentVisit, true);
 	handlePageView(this);
 	cacheForeignFragmentElements(this);
 };
@@ -147,5 +147,5 @@ export const onContentReplace: Handler<'content:replace'> = function (this: Frag
  * Remove possible fragment rule names from fragment elements
  */
 export const onVisitEnd: Handler<'visit:end'> = function (this: FragmentPlugin, visit) {
-	applyRuleNameClass(visit, 'remove');
+	toggleFragmentVisitClass(visit.fragmentVisit, false);
 };

@@ -214,13 +214,13 @@ export const getRoute = (visit: Visit): Route | undefined => {
 /**
  * Adds or removes a rule's name class from all current fragment elements
  */
-export const applyRuleNameClass = (visit: Visit, action: 'add' | 'remove'): void => {
-	if (!visit.fragmentVisit?.name) return;
+export const toggleFragmentVisitClass = (fragmentVisit: FragmentVisit | undefined, toggle: boolean): void => {
+	if (!fragmentVisit?.name) return;
 
-	const { name, containers } = visit.fragmentVisit;
+	const { name, containers } = fragmentVisit;
 
 	containers.forEach((selector) => {
-		document.querySelector(selector)?.classList[action](`to-${name}`);
+		document.querySelector(selector)?.classList.toggle(`to-${name}`, toggle);
 	});
 };
 
