@@ -83,7 +83,7 @@ export const maybeSkipOutAnimation: Handler<'animation:out:await'> = function (
 	visit,
 	args
 ) {
-	if (visit.fragmentVisit && shouldSkipAnimation(this)) {
+	if (visit.fragmentVisit && shouldSkipAnimation(visit.fragmentVisit)) {
 		if (__DEV__)
 			this.logger?.log(
 				`${highlight('out')}-animation skipped for ${highlight(

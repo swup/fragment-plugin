@@ -327,8 +327,7 @@ export const cacheForeignFragmentElements = ({ swup, logger }: FragmentPlugin): 
 /**
  * Skips the animation if all current containers are <template> elements
  */
-export function shouldSkipAnimation({ swup }: FragmentPlugin): boolean {
-	const { fragmentVisit } = swup.visit;
+export function shouldSkipAnimation(fragmentVisit?: FragmentVisit): boolean {
 	if (!fragmentVisit) return false;
 
 	return fragmentVisit.containers.every((selector) => {
