@@ -214,7 +214,10 @@ export const getRoute = (visit: Visit): Route | undefined => {
 /**
  * Adds or removes a rule's name class from all current fragment elements
  */
-export const toggleFragmentVisitClass = (fragmentVisit: FragmentVisit | undefined, toggle: boolean): void => {
+export const toggleFragmentVisitClass = (
+	fragmentVisit: FragmentVisit | undefined,
+	toggle: boolean
+): void => {
 	if (!fragmentVisit?.name) return;
 
 	const { name, containers } = fragmentVisit;
@@ -363,7 +366,10 @@ export function adjustVisitScroll(fragmentVisit: FragmentVisit, scroll: VisitScr
  * - one of swup's default containers
  * - inside of one of swup's default containers
  */
-export function queryFragmentElement(fragmentSelector: string, swup: Swup): FragmentElement | undefined {
+export function queryFragmentElement(
+	fragmentSelector: string,
+	swup: Swup
+): FragmentElement | undefined {
 	for (const containerSelector of swup.options.containers) {
 		const container = document.querySelector(containerSelector);
 		if (container?.matches(fragmentSelector)) return container;

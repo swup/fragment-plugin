@@ -46,7 +46,7 @@ export default class ParsedRule {
 
 		if (__DEV__) {
 			this.logger?.errorIf(!this.to, `Every fragment rule must contain a 'to' path`, this);
-			this.logger?.errorIf(!this.from, `Every fragment rule must contain a 'from' path`, this);
+			this.logger?.errorIf(!this.from, `Every fragment rule must contain a 'from' path`, this); // prettier-ignore
 		}
 
 		this.matchesFrom = matchPath(this.from);
