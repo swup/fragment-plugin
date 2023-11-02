@@ -363,7 +363,7 @@ export function adjustVisitScroll(fragmentVisit: FragmentVisit, scroll: VisitScr
  * - one of swup's default containers
  * - inside of one of swup's default containers
  */
-export function queryFragmentElement(fragmentSelector: string, swup: Swup): FragmentElement | null {
+export function queryFragmentElement(fragmentSelector: string, swup: Swup): FragmentElement | undefined {
 	for (const containerSelector of swup.options.containers) {
 		const container = document.querySelector(containerSelector);
 		if (container?.matches(fragmentSelector)) return container;
@@ -371,5 +371,5 @@ export function queryFragmentElement(fragmentSelector: string, swup: Swup): Frag
 		const fragment = container?.querySelector<FragmentElement>(fragmentSelector);
 		if (fragment) return fragment;
 	}
-	return null;
+	return;
 }
