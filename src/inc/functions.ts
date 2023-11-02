@@ -180,10 +180,10 @@ const isEqualUrl = (url1: string, url2: string) => {
  * - removes the trailing slash
  * - sorts query params
  */
-const normalizeUrl = (url: string) => {
+export const normalizeUrl = (url: string) => {
 	if (!url.trim()) return url;
 
-	const removeTrailingSlash = (str: string) => (str.endsWith('/') ? str.slice(0, -1) : str);
+	const removeTrailingSlash = (str: string) => str.replace(/\/+$/g, '');
 
 	const location = Location.fromUrl(url);
 	location.searchParams.sort();
