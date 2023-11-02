@@ -1,9 +1,9 @@
-import { describe, expect, it, vi } from 'vitest';
-import { addRuleNameClasses, getRoute } from '../../src/inc/functions.js';
+import { describe, expect, it } from 'vitest';
+import { applyRuleNameClass } from '../../src/inc/functions.js';
 import { stubGlobalDocument } from './inc/helpers.js';
 import Swup from 'swup';
 
-describe('addRuleNameClasses()', () => {
+describe('applyRuleNameClass()', () => {
 	it('should add a rule\'s name class', () => {
 		stubGlobalDocument(
 			/*html*/ `
@@ -20,8 +20,12 @@ describe('addRuleNameClasses()', () => {
 			containers: ['#fragment-1', '#fragment-2'],
 			scroll: false
 		}
-		addRuleNameClasses(visit);
+		applyRuleNameClass(visit, 'add');
 		expect(document.querySelector('#fragment-1')?.classList.contains(`to-test`)).toBe(true);
 		expect(document.querySelector('#fragment-2')?.classList.contains(`to-test`)).toBe(true);
+
+		applyRuleNameClass(visit, 'remove');
+		expect(document.querySelector('#fragment-1')?.classList.contains(`to-test`)).toBe(false);
+		expect(document.querySelector('#fragment-2')?.classList.contains(`to-test`)).toBe(false);
 	});
 });

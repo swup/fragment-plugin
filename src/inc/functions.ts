@@ -212,26 +212,15 @@ export const getRoute = (visit: Visit): Route | undefined => {
 };
 
 /**
- * Add the rule name to fragment elements
+ * Adds or removes a rule's name class from all current fragment elements
  */
-export const addRuleNameClasses = (visit: Visit): void => {
-	if (!visit.fragmentVisit) return;
+export const applyRuleNameClass = (visit: Visit, action: 'add' | 'remove'): void => {
+	if (!visit.fragmentVisit?.name) return;
 
 	const { name, containers } = visit.fragmentVisit;
-	if (!name) return;
 
 	containers.forEach((selector) => {
-		document.querySelector(selector)?.classList.add(`to-${name}`);
-	});
-};
-
-/**
- * Remove the rule name from fragment elements
- */
-export const removeRuleNameFromFragments = ({ name, containers }: FragmentVisit): void => {
-	if (!name) return;
-	containers.forEach((selector) => {
-		document.querySelector(selector)?.classList.remove(`to-${name}`);
+		document.querySelector(selector)?.classList[action](`to-${name}`);
 	});
 };
 
