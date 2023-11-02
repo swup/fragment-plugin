@@ -99,7 +99,7 @@ describe('ParsedRule', () => {
 	});
 
 	it('should validate selectors if matching a rule', () => {
-		const console = mockConsole(false);
+		const console = mockConsole();
 		const rule = new ParsedRule({
 			from: '(.*)',
 			to: '(.*)',
