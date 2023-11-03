@@ -1,3 +1,4 @@
+import { __TEST__ } from './env.js';
 /**
  * Wrap a string in an escape sequence
  * @see https://stackoverflow.com/a/68373080/586823
@@ -14,8 +15,15 @@ const wrapInEscapeSequence = (s: string, open: number, close: number): string =>
 const bold = (s: string): string => wrapInEscapeSequence(s, 1, 22);
 const purple = (s: string): string => wrapInEscapeSequence(s, 94, 39);
 
-const prepare = (s: string): string => `🧩 ${bold(s)}`;
-export const highlight = (s: string): string => purple(s);
+const prepare = (s: string): string => {
+	if (__TEST__) return s;
+	return `🧩 ${bold(s)}`;
+};
+
+export const highlight = (s: string): string => {
+	if (__TEST__) return s;
+	return purple(s);
+};
 
 /**
  * A slim wrapper around console statements

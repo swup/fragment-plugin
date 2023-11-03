@@ -5,8 +5,7 @@ import type { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
 import {
 	handlePageView,
 	getRoute,
-	addRuleNameClasses,
-	removeRuleNameFromFragments,
+	toggleFragmentVisitClass,
 	getFirstMatchingRule,
 	cacheForeignFragmentElements,
 	shouldSkipAnimation,
@@ -73,7 +72,7 @@ export const onVisitStart: Handler<'visit:start'> = async function (this: Fragme
 	// Overwrite the animationSelector for this visit
 	visit.animation.selector = visit.fragmentVisit.containers.join(',');
 
-	addRuleNameClasses(visit);
+	toggleFragmentVisitClass(fragmentVisit, true);
 };
 
 /**
@@ -84,7 +83,7 @@ export const maybeSkipOutAnimation: Handler<'animation:out:await'> = function (
 	visit,
 	args
 ) {
-	if (visit.fragmentVisit && shouldSkipAnimation(this)) {
+	if (visit.fragmentVisit && shouldSkipAnimation(visit.fragmentVisit)) {
 		if (__DEV__)
 			this.logger?.log(
 				`${highlight('out')}-animation skipped for ${highlight(
@@ -103,7 +102,7 @@ export const maybeSkipInAnimation: Handler<'animation:in:await'> = function (
 	visit,
 	args
 ) {
-	if (visit.fragmentVisit && shouldSkipAnimation(this)) {
+	if (visit.fragmentVisit && shouldSkipAnimation(visit.fragmentVisit)) {
 		if (__DEV__)
 			this.logger?.log(
 				`${highlight('in')}-animation skipped for ${highlight(
@@ -139,7 +138,7 @@ export const beforeContentReplace: Handler<'content:replace'> = function (
  * Runs after the content was replaced
  */
 export const onContentReplace: Handler<'content:replace'> = function (this: FragmentPlugin, visit) {
-	addRuleNameClasses(visit);
+	toggleFragmentVisitClass(visit.fragmentVisit, true);
 	handlePageView(this);
 	cacheForeignFragmentElements(this);
 };
@@ -148,5 +147,5 @@ export const onContentReplace: Handler<'content:replace'> = function (this: Frag
  * Remove possible fragment rule names from fragment elements
  */
 export const onVisitEnd: Handler<'visit:end'> = function (this: FragmentPlugin, visit) {
-	if (visit.fragmentVisit) removeRuleNameFromFragments(visit.fragmentVisit);
+	toggleFragmentVisitClass(visit.fragmentVisit, false);
 };

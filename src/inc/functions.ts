@@ -32,7 +32,7 @@ function showDialogs({ logger }: FragmentPlugin): void {
 			if (el.__swupFragment.modalShown) return;
 			el.__swupFragment.modalShown = true;
 			el.removeAttribute('open');
-			el.showModal();
+			el.showModal?.();
 		});
 }
 
@@ -180,10 +180,10 @@ const isEqualUrl = (url1: string, url2: string) => {
  * - removes the trailing slash
  * - sorts query params
  */
-const normalizeUrl = (url: string) => {
+export const normalizeUrl = (url: string) => {
 	if (!url.trim()) return url;
 
-	const removeTrailingSlash = (str: string) => (str.endsWith('/') ? str.slice(0, -1) : str);
+	const removeTrailingSlash = (str: string) => str.replace(/\/+$/g, '');
 
 	const location = Location.fromUrl(url);
 	location.searchParams.sort();
@@ -212,26 +212,18 @@ export const getRoute = (visit: Visit): Route | undefined => {
 };
 
 /**
- * Add the rule name to fragment elements
+ * Adds or removes a rule's name class from all current fragment elements
  */
-export const addRuleNameClasses = (visit: Visit): void => {
-	if (!visit.fragmentVisit) return;
+export const toggleFragmentVisitClass = (
+	fragmentVisit: FragmentVisit | undefined,
+	toggle: boolean
+): void => {
+	if (!fragmentVisit?.name) return;
 
-	const { name, containers } = visit.fragmentVisit;
-	if (!name) return;
+	const { name, containers } = fragmentVisit;
 
 	containers.forEach((selector) => {
-		document.querySelector(selector)?.classList.add(`to-${name}`);
-	});
-};
-
-/**
- * Remove the rule name from fragment elements
- */
-export const removeRuleNameFromFragments = ({ name, containers }: FragmentVisit): void => {
-	if (!name) return;
-	containers.forEach((selector) => {
-		document.querySelector(selector)?.classList.remove(`to-${name}`);
+		document.querySelector(selector)?.classList.toggle(`to-${name}`, toggle);
 	});
 };
 
@@ -338,8 +330,7 @@ export const cacheForeignFragmentElements = ({ swup, logger }: FragmentPlugin): 
 /**
  * Skips the animation if all current containers are <template> elements
  */
-export function shouldSkipAnimation({ swup }: FragmentPlugin): boolean {
-	const { fragmentVisit } = swup.visit;
+export function shouldSkipAnimation(fragmentVisit?: FragmentVisit): boolean {
 	if (!fragmentVisit) return false;
 
 	return fragmentVisit.containers.every((selector) => {
@@ -375,7 +366,10 @@ export function adjustVisitScroll(fragmentVisit: FragmentVisit, scroll: VisitScr
  * - one of swup's default containers
  * - inside of one of swup's default containers
  */
-export function queryFragmentElement(fragmentSelector: string, swup: Swup): FragmentElement | null {
+export function queryFragmentElement(
+	fragmentSelector: string,
+	swup: Swup
+): FragmentElement | undefined {
 	for (const containerSelector of swup.options.containers) {
 		const container = document.querySelector(containerSelector);
 		if (container?.matches(fragmentSelector)) return container;
@@ -383,5 +377,5 @@ export function queryFragmentElement(fragmentSelector: string, swup: Swup): Frag
 		const fragment = container?.querySelector<FragmentElement>(fragmentSelector);
 		if (fragment) return fragment;
 	}
-	return null;
+	return;
 }
