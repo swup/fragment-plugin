@@ -1,11 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// require('dotenv').config();
-
 const baseURL = 'http://localhost:8274';
 
 /**
@@ -40,7 +34,7 @@ export default defineConfig({
   ],
 
   expect: {
-    /* Timeout async expect matchers after 2 seconds */
+    /* Timeout async expect matchers after 3 seconds */
     timeout: 3_000,
   },
 
@@ -66,7 +60,7 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     url: baseURL,
-    command: 'npm run test:e2e:start',
+    command: 'npm run test:e2e:serve',
     reuseExistingServer: !process.env.CI,
   },
 });
