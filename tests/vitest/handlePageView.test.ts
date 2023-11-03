@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { getPluginInstance, mockConsole, stubGlobalDocument } from './inc/helpers.js';
+import { getMountedPluginInstance, spyOnConsole, stubGlobalDocument } from './inc/helpers.js';
 import { handlePageView } from '../../src/inc/functions.js';
 import type { FragmentElement } from '../../src/index.js';
 
-const fragmentPlugin = getPluginInstance({
+const fragmentPlugin = getMountedPluginInstance({
 	rules: [
 		{
 			from: '(.*)',
@@ -36,7 +36,7 @@ describe('handlePageView()', () => {
 	});
 
 	it('should handle user-provided data attributes', () => {
-		const console = mockConsole();
+		const console = spyOnConsole();
 		stubGlobalDocument(/*html*/ `
 			<div id="swup">
 				<div id="fragment-1" data-swup-fragment-url="/fragment-url/"></div>

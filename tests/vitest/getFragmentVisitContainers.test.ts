@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, afterEach } from 'vitest';
-import { getPluginInstance, stubGlobalDocument, mockConsole } from './inc/helpers.js';
+import { getMountedPluginInstance, stubGlobalDocument, spyOnConsole } from './inc/helpers.js';
 import { getFragmentVisitContainers, handlePageView } from '../../src/inc/functions.js';
 import type { FragmentElement } from '../../src/index.js';
 
@@ -8,9 +8,9 @@ describe('getFragmentVisitContainers()', () => {
 		vi.restoreAllMocks();
 	});
 	it('should get the right fragments', () => {
-		const console = mockConsole();
+		const console = spyOnConsole();
 		const url = '/page-1/';
-		const fragmentPlugin = getPluginInstance({
+		const fragmentPlugin = getMountedPluginInstance({
 			rules: [
 				{
 					from: '(.*)',

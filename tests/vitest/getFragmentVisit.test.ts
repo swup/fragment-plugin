@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, afterEach, beforeEach } from 'vitest';
-import { getPluginInstance, stubGlobalDocument } from './inc/helpers.js';
+import { getMountedPluginInstance, stubGlobalDocument } from './inc/helpers.js';
 import type SwupFragmentPlugin from '../../src/SwupFragmentPlugin.js';
 
 let fragmentPlugin: SwupFragmentPlugin;
@@ -7,7 +7,7 @@ let fragmentPlugin: SwupFragmentPlugin;
 describe('getFragmentVisit()', () => {
 	beforeEach(() => {
 		stubGlobalDocument(/*html*/ `<div id="swup"><div id="fragment-1"></div></div>`);
-		fragmentPlugin = getPluginInstance({
+		fragmentPlugin = getMountedPluginInstance({
 			rules: [
 				{
 					from: '/page-1/',

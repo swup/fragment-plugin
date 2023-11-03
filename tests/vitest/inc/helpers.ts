@@ -4,18 +4,14 @@ import { JSDOM } from 'jsdom';
 import SwupFragmentPlugin from '../../../src/index.js';
 import type { Options } from '../../../src/inc/defs.js';
 
-export const getHtml = (body: string): string => {
-	return /*html*/ `
-		<!DOCTYPE html>
-		<body>
-			${body}
-		</body>
-	`;
-};
-
 type DocumentOptions = {
 	url: string;
 };
+
+/**
+ * Wrap <body> HTML inside a html string
+ */
+export const wrapBodyTag = (body: string): string => /*html*/ `<!DOCTYPE html><body>${body}</body>`;
 
 /**
  * Stub the global document with
@@ -32,14 +28,17 @@ export const stubGlobalDocument = (body: string, options: Partial<DocumentOption
 	};
 	const settings: DocumentOptions = { ...defaults, ...options };
 
-	const dom = new JSDOM(getHtml(body));
+	const dom = new JSDOM(wrapBodyTag(body));
 	dom.reconfigure({ url: `${baseURI}${settings.url}` });
 
 	vi.stubGlobal('location', dom.window.location);
 	vi.stubGlobal('document', dom.window.document);
 };
 
-export const getPluginInstance = (options: Partial<Options> = {}): SwupFragmentPlugin => {
+/**
+ * Get an instance of FragmentPlugin, in the state after mount()
+ */
+export const getMountedPluginInstance = (options: Partial<Options> = {}): SwupFragmentPlugin => {
 	const defaults = {
 		rules: [],
 		debug: true
@@ -50,9 +49,9 @@ export const getPluginInstance = (options: Partial<Options> = {}): SwupFragmentP
 };
 
 /**
- * Mutes console calls
+ * Spies on and optionally mutes console calls
  */
-export const mockConsole = (mute: boolean = true) => {
+export const spyOnConsole = (mute: boolean = true) => {
 	const console = {
 		log: vi.spyOn(global.console, 'log'),
 		warn: vi.spyOn(global.console, 'warn'),
