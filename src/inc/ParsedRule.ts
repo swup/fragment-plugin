@@ -64,11 +64,11 @@ export default class ParsedRule {
 		}
 		// trim selectors
 		const containers = dedupe(rawContainers.map((selector) => selector.trim()));
-		containers.forEach((selector) => {
+		return containers.filter((selector) => {
 			const result = this.validateSelector(selector);
 			this.logger?.errorIf(result instanceof Error, result);
+			return result === true;
 		});
-		return containers;
 	}
 
 	/**

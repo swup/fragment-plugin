@@ -17,8 +17,8 @@ describe('ParsedRule', () => {
 		});
 
 		// expect valid matchesFrom and matchesTo functions
-		expect(!!rule.matchesFrom('/users/')).toBe(true);
-		expect(!!rule.matchesTo('/user/john')).toBe(true);
+		expect(Boolean(rule.matchesFrom('/users/'))).toBe(true);
+		expect(Boolean(rule.matchesTo('/user/john'))).toBe(true);
 		expect(rule.matchesFrom('/')).toBe(false);
 		expect(rule.matchesTo('/')).toBe(false);
 
@@ -71,7 +71,7 @@ describe('ParsedRule', () => {
 
 	it('should validate container selectors and log errors', () => {
 		const console = spyOnConsole();
-		new ParsedRule({
+		const rule = new ParsedRule({
 			from: '(.*)',
 			to: '(.*)',
 			containers: ['.fragment-1', '#swup #fragment-2'],
@@ -79,6 +79,7 @@ describe('ParsedRule', () => {
 			logger: new Logger()
 		});
 		expect(console.error).toBeCalledTimes(2);
+		expect(rule.containers).toEqual([]);
 
 		expect(console.error).toBeCalledWith(new Error(`fragment selectors must be IDs: .fragment-1`)); // prettier-ignore
 		expect(console.error).toBeCalledWith(new Error(`fragment selectors must not be nested: #swup #fragment-2`)); // prettier-ignore

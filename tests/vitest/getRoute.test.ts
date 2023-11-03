@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { getRoute } from '../../src/inc/functions.js';
 import Swup from 'swup';
 
@@ -10,6 +10,7 @@ describe('getRoute()', () => {
 		const visit = swup.createVisit(route);
 		expect(getRoute(visit)).toEqual(route);
 	});
+
 	it('should return undefined for incomplete visits', () => {
 		const swup = new Swup();
 		// @ts-expect-error createVisit is protected
