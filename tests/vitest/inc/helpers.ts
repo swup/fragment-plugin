@@ -1,6 +1,5 @@
-import { describe, expect, it, vi, afterEach } from 'vitest';
+import { vi } from 'vitest';
 import Swup from 'swup';
-import type { PageData } from 'swup';
 import { JSDOM } from 'jsdom';
 import SwupFragmentPlugin from '../../../src/index.js';
 import type { Options } from '../../../src/inc/defs.js';
