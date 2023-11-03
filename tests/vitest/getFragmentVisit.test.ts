@@ -1,26 +1,24 @@
 import { describe, expect, it, vi, afterEach, beforeEach } from 'vitest';
 import { getMountedPluginInstance, stubGlobalDocument } from './inc/helpers.js';
-import type SwupFragmentPlugin from '../../src/SwupFragmentPlugin.js';
 
-let fragmentPlugin: SwupFragmentPlugin;
+const fragmentPlugin = getMountedPluginInstance({
+	rules: [
+		{
+			from: '/page-1/',
+			to: '/page-2/',
+			containers: ['#fragment-1']
+		}
+	]
+});
 
 describe('getFragmentVisit()', () => {
 	beforeEach(() => {
 		stubGlobalDocument(/*html*/ `<div id="swup"><div id="fragment-1"></div></div>`);
-		fragmentPlugin = getMountedPluginInstance({
-			rules: [
-				{
-					from: '/page-1/',
-					to: '/page-2/',
-					containers: ['#fragment-1']
-				}
-			]
-		});
 	});
 	afterEach(() => {
 		vi.restoreAllMocks();
 	});
-	it('should get the fragment visit', () => {
+	it('should be callable as public API', () => {
 		const fromPlugin = fragmentPlugin.getFragmentVisit({ from: '/page-1/', to: '/page-2/' });
 		const fromSwup = fragmentPlugin.swup.getFragmentVisit?.({ from: '/page-1/',to: '/page-2/' }); // prettier-ignore
 
@@ -35,7 +33,7 @@ describe('getFragmentVisit()', () => {
 		expect(fromPlugin).toEqual(fromSwup);
 	});
 
-	it('should return undefined if there is no matching fragment visit', () => {
+	it('should return undefined if there is no matching rule', () => {
 		const fragmentVisit = fragmentPlugin.getFragmentVisit({ from: '/foo/', to: '/bar/' });
 
 		expect(fragmentVisit).toBeUndefined();

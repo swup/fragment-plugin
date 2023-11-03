@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { adjustVisitScroll } from '../../src/inc/functions.js';
 import Swup from 'swup';
-import type { FragmentVisit } from '../../src/inc/defs.js';
 
 describe('adjustVisitScroll()', () => {
 	it('adjust visit.scroll', () => {
