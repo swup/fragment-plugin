@@ -7,7 +7,7 @@ import {
 	getFirstMatchingRule,
 	getFragmentVisitContainers
 } from './inc/functions.js';
-import type { Options, Route, FragmentVisit } from './inc/defs.js';
+import type { Options, Rule, Route, FragmentVisit } from './inc/defs.js';
 import * as handlers from './inc/handlers.js';
 import { __DEV__ } from './inc/env.js';
 
@@ -52,18 +52,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	mount() {
 		const swup = this.swup;
 
-		this.rules = this.options.rules.map(({ from, to, containers, name, scroll, focus }) => {
-			return new ParsedRule({
-				from,
-				to,
-				containers,
-				name,
-				scroll,
-				focus,
-				logger: this.logger,
-				swup: this.swup
-			});
-		});
+		this.options.rules.forEach((rule) => this.addRule(rule));
 
 		this.before('link:self', handlers.onLinkToSelf);
 		this.on('visit:start', handlers.onVisitStart);
@@ -73,6 +62,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 		this.on('content:replace', handlers.onContentReplace);
 		this.on('visit:end', handlers.onVisitEnd);
 
+		swup.addRule = this.addRule.bind(this);
 		swup.getFragmentVisit = this.getFragmentVisit.bind(this);
 
 		if (__DEV__) {
@@ -93,6 +83,41 @@ export default class SwupFragmentPlugin extends PluginBase {
 		this.swup.getFragmentVisit = undefined;
 		this.rules = [];
 		cleanupFragmentElements();
+	}
+
+	/**
+	 * Add a fragment rule
+	 * @param {Rule} rule 			The rule options
+	 * @param {'start' | 'end'} at 	Should the rule be added to the beginning or end of the existing rules?
+	 */
+	addRule(
+		{ from, to, containers, name, scroll, focus }: Rule,
+		at: 'start' | 'end' = 'end'
+	): ParsedRule[] {
+		const parsedRule = new ParsedRule({
+			from,
+			to,
+			containers,
+			name,
+			scroll,
+			focus,
+			logger: this.logger,
+			swup: this.swup
+		});
+
+		switch (at) {
+			case 'start':
+				this.rules.unshift(parsedRule);
+				break;
+			case 'end':
+				this.rules.push(parsedRule);
+				break;
+			default:
+				this.logger?.error(new Error(`addRule(rule, at): 'at' must either be 'start' or 'end'`));
+				break;
+		}
+
+		return this.rules;
 	}
 
 	/**
