@@ -459,3 +459,19 @@ document.querySelectorAll('a[href]').forEach((el) => {
   });
 });
 ```
+
+### `prependFragmentRule(rule)`
+
+Prepends a [rule](#rules) to the array of rules.
+
+```js
+swup.prependFragmentRule({ from: '/foo/', to: '/bar/', containers: ['#foobar'] });
+```
+
+### `appendFragmentRule(rule)`
+
+Appends a [rule](#rules) to the array of rules.
+
+```js
+swup.prependFragmentRule({ from: '/baz/', to: '/bat/', containers: ['#bazbat'] });
+```
