@@ -16,7 +16,7 @@ describe('modify fragment rules', () => {
 		spyOnConsole();
 		/** Reset the rules */
 		fragmentPlugin.setRules([defaultRule]);
-	})
+	});
 	afterEach(() => {
 		vi.restoreAllMocks();
 	});
@@ -70,5 +70,17 @@ describe('modify fragment rules', () => {
 		swup.setFragmentRules?.([prependRule, ...(swup.getFragmentRules?.() || [])]);
 
 		expect(swup.getFragmentRules?.()).toEqual([prependRule, defaultRule, appendRule]);
+	});
+
+	it('should remove rules', () => {
+		swup.appendFragmentRule?.({
+			from: '/foo/',
+			to: '/bar/',
+			containers: ['#foobar'],
+			name: 'remove-me'
+		});
+		const rules = swup.getFragmentRules?.() || [];
+		swup.setFragmentRules?.(rules.filter((rule) => rule.name !== 'remove-me'));
+		expect(swup.getFragmentRules?.()).toEqual([defaultRule]);
 	});
 });
