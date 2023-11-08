@@ -436,7 +436,7 @@ The first `<main>` element in a document will be considered the main content by 
 
 The plugin adds a few methods to the swup instance:
 
-### `getFragmentVisit({ from, to })
+### `swup.getFragmentVisit(route)`
 
 Get information about the fragment visit for a given route. Returns either `FragmentVisit` or `undefined`.
 
@@ -460,7 +460,7 @@ document.querySelectorAll('a[href]').forEach((el) => {
 });
 ```
 
-### `prependFragmentRule(rule)`
+### `swup.prependFragmentRule(rule)`
 
 Prepends a [rule](#rules) to the array of rules.
 
@@ -468,7 +468,7 @@ Prepends a [rule](#rules) to the array of rules.
 swup.prependFragmentRule({ from: '/foo/', to: '/bar/', containers: ['#foobar'] });
 ```
 
-### `appendFragmentRule(rule)`
+### `swup.appendFragmentRule(rule)`
 
 Appends a [rule](#rules) to the array of rules.
 
