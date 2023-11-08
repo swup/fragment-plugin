@@ -147,7 +147,17 @@ html.is-animating .transition-main {
 
 ## Options
 
-### Type `Rule`
+
+### Type Signature: `Options`
+
+```js
+export type Options = {
+  rules: Rule[];
+  debug?: boolean;
+};
+```
+
+### Type Signature: `Rule`
 
 ```js
 export type Rule = {
@@ -157,15 +167,6 @@ export type Rule = {
   name?: string;
   scroll?: boolean | string;
   focus?: boolean | string;
-};
-```
-
-### Type `Options`
-
-```js
-export type Options = {
-  rules: Rule[];
-  debug?: boolean;
 };
 ```
 
@@ -470,7 +471,7 @@ document.querySelectorAll('a[href]').forEach((el) => {
 
 ### `swup.prependFragmentRule(rule)`
 
-Prepends a [rule](#type-rule) to the array of rules.
+Prepends a [rule](#type-signature-rule) to the array of rules.
 
 ```js
 swup.prependFragmentRule({ from: '/foo/', to: '/bar/', containers: ['#foobar'] });
@@ -478,7 +479,7 @@ swup.prependFragmentRule({ from: '/foo/', to: '/bar/', containers: ['#foobar'] }
 
 ### `swup.appendFragmentRule(rule)`
 
-Appends a [rule](#type-rule) to the array of rules.
+Appends a [rule](#type-signature-rule) to the array of rules.
 
 ```js
 swup.prependFragmentRule({ from: '/baz/', to: '/bat/', containers: ['#bazbat'] });
