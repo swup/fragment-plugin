@@ -22,7 +22,18 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 	requires = { swup: '>=4' };
 
-	rules: ParsedRule[] = [];
+	_rawRules: Rule[] = [];
+	_parsedRules: ParsedRule[] = [];
+
+	setRules(rules: Rule[]) {
+		this._rawRules = structuredClone(rules);
+		this._parsedRules = rules.map((rule) => this.parseRule(rule));
+		if (__DEV__) this.logger?.log('Updated fragment rules', this.getRules());
+	}
+
+	getRules() {
+		return structuredClone(this._rawRules);
+	}
 
 	options: Options;
 
@@ -39,11 +50,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 */
 	constructor(options: InitOptions) {
 		super();
-
 		this.options = { ...this.defaults, ...options };
-		if (__DEV__) {
-			if (this.options.debug) this.logger = new Logger();
-		}
 	}
 
 	/**
@@ -52,7 +59,10 @@ export default class SwupFragmentPlugin extends PluginBase {
 	mount() {
 		const swup = this.swup;
 
-		this.options.rules.forEach((rule) => this.addRule(rule));
+		this.setRules(this.options.rules);
+		if (__DEV__) {
+			if (this.options.debug) this.logger = new Logger();
+		}
 
 		this.before('link:self', handlers.onLinkToSelf);
 		this.on('visit:start', handlers.onVisitStart);
@@ -62,8 +72,9 @@ export default class SwupFragmentPlugin extends PluginBase {
 		this.on('content:replace', handlers.onContentReplace);
 		this.on('visit:end', handlers.onVisitEnd);
 
-		swup.addRule = this.addRule.bind(this);
 		swup.getFragmentVisit = this.getFragmentVisit.bind(this);
+		swup.getFragmentRules = this.getRules.bind(this);
+		swup.setFragmentRules = this.setRules.bind(this);
 
 		if (__DEV__) {
 			this.logger?.warnIf(
@@ -80,8 +91,10 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 */
 	unmount() {
 		super.unmount();
-		this.swup.getFragmentVisit = undefined;
-		this.rules = [];
+		const { swup } = this;
+		swup.getFragmentVisit = undefined;
+		swup.getFragmentRules = undefined;
+		swup.setFragmentRules = undefined;
 		cleanupFragmentElements();
 	}
 
@@ -90,11 +103,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * @param {Rule} rule 			The rule options
 	 * @param {'start' | 'end'} at 	Should the rule be added to the beginning or end of the existing rules?
 	 */
-	addRule(
-		{ from, to, containers, name, scroll, focus }: Rule,
-		at: 'start' | 'end' = 'end'
-	): ParsedRule[] {
-		const parsedRule = new ParsedRule({
+	parseRule({ from, to, containers, name, scroll, focus }: Rule): ParsedRule {
+		return new ParsedRule({
 			from,
 			to,
 			containers,
@@ -104,27 +114,13 @@ export default class SwupFragmentPlugin extends PluginBase {
 			logger: this.logger,
 			swup: this.swup
 		});
-
-		switch (at) {
-			case 'start':
-				this.rules.unshift(parsedRule);
-				break;
-			case 'end':
-				this.rules.push(parsedRule);
-				break;
-			default:
-				this.logger?.error(new Error(`addRule(rule, at): 'at' must either be 'start' or 'end'`));
-				break;
-		}
-
-		return this.rules;
 	}
 
 	/**
 	 * Get the fragment visit object for a given route
 	 */
 	getFragmentVisit(route: Route): FragmentVisit | undefined {
-		const rule = getFirstMatchingRule(route, this.rules);
+		const rule = getFirstMatchingRule(route, this._parsedRules);
 
 		// Bail early if no rule matched
 		if (!rule) return;

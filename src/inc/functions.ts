@@ -82,10 +82,10 @@ function handleLinksToFragments({ logger, swup }: FragmentPlugin): void {
 /**
  * Adds attributes and properties to fragment elements
  */
-function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void {
+function prepareFragmentElements({ _parsedRules, swup, logger }: FragmentPlugin): void {
 	const currentUrl = swup.getCurrentUrl();
 
-	rules
+	_parsedRules
 		.filter((rule) => rule.matchesFrom(currentUrl) || rule.matchesTo(currentUrl))
 		.forEach((rule) => {
 			rule.containers.forEach((selector) => {
