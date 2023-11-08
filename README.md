@@ -147,16 +147,24 @@ html.is-animating .transition-main {
 
 ## Options
 
-```typescript
+### Type `Rule`
+
+```js
+export type Rule = {
+  from: string | string[];
+  to: string | string[];
+  containers: string[];
+  name?: string;
+  scroll?: boolean | string;
+  focus?: boolean | string;
+};
+```
+
+### Type `Options`
+
+```js
 export type Options = {
-  rules: Array<{
-    from: string | string[];
-    to: string | string[];
-    containers: string[];
-    name?: string;
-    scroll?: boolean | string;
-    focus?: boolean | string;
-  }>;
+  rules: Rule[];
   debug?: boolean;
 };
 ```
@@ -462,7 +470,7 @@ document.querySelectorAll('a[href]').forEach((el) => {
 
 ### `swup.prependFragmentRule(rule)`
 
-Prepends a [rule](#rules) to the array of rules.
+Prepends a [rule](#type-rule) to the array of rules.
 
 ```js
 swup.prependFragmentRule({ from: '/foo/', to: '/bar/', containers: ['#foobar'] });
@@ -470,7 +478,7 @@ swup.prependFragmentRule({ from: '/foo/', to: '/bar/', containers: ['#foobar'] }
 
 ### `swup.appendFragmentRule(rule)`
 
-Appends a [rule](#rules) to the array of rules.
+Appends a [rule](#type-rule) to the array of rules.
 
 ```js
 swup.prependFragmentRule({ from: '/baz/', to: '/bat/', containers: ['#bazbat'] });
