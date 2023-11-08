@@ -408,7 +408,7 @@ The reason for this is that a CSS `transform` establishes a [containing block fo
 You have two options to fix this:
 
 1. Don't apply CSS `transform`s to any of the parents of a modal
-2. Use `<detail open>` for the modal:
+2. Use `<dialog open>` for the modal:
 
 ```diff
 - <main id="overlay" class="modal">
