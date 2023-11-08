@@ -175,7 +175,7 @@ The rule's `from`/`to` paths are converted to a regular expression by [path-to-r
     {
       from: ['/users', '/users/:filter?'],
       to: ['/users', '/users/:filter?'],
-      containers: ['#user-list'],
+      containers: ['#user-list']
     }
   ];
 }
@@ -196,7 +196,7 @@ Required, Type: `string[]` – Selectors of containers to be replaced if the vis
 **Notes**
 
 - **only IDs and no nested selectors are allowed**. `#my-element` is valid, while
-`.my-element` or `#wrap #child` both will throw an error.
+  `.my-element` or `#wrap #child` both will throw an error.
 - if **any** of the selectors in `containers` doesn't return a match in the current document, the rule will be skipped.
 - Fragment elements **must either match a swup container or be a descendant of one of them**
 
@@ -384,7 +384,9 @@ This will work fine, until you apply a `transform` to one of the modal's parent 
 
 ```css
 html.is-changing .transition-main {
-  transition: opacity 250ms, transform 250ms;
+  transition:
+    opacity 250ms,
+    transform 250ms;
 }
 html.is-animating .transition-main {
   opacity: 0;
@@ -429,3 +431,31 @@ The first `<main>` element in a document will be considered the main content by 
 **Cons**:
 
 - Wrapping your `<main>` content inside a `<dialog>` will produce [semantically incorrect markup](https://stackoverflow.com/a/75007908/586823). We still think it's the cleanest approach for now, until the [Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API) reaches [wider browser support](https://caniuse.com/?search=popover).
+
+## Methods on the swup instance
+
+The plugin adds a few methods to the swup instance:
+
+### `getFragmentVisit(route)`
+
+Get the fragment visit for a given route. Example:
+
+```js
+const rules = [
+  // ...
+];
+const swup = new Swup({ plugins: [new SwupFragmentPlugin({ rules })] });
+/**
+ * Get information about which containers will
+ * be replaced when hovering over links:
+ */
+document.querySelectorAll('a[href]').forEach((el) => {
+  el.addEventListener('mouseenter', () => {
+    const fragmentVisit = swup.getFragmentVisit?.({
+      from: window.location.href,
+      to: el.href
+    });
+    console.log(`will replace ${fragmentVisit?.containers || swup.options.containers}`);
+  });
+});
+```
