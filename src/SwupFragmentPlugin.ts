@@ -25,16 +25,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 	_rawRules: Rule[] = [];
 	_parsedRules: ParsedRule[] = [];
 
-	setRules(rules: Rule[]) {
-		this._rawRules = structuredClone(rules);
-		this._parsedRules = rules.map((rule) => this.parseRule(rule));
-		if (__DEV__) this.logger?.log('Updated fragment rules', this.getRules());
-	}
-
-	getRules() {
-		return structuredClone(this._rawRules);
-	}
-
 	options: Options;
 
 	defaults: Options = {
@@ -75,6 +65,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 		swup.getFragmentVisit = this.getFragmentVisit.bind(this);
 		swup.getFragmentRules = this.getRules.bind(this);
 		swup.setFragmentRules = this.setRules.bind(this);
+		swup.prependFragmentRule = this.prependRule.bind(this);
+		swup.appendFragmentRule = this.appendRule.bind(this);
 
 		if (__DEV__) {
 			this.logger?.warnIf(
@@ -95,7 +87,27 @@ export default class SwupFragmentPlugin extends PluginBase {
 		swup.getFragmentVisit = undefined;
 		swup.getFragmentRules = undefined;
 		swup.setFragmentRules = undefined;
+		swup.prependFragmentRule = undefined;
+		swup.appendFragmentRule = undefined;
 		cleanupFragmentElements();
+	}
+
+	setRules(rules: Rule[]) {
+		this._rawRules = structuredClone(rules);
+		this._parsedRules = rules.map((rule) => this.parseRule(rule));
+		if (__DEV__) this.logger?.log('Updated fragment rules', this.getRules());
+	}
+
+	getRules() {
+		return structuredClone(this._rawRules);
+	}
+
+	prependRule(rule: Rule) {
+		this.setRules([rule, ...this.getRules()]);
+	}
+
+	appendRule(rule: Rule) {
+		this.setRules([...this.getRules(), rule]);
 	}
 
 	/**

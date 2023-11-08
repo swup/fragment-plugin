@@ -1,81 +1,74 @@
-import { describe, expect, it, vi, afterEach } from 'vitest';
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { getMountedPluginInstance, spyOnConsole } from './inc/helpers.js';
 
+const defaultRule = {
+	from: '/page-1/',
+	to: '/page-2/',
+	containers: ['#default']
+};
 const fragmentPlugin = getMountedPluginInstance({
-	rules: [
-		{
-			from: '/page-1/',
-			to: '/page-2/',
-			containers: ['#fragment-1']
-		}
-	]
+	rules: [defaultRule]
 });
+const { swup } = fragmentPlugin;
 
-describe('get and set fragment rules', () => {
+describe('modify fragment rules', () => {
+	beforeEach(() => {
+		spyOnConsole();
+		/** Reset the rules */
+		fragmentPlugin.setRules([defaultRule]);
+	})
 	afterEach(() => {
 		vi.restoreAllMocks();
 	});
 
-	it('should return raw rules', () => {
-		expect(fragmentPlugin.getRules()).toEqual([
-			{
-				from: '/page-1/',
-				to: '/page-2/',
-				containers: ['#fragment-1']
-			}
-		]);
+	it('should return unparsed raw rules', () => {
+		expect(fragmentPlugin.getRules()).toEqual([defaultRule]);
 	});
 
-	it('should be possible to modify rules at runtime', () => {
-		const console = spyOnConsole();
-		const { swup } = fragmentPlugin;
+	it('should provide API methods on the swup instance', () => {
+		expect(swup.getFragmentRules).toBeTypeOf('function');
+		expect(swup.setFragmentRules).toBeTypeOf('function');
+		expect(swup.prependFragmentRule).toBeTypeOf('function');
+		expect(swup.appendFragmentRule).toBeTypeOf('function');
+	});
 
+	it('should provide access to prependRule() and appendRule()', () => {
+		const prependRule = {
+			from: '/corge/',
+			to: '/grault/',
+			containers: ['#corgegrault']
+		};
+		const appendRule = {
+			from: '/garply/',
+			to: '/waldo/',
+			containers: ['#garplywaldo']
+		};
+
+		swup.prependFragmentRule?.(prependRule);
+		swup.appendFragmentRule?.(appendRule);
+
+		expect(swup.getFragmentRules?.()).toEqual([prependRule, defaultRule, appendRule]);
+	});
+
+	it('should provide access to getRules() and setRules()', () => {
 		/** Add a rule using the plugin's API, *after* the existing rules */
-		fragmentPlugin.setRules([
-			...fragmentPlugin.getRules(),
-			{
-				from: '/foo/',
-				to: '/bar/',
-				containers: ['#fragment-1'],
-				name: 'from-plugin'
-			}
-		]);
+		const appendRule = {
+			from: '/foo/',
+			to: '/bar/',
+			containers: ['#foobar'],
+			name: 'from-plugin'
+		};
+		fragmentPlugin.setRules([...fragmentPlugin.getRules(), appendRule]);
 
 		/** Add a rule using swup's API, *before* the existing rules */
-		swup.setFragmentRules?.([
-			{
-				from: '/foo/',
-				to: '/bar/',
-				containers: ['#fragment-1'],
-				name: 'from-swup'
-			},
-			...swup.getFragmentRules?.() || [],
-		]);
+		const prependRule = {
+			from: '/baz/',
+			to: '/bat/',
+			containers: ['#bazbat'],
+			name: 'from-swup'
+		};
+		swup.setFragmentRules?.([prependRule, ...(swup.getFragmentRules?.() || [])]);
 
-		const fromPlugin = fragmentPlugin.getRules();
-		const fromSwup = swup.getFragmentRules?.();
-
-		/** make sure the method exists on swup as well */
-		expect(fromPlugin).toEqual(fromSwup);
-
-		expect(fromPlugin).toEqual([
-			{
-				from: '/foo/',
-				to: '/bar/',
-				containers: ['#fragment-1'],
-				name: 'from-swup'
-			},
-			{
-				from: '/page-1/',
-				to: '/page-2/',
-				containers: ['#fragment-1']
-			},
-			{
-				from: '/foo/',
-				to: '/bar/',
-				containers: ['#fragment-1'],
-				name: 'from-plugin'
-			}
-		]);
+		expect(swup.getFragmentRules?.()).toEqual([prependRule, defaultRule, appendRule]);
 	});
 });

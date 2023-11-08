@@ -8,6 +8,8 @@ declare module 'swup' {
 		getFragmentVisit?: FragmentPlugin['getFragmentVisit'];
 		getFragmentRules?: FragmentPlugin['getRules'];
 		setFragmentRules?: FragmentPlugin['setRules'];
+		prependFragmentRule?: FragmentPlugin['prependRule'];
+		appendFragmentRule?: FragmentPlugin['appendRule'];
 	}
 	export interface Visit {
 		fragmentVisit?: FragmentVisit;
