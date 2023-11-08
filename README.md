@@ -436,9 +436,9 @@ The first `<main>` element in a document will be considered the main content by 
 
 The plugin adds a few methods to the swup instance:
 
-### `getFragmentVisit(route)`
+### `getFragmentVisit({ from, to })
 
-Get the fragment visit for a given route. Example:
+Get information about the fragment visit for a given route. Returns either `FragmentVisit` or `undefined`.
 
 ```js
 const rules = [
@@ -452,8 +452,8 @@ const swup = new Swup({ plugins: [new SwupFragmentPlugin({ rules })] });
 document.querySelectorAll('a[href]').forEach((el) => {
   el.addEventListener('mouseenter', () => {
     const fragmentVisit = swup.getFragmentVisit?.({
-      from: window.location.href,
-      to: el.href
+      from: window.location.href, // the current URL
+      to: el.href // the URL of the link
     });
     console.log(`will replace ${fragmentVisit?.containers || swup.options.containers}`);
   });
