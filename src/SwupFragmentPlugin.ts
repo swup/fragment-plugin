@@ -18,16 +18,19 @@ type InitOptions = RequireKeys<Options, 'rules'>;
  * The main plugin class
  */
 export default class SwupFragmentPlugin extends PluginBase {
-	name = 'SwupFragmentPlugin';
+	readonly name = 'SwupFragmentPlugin';
+	readonly requires = { swup: '>=4' };
 
-	requires = { swup: '>=4' };
+	protected _rawRules: Rule[] = [];
+	protected _parsedRules: ParsedRule[] = [];
 
-	_rawRules: Rule[] = [];
-	_parsedRules: ParsedRule[] = [];
+	get parsedRules() {
+		return this._parsedRules;
+	}
 
 	options: Options;
 
-	defaults: Options = {
+	protected defaults: Options = {
 		rules: [],
 		debug: false
 	};
@@ -132,7 +135,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * Get the fragment visit object for a given route
 	 */
 	getFragmentVisit(route: Route): FragmentVisit | undefined {
-		const rule = getFirstMatchingRule(route, this._parsedRules);
+		const rule = getFirstMatchingRule(route, this.parsedRules);
 
 		// Bail early if no rule matched
 		if (!rule) return;

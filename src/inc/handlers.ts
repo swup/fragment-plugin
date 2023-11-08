@@ -22,7 +22,7 @@ export const onLinkToSelf: Handler<'link:self'> = function (this: FragmentPlugin
 	const route = getRoute(visit);
 	if (!route) return;
 
-	const rule = getFirstMatchingRule(route, this._parsedRules);
+	const rule = getFirstMatchingRule(route, this.parsedRules);
 
 	if (rule) visit.scroll.reset = false;
 };
