@@ -5,9 +5,10 @@ import {
 	handlePageView,
 	cleanupFragmentElements,
 	getFirstMatchingRule,
-	getFragmentVisitContainers
+	getFragmentVisitContainers,
+	cloneRules
 } from './inc/functions.js';
-import type { Options, Route, FragmentVisit } from './inc/defs.js';
+import type { Options, Rule, Route, FragmentVisit } from './inc/defs.js';
 import * as handlers from './inc/handlers.js';
 import { __DEV__ } from './inc/env.js';
 
@@ -18,15 +19,19 @@ type InitOptions = RequireKeys<Options, 'rules'>;
  * The main plugin class
  */
 export default class SwupFragmentPlugin extends PluginBase {
-	name = 'SwupFragmentPlugin';
+	readonly name = 'SwupFragmentPlugin';
+	readonly requires = { swup: '>=4' };
 
-	requires = { swup: '>=4' };
+	protected _rawRules: Rule[] = [];
+	protected _parsedRules: ParsedRule[] = [];
 
-	rules: ParsedRule[] = [];
+	get parsedRules() {
+		return this._parsedRules;
+	}
 
 	options: Options;
 
-	defaults: Options = {
+	protected defaults: Options = {
 		rules: [],
 		debug: false
 	};
@@ -39,11 +44,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 */
 	constructor(options: InitOptions) {
 		super();
-
 		this.options = { ...this.defaults, ...options };
-		if (__DEV__) {
-			if (this.options.debug) this.logger = new Logger();
-		}
 	}
 
 	/**
@@ -52,18 +53,10 @@ export default class SwupFragmentPlugin extends PluginBase {
 	mount() {
 		const swup = this.swup;
 
-		this.rules = this.options.rules.map(({ from, to, containers, name, scroll, focus }) => {
-			return new ParsedRule({
-				from,
-				to,
-				containers,
-				name,
-				scroll,
-				focus,
-				logger: this.logger,
-				swup: this.swup
-			});
-		});
+		this.setRules(this.options.rules);
+		if (__DEV__) {
+			if (this.options.debug) this.logger = new Logger();
+		}
 
 		this.before('link:self', handlers.onLinkToSelf);
 		this.on('visit:start', handlers.onVisitStart);
@@ -72,8 +65,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 		this.before('content:replace', handlers.beforeContentReplace);
 		this.on('content:replace', handlers.onContentReplace);
 		this.on('visit:end', handlers.onVisitEnd);
-
-		swup.getFragmentVisit = this.getFragmentVisit.bind(this);
 
 		if (__DEV__) {
 			this.logger?.warnIf(
@@ -90,16 +81,50 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 */
 	unmount() {
 		super.unmount();
-		this.swup.getFragmentVisit = undefined;
-		this.rules = [];
 		cleanupFragmentElements();
+	}
+
+	setRules(rules: Rule[]) {
+		this._rawRules = cloneRules(rules);
+		this._parsedRules = rules.map((rule) => this.parseRule(rule));
+		if (__DEV__) this.logger?.log('Updated fragment rules', this.getRules());
+	}
+
+	getRules() {
+		return cloneRules(this._rawRules);
+	}
+
+	prependRule(rule: Rule) {
+		this.setRules([rule, ...this.getRules()]);
+	}
+
+	appendRule(rule: Rule) {
+		this.setRules([...this.getRules(), rule]);
+	}
+
+	/**
+	 * Add a fragment rule
+	 * @param {Rule} rule 			The rule options
+	 * @param {'start' | 'end'} at 	Should the rule be added to the beginning or end of the existing rules?
+	 */
+	parseRule({ from, to, containers, name, scroll, focus }: Rule): ParsedRule {
+		return new ParsedRule({
+			from,
+			to,
+			containers,
+			name,
+			scroll,
+			focus,
+			logger: this.logger,
+			swup: this.swup
+		});
 	}
 
 	/**
 	 * Get the fragment visit object for a given route
 	 */
 	getFragmentVisit(route: Route): FragmentVisit | undefined {
-		const rule = getFirstMatchingRule(route, this.rules);
+		const rule = getFirstMatchingRule(route, this.parsedRules);
 
 		// Bail early if no rule matched
 		if (!rule) return;
