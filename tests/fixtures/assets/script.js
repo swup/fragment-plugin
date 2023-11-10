@@ -1,3 +1,6 @@
+import Swup from 'swup';
+import SwupFragmentPlugin from '@swup/fragment-plugin';
+
 const rules = [
 	{
 		from: ['/list/', '/list/filter/:filter'],
@@ -6,11 +9,9 @@ const rules = [
 		name: 'update-list'
 	}
 ];
-const swup = new Swup({
-	plugins: [new SwupFragmentPlugin({ rules })]
-});
-window._swup = swup;
 
-// swup.hooks.on('visit:start', async (visit) => {
-// 	console.log(visit);
-// });
+const fragmentPlugin = new SwupFragmentPlugin({ rules });
+
+const swup = new Swup({ plugins: [fragmentPlugin] });
+window._fragmentPlugin = fragmentPlugin;
+window._swup = swup;

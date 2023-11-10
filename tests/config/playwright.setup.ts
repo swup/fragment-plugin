@@ -1,10 +1,10 @@
-import { cpSync } from 'node:fs';
+import { cpSync, rmSync } from 'node:fs';
+
+const options = { recursive: true };
+const fixturesDir = './tests/fixtures';
 
 export default () => {
-	cpSync('./node_modules/swup/dist/Swup.umd.js', './tests/fixtures/dist/swup.umd.js', {
-		recursive: true
-	});
-	cpSync('./dist/index.umd.js', './tests/fixtures/dist/fragment-plugin.umd.js', {
-		recursive: true
-	});
+	rmSync('./tests/fixtures/dist/', options);
+	cpSync('./node_modules/', `${fixturesDir}/dist/node_modules/`, options);
+	cpSync('./dist/', `${fixturesDir}/dist/fragment-plugin/`, options);
 };

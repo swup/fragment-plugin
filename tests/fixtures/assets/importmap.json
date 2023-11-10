@@ -1,0 +1,9 @@
+{
+  "imports": {
+    "swup": "/dist/node_modules/swup/dist/Swup.modern.js",
+    "delegate-it": "/dist/node_modules/delegate-it/index.js",
+    "path-to-regexp": "/dist/node_modules/path-to-regexp/dist.es2015/index.js",
+    "@swup/fragment-plugin": "/dist/fragment-plugin/index.modern.js",
+    "@swup/plugin": "/dist/node_modules/@swup/plugin/dist/index.modern.js"
+  }
+}
