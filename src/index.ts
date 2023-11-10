@@ -6,6 +6,10 @@ export type { Options, Rule, FragmentElement, FragmentVisit } from './inc/defs.j
 declare module 'swup' {
 	export interface Swup {
 		getFragmentVisit?: FragmentPlugin['getFragmentVisit'];
+		getFragmentRules?: FragmentPlugin['getRules'];
+		setFragmentRules?: FragmentPlugin['setRules'];
+		prependFragmentRule?: FragmentPlugin['prependRule'];
+		appendFragmentRule?: FragmentPlugin['appendRule'];
 	}
 	export interface Visit {
 		fragmentVisit?: FragmentVisit;
