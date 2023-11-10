@@ -5,7 +5,8 @@ import {
 	handlePageView,
 	cleanupFragmentElements,
 	getFirstMatchingRule,
-	getFragmentVisitContainers
+	getFragmentVisitContainers,
+	cloneRules
 } from './inc/functions.js';
 import type { Options, Rule, Route, FragmentVisit } from './inc/defs.js';
 import * as handlers from './inc/handlers.js';
@@ -84,13 +85,13 @@ export default class SwupFragmentPlugin extends PluginBase {
 	}
 
 	setRules(rules: Rule[]) {
-		this._rawRules = structuredClone(rules);
+		this._rawRules = cloneRules(rules);
 		this._parsedRules = rules.map((rule) => this.parseRule(rule));
 		if (__DEV__) this.logger?.log('Updated fragment rules', this.getRules());
 	}
 
 	getRules() {
-		return structuredClone(this._rawRules);
+		return cloneRules(this._rawRules);
 	}
 
 	prependRule(rule: Rule) {

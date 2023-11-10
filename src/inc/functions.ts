@@ -1,7 +1,7 @@
 import { Location } from 'swup';
 import type { Swup, Visit, VisitScroll } from 'swup';
 import type { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
-import type { Route, FragmentVisit, FragmentElement } from './defs.js';
+import type { Route, Rule, FragmentVisit, FragmentElement } from './defs.js';
 import type ParsedRule from './ParsedRule.js';
 import Logger, { highlight } from './Logger.js';
 
@@ -378,4 +378,18 @@ export function queryFragmentElement(
 		if (fragment) return fragment;
 	}
 	return;
+}
+
+export function cloneRules(rules: Rule[]): any {
+	if (!Array.isArray(rules)) throw new Error(`cloneRules() expects an array of rules`);
+
+	const clone: Rule[] = [];
+
+	rules.forEach((rule) => {
+		const clonedRule = { ...rule };
+		clonedRule.containers = [...clonedRule.containers];
+		clone.push({ ...clonedRule });
+	});
+
+	return clone;
 }
