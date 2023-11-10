@@ -383,7 +383,7 @@ export function queryFragmentElement(
 /**
  * Clone fragment rules (replacement for `structuredClone`)
  */
-export function cloneRules(rules: Rule[]): any {
+export function cloneRules(rules: Rule[]): Rule[] {
 	if (!Array.isArray(rules)) throw new Error(`cloneRules() expects an array of rules`);
 
 	return rules.map((rule) => ({
