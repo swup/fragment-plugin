@@ -36,7 +36,6 @@ jobs:
       - name: Run tests
         run: HOME=/root npx playwright test --config ./tests/config/playwright.config.ts
 
-
       - name: Create report comment
         id: report-summary
         uses: daun/playwright-report-summary@v2.1.2
