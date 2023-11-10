@@ -9,7 +9,6 @@ const defaultRule = {
 const fragmentPlugin = getMountedPluginInstance({
 	rules: [defaultRule]
 });
-const { swup } = fragmentPlugin;
 
 describe('modify fragment rules', () => {
 	beforeEach(() => {
@@ -26,10 +25,10 @@ describe('modify fragment rules', () => {
 	});
 
 	it('should provide API methods on the swup instance', () => {
-		expect(swup.getFragmentRules).toBeTypeOf('function');
-		expect(swup.setFragmentRules).toBeTypeOf('function');
-		expect(swup.prependFragmentRule).toBeTypeOf('function');
-		expect(swup.appendFragmentRule).toBeTypeOf('function');
+		expect(fragmentPlugin.getRules).toBeTypeOf('function');
+		expect(fragmentPlugin.setRules).toBeTypeOf('function');
+		expect(fragmentPlugin.prependRule).toBeTypeOf('function');
+		expect(fragmentPlugin.appendRule).toBeTypeOf('function');
 	});
 
 	it('should provide access to prependRule() and appendRule()', () => {
@@ -44,10 +43,10 @@ describe('modify fragment rules', () => {
 			containers: ['#garplywaldo']
 		};
 
-		swup.prependFragmentRule?.(prependRule);
-		swup.appendFragmentRule?.(appendRule);
+		fragmentPlugin.prependRule(prependRule);
+		fragmentPlugin.appendRule(appendRule);
 
-		expect(swup.getFragmentRules?.()).toEqual([prependRule, defaultRule, appendRule]);
+		expect(fragmentPlugin.getRules()).toEqual([prependRule, defaultRule, appendRule]);
 	});
 
 	it('should provide access to getRules() and setRules()', () => {
@@ -67,20 +66,20 @@ describe('modify fragment rules', () => {
 			containers: ['#bazbat'],
 			name: 'from-swup'
 		};
-		swup.setFragmentRules?.([prependRule, ...(swup.getFragmentRules?.() || [])]);
+		fragmentPlugin.setRules([prependRule, ...fragmentPlugin.getRules()]);
 
-		expect(swup.getFragmentRules?.()).toEqual([prependRule, defaultRule, appendRule]);
+		expect(fragmentPlugin.getRules()).toEqual([prependRule, defaultRule, appendRule]);
 	});
 
 	it('should remove rules', () => {
-		swup.appendFragmentRule?.({
+		fragmentPlugin.appendRule({
 			from: '/foo/',
 			to: '/bar/',
 			containers: ['#foobar'],
 			name: 'remove-me'
 		});
-		const rules = swup.getFragmentRules?.() || [];
-		swup.setFragmentRules?.(rules.filter((rule) => rule.name !== 'remove-me'));
-		expect(swup.getFragmentRules?.()).toEqual([defaultRule]);
+		const rules = fragmentPlugin.getRules();
+		fragmentPlugin.setRules(rules.filter((rule) => rule.name !== 'remove-me'));
+		expect(fragmentPlugin.getRules()).toEqual([defaultRule]);
 	});
 });

@@ -19,18 +19,14 @@ describe('getFragmentVisit()', () => {
 		vi.restoreAllMocks();
 	});
 	it('should be callable as public API', () => {
-		const fromPlugin = fragmentPlugin.getFragmentVisit({ from: '/page-1/', to: '/page-2/' });
-		const fromSwup = fragmentPlugin.swup.getFragmentVisit?.({ from: '/page-1/',to: '/page-2/' }); // prettier-ignore
+		const fragmentVisit = fragmentPlugin.getFragmentVisit({ from: '/page-1/', to: '/page-2/' });
 
-		expect(fromPlugin).toEqual({
+		expect(fragmentVisit).toEqual({
 			containers: ['#fragment-1'],
 			name: undefined,
 			scroll: false,
 			focus: undefined
 		});
-
-		/** make sure the method exists on swup as well */
-		expect(fromPlugin).toEqual(fromSwup);
 	});
 
 	it('should return undefined if there is no matching rule', () => {

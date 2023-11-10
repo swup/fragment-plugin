@@ -65,12 +65,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 		this.on('content:replace', handlers.onContentReplace);
 		this.on('visit:end', handlers.onVisitEnd);
 
-		swup.getFragmentVisit = this.getFragmentVisit.bind(this);
-		swup.getFragmentRules = this.getRules.bind(this);
-		swup.setFragmentRules = this.setRules.bind(this);
-		swup.prependFragmentRule = this.prependRule.bind(this);
-		swup.appendFragmentRule = this.appendRule.bind(this);
-
 		if (__DEV__) {
 			this.logger?.warnIf(
 				!swup.options.cache,
@@ -86,12 +80,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 */
 	unmount() {
 		super.unmount();
-		const { swup } = this;
-		swup.getFragmentVisit = undefined;
-		swup.getFragmentRules = undefined;
-		swup.setFragmentRules = undefined;
-		swup.prependFragmentRule = undefined;
-		swup.appendFragmentRule = undefined;
 		cleanupFragmentElements();
 	}
 
