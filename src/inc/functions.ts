@@ -1,7 +1,7 @@
 import { Location } from 'swup';
 import type { Swup, Visit, VisitScroll } from 'swup';
 import type { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
-import type { Route, FragmentVisit, FragmentElement } from './defs.js';
+import type { Route, Rule, FragmentVisit, FragmentElement } from './defs.js';
 import type ParsedRule from './ParsedRule.js';
 import Logger, { highlight } from './Logger.js';
 
@@ -82,10 +82,10 @@ function handleLinksToFragments({ logger, swup }: FragmentPlugin): void {
 /**
  * Adds attributes and properties to fragment elements
  */
-function prepareFragmentElements({ rules, swup, logger }: FragmentPlugin): void {
+function prepareFragmentElements({ parsedRules, swup, logger }: FragmentPlugin): void {
 	const currentUrl = swup.getCurrentUrl();
 
-	rules
+	parsedRules
 		.filter((rule) => rule.matchesFrom(currentUrl) || rule.matchesTo(currentUrl))
 		.forEach((rule) => {
 			rule.containers.forEach((selector) => {
@@ -378,4 +378,18 @@ export function queryFragmentElement(
 		if (fragment) return fragment;
 	}
 	return;
+}
+
+/**
+ * Clone fragment rules (replacement for `structuredClone`)
+ */
+export function cloneRules(rules: Rule[]): Rule[] {
+	if (!Array.isArray(rules)) throw new Error(`cloneRules() expects an array of rules`);
+
+	return rules.map((rule) => ({
+		...rule,
+		from: Array.isArray(rule.from) ? [...rule.from] : rule.from,
+		to: Array.isArray(rule.to) ? [...rule.to] : rule.to,
+		containers: [...rule.containers]
+	}));
 }
