@@ -441,26 +441,29 @@ The first `<main>` element in a document will be considered the main content by 
 
 - Wrapping your `<main>` content inside a `<dialog>` will produce [semantically incorrect markup](https://stackoverflow.com/a/75007908/586823). We still think it's the cleanest approach for now, until the [Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API) reaches [wider browser support](https://caniuse.com/?search=popover).
 
-## Methods on the swup instance
+## API methods
 
-The plugin adds a few methods to the swup instance:
+Fragment plugin provides a few API functions for advanced use cases. To be able to access those, you'll need to keep a reference to the plugin during instanciation:
 
-### `swup.getFragmentVisit(route)`
+```js
+const fragmentPlugin = new SwupFragmentPlugin({ rules });
+const swup = new Swup({ plugins: [ fragmentPlugin ] });
+/** You can now call the plugin's public API, for example: */
+fragmentPlugin.getFragmentVisit(route);
+```
+
+### `getFragmentVisit(route)`
 
 Get information about the fragment visit for a given route. Returns either `FragmentVisit` or `undefined`.
 
 ```js
-const rules = [
-  // ...
-];
-const swup = new Swup({ plugins: [new SwupFragmentPlugin({ rules })] });
 /**
  * Get information about which containers will
  * be replaced when hovering over links:
  */
 document.querySelectorAll('a[href]').forEach((el) => {
   el.addEventListener('mouseenter', () => {
-    const fragmentVisit = swup.getFragmentVisit?.({
+    const fragmentVisit = fragmentPlugin.getFragmentVisit({
       from: window.location.href, // the current URL
       to: el.href // the URL of the link
     });
@@ -469,18 +472,30 @@ document.querySelectorAll('a[href]').forEach((el) => {
 });
 ```
 
-### `swup.prependFragmentRule(rule)`
+### `prependRule(rule)`
 
 Prepends a [rule](#type-signature-rule) to the array of rules.
 
 ```js
-swup.prependFragmentRule({ from: '/foo/', to: '/bar/', containers: ['#foobar'] });
+fragmentPlugin.prependRule({ from: '/foo/', to: '/bar/', containers: ['#foobar'] });
 ```
 
-### `swup.appendFragmentRule(rule)`
+### `appendRule(rule)`
 
 Appends a [rule](#type-signature-rule) to the array of rules.
 
 ```js
-swup.prependFragmentRule({ from: '/baz/', to: '/bat/', containers: ['#bazbat'] });
+fragmentPlugin.prependRule({ from: '/baz/', to: '/bat/', containers: ['#bazbat'] });
 ```
+
+### `getRules()`
+
+Get a [clone](https://developer.mozilla.org/en-US/docs/Web/API/structuredClone) of all registered fragment rules
+
+```js
+console.log(fragmentPlugin.getRules());
+```
+
+### `setRules(rules)`
+
+Overwrite all fragment rules with the provided rules.
