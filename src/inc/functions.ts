@@ -386,9 +386,7 @@ export function cloneRules(rules: Rule[]): any {
 	const clone: Rule[] = [];
 
 	rules.forEach((rule) => {
-		const clonedRule = { ...rule };
-		clonedRule.containers = [...clonedRule.containers];
-		clone.push({ ...clonedRule });
+		clone.push({ ...rule, containers: [...rule.containers] });
 	});
 
 	return clone;
