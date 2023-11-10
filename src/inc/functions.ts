@@ -380,6 +380,9 @@ export function queryFragmentElement(
 	return;
 }
 
+/**
+ * Clone fragment rules (replacement for `structuredClone`)
+ */
 export function cloneRules(rules: Rule[]): any {
 	if (!Array.isArray(rules)) throw new Error(`cloneRules() expects an array of rules`);
 
