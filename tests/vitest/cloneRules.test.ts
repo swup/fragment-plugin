@@ -4,7 +4,8 @@ import { cloneRules } from '../../src/inc/functions.js';
 describe('cloneRules()', () => {
 	it('should clone rules', () => {
 		const original = [
-			{from: 'foo', to: 'bar', containers: ['#foobar']}
+			{ from: 'foo', to: 'bar', containers: ['#foobar'] },
+			{ from: 'baz', to: 'bat', containers: ['#bazbat'] }
 		];
 		/** test equality with a reference */
 		const reference = original;
