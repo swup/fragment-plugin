@@ -489,7 +489,7 @@ fragmentPlugin.prependRule({ from: '/baz/', to: '/bat/', containers: ['#bazbat']
 
 ### `getRules()`
 
-Get a [clone](https://developer.mozilla.org/en-US/docs/Web/API/structuredClone) of all registered fragment rules
+Get a **clone** of all registered fragment rules
 
 ```js
 console.log(fragmentPlugin.getRules());
@@ -497,7 +497,7 @@ console.log(fragmentPlugin.getRules());
 
 ### `setRules(rules)`
 
-Overwrite all fragment rules with the provided rules. This methods provides the lowest-level access to the rules. For example, you could use it to remove all rules with the name  `foobar`:
+Overwrite all fragment rules with the provided rules. This methods provides the lowest-level access to the rules. For example, you could use it to remove all rules with the name `foobar`:
 
 ```js
 fragmentPlugin.setRules(
