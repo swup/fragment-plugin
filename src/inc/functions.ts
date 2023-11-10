@@ -386,5 +386,10 @@ export function queryFragmentElement(
 export function cloneRules(rules: Rule[]): any {
 	if (!Array.isArray(rules)) throw new Error(`cloneRules() expects an array of rules`);
 
-	return rules.map(rule => ({ ...rule, containers: [...rule.containers] }))
+	return rules.map((rule) => ({
+		...rule,
+		from: Array.isArray(rule.from) ? [...rule.from] : rule.from,
+		to: Array.isArray(rule.to) ? [...rule.to] : rule.to,
+		containers: [...rule.containers]
+	}));
 }
