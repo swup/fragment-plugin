@@ -500,8 +500,5 @@ console.log(fragmentPlugin.getRules());
 Overwrite all fragment rules with the provided rules. This methods provides the lowest-level access to the rules. For example, you could use it to remove all rules with the name `foobar`:
 
 ```js
-fragmentPlugin.setRules(
-  fragmentPlugin.getRules()
-    .filter((rule) => rule.name !== 'foobar')
-);
+fragmentPlugin.setRules(fragmentPlugin.getRules().filter((rule) => rule.name !== 'foobar'));
 ```
