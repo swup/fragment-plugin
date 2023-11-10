@@ -147,7 +147,6 @@ html.is-animating .transition-main {
 
 ## Options
 
-
 ### Type Signature: `Options`
 
 ```js
@@ -447,7 +446,7 @@ Fragment plugin provides a few API functions for advanced use cases. To be able 
 
 ```js
 const fragmentPlugin = new SwupFragmentPlugin({ rules });
-const swup = new Swup({ plugins: [ fragmentPlugin ] });
+const swup = new Swup({ plugins: [fragmentPlugin] });
 /** You can now call the plugin's public API, for example: */
 fragmentPlugin.getFragmentVisit(route);
 ```
@@ -498,4 +497,11 @@ console.log(fragmentPlugin.getRules());
 
 ### `setRules(rules)`
 
-Overwrite all fragment rules with the provided rules.
+Overwrite all fragment rules with the provided rules. This methods provides the lowest-level access to the rules. For example, you could use it to remove all rules with the name  `foobar`:
+
+```js
+fragmentPlugin.setRules(
+  fragmentPlugin.getRules()
+    .filter((rule) => rule.name !== 'foobar')
+);
+```
