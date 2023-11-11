@@ -40,6 +40,7 @@ https://github.com/swup/fragment-plugin/assets/869813/ecaf15d7-ec72-43e8-898a-64
 - [Skip out/in animations using `<template>`](#skip-out-in-animations-using-template)
 - [Modals as children of `transform`ed parents](#modals-as-children-of-transformed-parents)
 - [Modals and Accessibility](#modals-and-accessibility)
+- [API Methods](#api-methods)
 
 ## Installation
 
