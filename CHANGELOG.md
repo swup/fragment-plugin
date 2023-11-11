@@ -2,7 +2,7 @@
 
 ## [0.3.5] - 2023-11-11
 
-- New API methods:
+- New [API methods](https://github.com/swup/fragment-plugin#api-methods):
   - `getFragmentVisit()`
   - `prependRule()`
   - `appendRule()`
