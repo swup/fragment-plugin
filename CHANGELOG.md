@@ -8,7 +8,7 @@
   - `appendRule()`
   - `getRules()`
   - `setRules()`
-- Improve test coverage
+- Add vitest tests for many functions
 
 ## [0.3.4] - 2023-10-15
 
