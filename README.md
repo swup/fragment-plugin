@@ -2,8 +2,9 @@
 
 <div class="shields">
 
-[![npm version](https://img.shields.io/npm/v/@swup/fragment-plugin.svg)](https://www.npmjs.com/package/@swup/fragment-plugin)
+<!--[![npm version](https://img.shields.io/npm/v/@swup/fragment-plugin.svg)](https://www.npmjs.com/package/@swup/fragment-plugin) -->
 [![Test status](https://img.shields.io/github/actions/workflow/status/swup/fragment-plugin/unit-tests.yml?branch=master&label=Vitest)](https://github.com/swup/fragment-plugin/actions/workflows/unit-tests.yml)
+[![License](https://img.shields.io/github/license/swup/fragment-plugin.svg)](https://github.com/swup/fragment-plugin/blob/master/LICENSE)
 
 </div>
 
