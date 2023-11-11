@@ -1,5 +1,13 @@
 # Swup Fragment Plugin
 
+<div class="shields">
+
+<!--[![npm version](https://img.shields.io/npm/v/@swup/fragment-plugin.svg)](https://www.npmjs.com/package/@swup/fragment-plugin) -->
+[![Test status](https://img.shields.io/github/actions/workflow/status/swup/fragment-plugin/unit-tests.yml?branch=master&label=unit%20tests)](https://github.com/swup/fragment-plugin/actions/workflows/unit-tests.yml)
+[![License](https://img.shields.io/github/license/swup/fragment-plugin.svg)](https://github.com/swup/fragment-plugin/blob/master/LICENSE)
+
+</div>
+
 A [swup](https://swup.js.org) plugin for dynamically replacing containers based on rules 🧩
 
 - Selectively replace containers instead of the main swup containers, based on custom rules
@@ -40,6 +48,7 @@ https://github.com/swup/fragment-plugin/assets/869813/ecaf15d7-ec72-43e8-898a-64
 - [Skip out/in animations using `<template>`](#skip-out-in-animations-using-template)
 - [Modals as children of `transform`ed parents](#modals-as-children-of-transformed-parents)
 - [Modals and Accessibility](#modals-and-accessibility)
+- [API Methods](#api-methods)
 
 ## Installation
 
