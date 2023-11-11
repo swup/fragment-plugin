@@ -1,7 +1,10 @@
 # Swup Fragment Plugin
 
-[![Test status](https://img.shields.io/github/actions/workflow/status/swup/fragment-plugin/unit-tests.yml?branch=master&label=Vitest)](https://github.com/swup/fragment-plugin/actions/workflows/unit-tests.yml)
+<div class="shields">
 
+[![Test status](https://img.shields.io/github/actions/workflow/status/swup/fragment-plugin/unit-test.yml?branch=master&label=Vitest)](https://github.com/swup/fragment-plugin/actions/workflows/unit-tests.yml)
+
+</div>
 
 A [swup](https://swup.js.org) plugin for dynamically replacing containers based on rules 🧩
 
