@@ -1,5 +1,13 @@
 # Swup Fragment Plugin
 
+<div class="shields">
+
+<!--[![npm version](https://img.shields.io/npm/v/@swup/fragment-plugin.svg)](https://www.npmjs.com/package/@swup/fragment-plugin) -->
+[![Test status](https://img.shields.io/github/actions/workflow/status/swup/fragment-plugin/unit-tests.yml?branch=master&label=unit%20tests)](https://github.com/swup/fragment-plugin/actions/workflows/unit-tests.yml)
+[![License](https://img.shields.io/github/license/swup/fragment-plugin.svg)](https://github.com/swup/fragment-plugin/blob/master/LICENSE)
+
+</div>
+
 A [swup](https://swup.js.org) plugin for dynamically replacing containers based on rules 🧩
 
 - Selectively replace containers instead of the main swup containers, based on custom rules
@@ -40,6 +48,7 @@ https://github.com/swup/fragment-plugin/assets/869813/ecaf15d7-ec72-43e8-898a-64
 - [Skip out/in animations using `<template>`](#skip-out-in-animations-using-template)
 - [Modals as children of `transform`ed parents](#modals-as-children-of-transformed-parents)
 - [Modals and Accessibility](#modals-and-accessibility)
+- [API Methods](#api-methods)
 
 ## Installation
 
@@ -147,17 +156,25 @@ html.is-animating .transition-main {
 
 ## Options
 
-```typescript
+### Type Signature: `Options`
+
+```js
 export type Options = {
-  rules: Array<{
-    from: string | string[];
-    to: string | string[];
-    containers: string[];
-    name?: string;
-    scroll?: boolean | string;
-    focus?: boolean | string;
-  }>;
+  rules: Rule[];
   debug?: boolean;
+};
+```
+
+### Type Signature: `Rule`
+
+```js
+export type Rule = {
+  from: string | string[];
+  to: string | string[];
+  containers: string[];
+  name?: string;
+  scroll?: boolean | string;
+  focus?: boolean | string;
 };
 ```
 
@@ -175,7 +192,7 @@ The rule's `from`/`to` paths are converted to a regular expression by [path-to-r
     {
       from: ['/users', '/users/:filter?'],
       to: ['/users', '/users/:filter?'],
-      containers: ['#user-list'],
+      containers: ['#user-list']
     }
   ];
 }
@@ -196,7 +213,7 @@ Required, Type: `string[]` – Selectors of containers to be replaced if the vis
 **Notes**
 
 - **only IDs and no nested selectors are allowed**. `#my-element` is valid, while
-`.my-element` or `#wrap #child` both will throw an error.
+  `.my-element` or `#wrap #child` both will throw an error.
 - if **any** of the selectors in `containers` doesn't return a match in the current document, the rule will be skipped.
 - Fragment elements **must either match a swup container or be a descendant of one of them**
 
@@ -384,7 +401,9 @@ This will work fine, until you apply a `transform` to one of the modal's parent 
 
 ```css
 html.is-changing .transition-main {
-  transition: opacity 250ms, transform 250ms;
+  transition:
+    opacity 250ms,
+    transform 250ms;
 }
 html.is-animating .transition-main {
   opacity: 0;
@@ -398,7 +417,7 @@ The reason for this is that a CSS `transform` establishes a [containing block fo
 You have two options to fix this:
 
 1. Don't apply CSS `transform`s to any of the parents of a modal
-2. Use `<detail open>` for the modal:
+2. Use `<dialog open>` for the modal:
 
 ```diff
 - <main id="overlay" class="modal">
@@ -429,3 +448,66 @@ The first `<main>` element in a document will be considered the main content by 
 **Cons**:
 
 - Wrapping your `<main>` content inside a `<dialog>` will produce [semantically incorrect markup](https://stackoverflow.com/a/75007908/586823). We still think it's the cleanest approach for now, until the [Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API) reaches [wider browser support](https://caniuse.com/?search=popover).
+
+## API methods
+
+Fragment plugin provides a few API functions for advanced use cases. To be able to access those, you'll need to keep a reference to the plugin during instanciation:
+
+```js
+const fragmentPlugin = new SwupFragmentPlugin({ rules });
+const swup = new Swup({ plugins: [fragmentPlugin] });
+/** You can now call the plugin's public API, for example: */
+fragmentPlugin.getFragmentVisit(route);
+```
+
+### `getFragmentVisit(route)`
+
+Get information about the fragment visit for a given route. Returns either `FragmentVisit` or `undefined`.
+
+```js
+/**
+ * Get information about which containers will
+ * be replaced when hovering over links:
+ */
+document.querySelectorAll('a[href]').forEach((el) => {
+  el.addEventListener('mouseenter', () => {
+    const fragmentVisit = fragmentPlugin.getFragmentVisit({
+      from: window.location.href, // the current URL
+      to: el.href // the URL of the link
+    });
+    console.log(`will replace ${fragmentVisit?.containers || swup.options.containers}`);
+  });
+});
+```
+
+### `prependRule(rule)`
+
+Prepends a [rule](#type-signature-rule) to the array of rules.
+
+```js
+fragmentPlugin.prependRule({ from: '/foo/', to: '/bar/', containers: ['#foobar'] });
+```
+
+### `appendRule(rule)`
+
+Appends a [rule](#type-signature-rule) to the array of rules.
+
+```js
+fragmentPlugin.prependRule({ from: '/baz/', to: '/bat/', containers: ['#bazbat'] });
+```
+
+### `getRules()`
+
+Get a **clone** of all registered fragment rules
+
+```js
+console.log(fragmentPlugin.getRules());
+```
+
+### `setRules(rules)`
+
+Overwrite all fragment rules with the provided rules. This methods provides the lowest-level access to the rules. For example, you could use it to remove all rules with the name `foobar`:
+
+```js
+fragmentPlugin.setRules(fragmentPlugin.getRules().filter((rule) => rule.name !== 'foobar'));
+```

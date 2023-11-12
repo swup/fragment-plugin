@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.5] - 2023-11-11
+
+- New [API methods](https://github.com/swup/fragment-plugin#api-methods):
+  - `getFragmentVisit()`
+  - `prependRule()`
+  - `appendRule()`
+  - `getRules()`
+  - `setRules()`
+- Add vitest tests for many functions
+
 ## [0.3.4] - 2023-10-15
 
 - Ignore fragment elements that are not children of swup's default `containers`
@@ -47,6 +57,7 @@
 
 - Initial Release
 
+[0.3.5]: https://github.com/swup/fragment-plugin/releases/tag/0.3.5
 [0.3.4]: https://github.com/swup/fragment-plugin/releases/tag/0.3.4
 [0.3.3]: https://github.com/swup/fragment-plugin/releases/tag/0.3.3
 [0.3.2]: https://github.com/swup/fragment-plugin/releases/tag/0.3.2
