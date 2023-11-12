@@ -19,7 +19,8 @@ h1, h2, ul {
 }
 
 :focus-visible {
-  box-shadow: 0 0 0 10px gold;
+  box-shadow: 0 0 0 3px gold;
+  outline: 0;
 }
 
 /*
@@ -47,15 +48,16 @@ h1, h2, ul {
 .filters {
   display: flex;
   gap: 1rem;
-  & a {
-    padding: 0.2em 0.5em;
-    border: 1px solid var(--blue);
-    border-radius: 0.5em;
-    &.is-active,
-    &:hover {
-      background: var(--blue);
-      color: white;
-    }
+}
+.filters a,
+a.button {
+  padding: 0.2em 0.5em;
+  border: 1px solid var(--blue);
+  border-radius: 0.5em;
+  &.is-active,
+  &:hover {
+    background: var(--blue);
+    color: white;
   }
 }
 .list {
