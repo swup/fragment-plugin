@@ -5,6 +5,7 @@
 :root {
   --red: hsl(0, 74%, 67%);
   --green: hsl(100, 68%, 58%);
+  --blue: oklch(59.12% 0.153 230.82);
 }
 body {
   font-family: system-ui;
@@ -31,6 +32,13 @@ h1, h2, ul {
 :where(ul:not([class])) {
   list-style-type: "> ";
   padding-left: 1rem;
+  & li {
+    padding-block: 0.2em;
+  }
+}
+:where(a) {
+  color: var(--blue);
+  text-decoration: none;
 }
 
 /*
@@ -39,6 +47,16 @@ h1, h2, ul {
 .filters {
   display: flex;
   gap: 1rem;
+  & a {
+    padding: 0.2em 0.5em;
+    border: 1px solid var(--blue);
+    border-radius: 0.5em;
+    &.is-active,
+    &:hover {
+      background: var(--blue);
+      color: white;
+    }
+  }
 }
 .list {
   display: grid;
