@@ -3,15 +3,20 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Items</title>
+		<title>List</title>
 		<link rel="stylesheet" href="/assets/style.css" />
 	</head>
 	<body>
-		<main id="swup">
+		<main id="swup" data-uniqueid>
+
 			<h1>List</h1>
-			<p id="intro">
+
+			<p id="intro" data-uniqueid>
 				This paragraph should persist when clicking one of the filters.
 			</p>
+
+			<template id="detail" data-uniqueid></template>
+
 			<div id="list">
 				<h2>All Items</h2>
 				<ul class="filters">
@@ -21,22 +26,22 @@
 				</ul>
 				<ul class="list">
 					<li class="list_item list_item--red">
-						<a class="list_item_link" href="/overlay/">1</a>
+						<a class="list_item_link" href="/detail/">1</a>
 					</li>
 					<li class="list_item list_item--green">
-						<a class="list_item_link" href="/overlay/">2</a>
+						<a class="list_item_link" href="/detail/">2</a>
 					</li>
 					<li class="list_item list_item--red">
-						<a class="list_item_link" href="/overlay/">3</a>
+						<a class="list_item_link" href="/detail/">3</a>
 					</li>
 					<li class="list_item list_item--green">
-						<a class="list_item_link" href="/overlay/">4</a>
+						<a class="list_item_link" href="/detail/">4</a>
 					</li>
 				</ul>
 			</div>
 		</main>
 		<script src="/dist/swup.umd.js"></script>
-		<script src="/dist/index.umd.js"></script>
+		<script src="/dist/fragment-plugin.umd.js"></script>
 		<script src="/assets/script.js"></script>
 	</body>
 </html>

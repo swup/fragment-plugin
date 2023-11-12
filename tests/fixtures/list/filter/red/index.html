@@ -3,13 +3,17 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>Items</title>
+		<title>List: Red Items</title>
 		<link rel="stylesheet" href="/assets/style.css" />
 	</head>
 	<body>
-		<main id="swup">
-			<h1>List</h1>
-			<div id="list">
+		<main id="swup" data-uniqueid>
+
+			<h1>List: Red Items</h1>
+
+			<template id="detail" data-uniqueid></template>
+
+			<div id="list" data-uniqueid>
 				<h2>Red Items</h2>
 				<ul class="filters">
 					<li><a href="/list/">All</a></li>
@@ -18,16 +22,17 @@
 				</ul>
 				<ul class="list">
 					<li class="list_item list_item--red">
-						<a class="list_item_link" href="/overlay/">1</a>
+						<a class="list_item_link" href="/detail/">1</a>
 					</li>
 					<li class="list_item list_item--red">
-						<a class="list_item_link" href="/overlay/">3</a>
+						<a class="list_item_link" href="/detail/">3</a>
 					</li>
 				</ul>
 			</div>
+
 		</main>
 		<script src="/dist/swup.umd.js"></script>
-		<script src="/dist/index.umd.js"></script>
+		<script src="/dist/fragment-plugin.umd.js"></script>
 		<script src="/assets/script.js"></script>
 	</body>
 </html>

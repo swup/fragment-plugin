@@ -8,10 +8,10 @@ const url = prefixed('/');
 
 test.describe('replace fragments', () => {
 	test.beforeEach(async ({ page }) => {
-		await page.goto('/');
+		await page.goto('/list/');
 	});
 
-	test('hello world', async ({ page }) => {
-		await expectToBeAt(page, '/page-1.html', 'Page 1');
+	test('should be at home', async ({ page }) => {
+		await expectToBeAt(page, '/list/', 'List');
 	});
 });
