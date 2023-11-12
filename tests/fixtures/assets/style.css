@@ -64,5 +64,14 @@ h1, h2, ul {
 }
 
 /*
-* Overlay
+* Modals
 */
+.modal {
+  max-width: 600px;
+  padding: 1rem;
+}
+.modal_close {
+  position: absolute;
+  inset-block-start: 1rem;
+  inset-inline-end: 1rem;
+}

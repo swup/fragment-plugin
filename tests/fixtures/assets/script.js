@@ -4,6 +4,18 @@ const rules = [
 		to: ['/list/', '/list/filter/:filter'],
 		containers: ['#list'],
 		name: 'update-list'
+	},
+	{
+		from: ['/list/', '/list/filter/:filter'],
+		to: '/detail/',
+		containers: ['#detail'],
+		name: 'open-detail'
+	},
+	{
+		from: '/detail/',
+		to: ['/list/', '/list/filter/:filter'],
+		containers: ['#detail', '#list'],
+		name: 'close-detail'
 	}
 ];
 
@@ -21,6 +33,19 @@ const uniqueId = (length = 16) => {
 			.replace('.', '')
 	);
 };
-document
-	.querySelectorAll('[data-uniqueid]')
-	.forEach((el) => el.setAttribute('data-uniqueid', uniqueId()));
+
+const fragmentContainers = rules.reduce((acc, current) => [...acc, ...current.containers], []);
+const allContainers = [...new Set([...swup.options.containers, ...fragmentContainers])];
+
+/**
+ * Add a unique id attribute to every provided selector.
+ * This will help to identify persisted elements more easily
+ */
+function addUniqueIds(selectors) {
+	selectors.forEach(selector => {
+		document.querySelector(selector)?.setAttribute('data-uniqueid', uniqueId());
+	})
+}
+
+addUniqueIds(allContainers);
+swup.hooks.on('content:replace', ({ containers }) => addUniqueIds(containers));
