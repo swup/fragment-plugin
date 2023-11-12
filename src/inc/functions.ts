@@ -33,6 +33,7 @@ function showDialogs({ logger }: FragmentPlugin): void {
 			el.__swupFragment.modalShown = true;
 			el.removeAttribute('open');
 			el.showModal?.();
+			el.addEventListener('keydown', (e) => e.key === 'Escape' && e.preventDefault());
 		});
 }
 
