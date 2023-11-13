@@ -34,6 +34,10 @@ export async function navigateWithSwup(
 	await expectToBeAt(page, url);
 }
 
+export async function scrollTo(page: Page, y: number) {
+	await page.evaluate((y) => window.scrollTo(0, y), y);
+}
+
 export async function expectScrollPosition(page: Page, expected: number) {
 	const scrollY = await page.evaluate(() => window.scrollY);
 	expect(scrollY).toBe(expected);

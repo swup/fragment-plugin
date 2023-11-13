@@ -1,8 +1,14 @@
 import { test, expect } from '@playwright/test';
 
-import { clickOnLink, waitForSwup, navigateWithSwup, prefixed, expectScrollPosition } from './inc/commands.js';
+import {
+	clickOnLink,
+	waitForSwup,
+	navigateWithSwup,
+	scrollTo,
+	expectScrollPosition
+} from './inc/commands.js';
 
-test.describe('replace fragments', () => {
+test.describe('Fragment Plugin', () => {
 	test.beforeEach(async ({ page }) => {
 		await page.goto('/');
 		await waitForSwup(page);
@@ -22,7 +28,6 @@ test.describe('replace fragments', () => {
 
 		const swupID = await page.locator('#swup').getAttribute('data-uniqueid');
 		const listID = await page.locator('#list').getAttribute('data-uniqueid');
-		console.log(listID);
 
 		await navigateWithSwup(page, '/list/filter/red/');
 		await expect(page).toHaveURL('/list/filter/red/');
@@ -48,11 +53,11 @@ test.describe('replace fragments', () => {
 
 	test('should not scroll', async ({ page }) => {
 		await page.goto('/list/');
-		await page.evaluate(() => window.scrollTo(0, 100));
+
+		await scrollTo(page, 100);
 
 		await navigateWithSwup(page, '/list/filter/green/');
 
 		await expectScrollPosition(page, 100);
-		// expect(await page.evaluate(() => window.scrollY)).toBe(100);
 	});
 });
