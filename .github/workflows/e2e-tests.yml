@@ -26,4 +26,4 @@ jobs:
         run: npm run build
 
       - name: Run tests
-        run: npx playwright test --config ./tests/config/playwright.config.ts
+        run: xvfb-run npx playwright test --config ./tests/config/playwright.config.ts
