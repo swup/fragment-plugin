@@ -38,10 +38,3 @@ jobs:
 
       - name: Run tests
         run: npx playwright test --config ./tests/config/playwright.config.ts
-
-      - name: Create report comment
-        id: report-summary
-        uses: daun/playwright-report-summary@v2.1.2
-        with:
-          report-file: results.json
-          job-summary: true
