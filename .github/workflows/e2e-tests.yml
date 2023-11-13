@@ -24,7 +24,7 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci && npm run test:e2e:install
 
       - name: Bundle library
         run: npm run build
@@ -34,7 +34,7 @@ jobs:
         run: echo "version=$(cat ./package-lock.json | jq -re '.packages["node_modules/@playwright/test"].version')" >> $GITHUB_OUTPUT
 
       - name: Run tests
-        run: HOME=/root npx playwright install --with-deps && npx playwright test --config ./tests/config/playwright.config.ts
+        run: HOME=/root npx playwright test --config ./tests/config/playwright.config.ts
 
       - name: Create report comment
         id: report-summary
