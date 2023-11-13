@@ -7,34 +7,23 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
-    name: Run playwright tests
+  playwright:
+    name: 'Playwright Tests'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    permissions:
-      pull-requests: write
-      contents: write
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+    container:
+      image: mcr.microsoft.com/playwright:v1.39.0-jammy
 
-      - name: Set up node
-        uses: actions/setup-node@v3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
         with:
           node-version: 18
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Install playwright
-        run: npx playwright install --with-deps
-
       - name: Bundle library
         run: npm run build
-
-      - name: Get playwright version
-        id: playwright-version
-        run: echo "version=$(cat ./package-lock.json | jq -re '.packages["node_modules/@playwright/test"].version')" >> $GITHUB_OUTPUT
 
       - name: Run tests
         run: npx playwright test --config ./tests/config/playwright.config.ts

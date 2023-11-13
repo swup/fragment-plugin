@@ -35,7 +35,11 @@ export default defineConfig({
 	/* Reporter to use. See https://playwright.dev/docs/test-reporters */
 	reporter: process.env.CI
 		? [['dot'], ['github'], ['json', { outputFile: '../reports/json/report.json' }]]
-		: [['list'], ['html', { outputFolder: '../reports/html', open: 'on-failure' }]],
+		: [
+				['list'],
+				['html', { outputFolder: '../reports/html', open: 'on-failure' }],
+				['json', { outputFile: '../reports/json/report.json' }]
+		  ],
 
 	expect: {
 		/* Timeout async expect matchers after 3 seconds */
