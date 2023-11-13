@@ -1,3 +1,5 @@
+@import url("./transitions.css");
+
 *, *:before, *:after {
   box-sizing: border-box;
 }
@@ -12,6 +14,7 @@ body {
   padding: 1rem;
   max-width: 800px;
   margin: 5% auto;
+  padding-bottom: 100vh;
 }
 
 h1, h2, ul {
@@ -99,3 +102,4 @@ a.button {
   inset-block-start: 1rem;
   inset-inline-end: 1rem;
 }
+

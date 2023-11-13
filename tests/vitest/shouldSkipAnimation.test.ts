@@ -9,14 +9,14 @@ describe('shouldSkipAnimation()', () => {
 			scroll: false
 		};
 		/** all are <template> elements */
-		stubGlobalDocument(/*html*/ `<div id="swup">
+		stubGlobalDocument(/*html*/ `<div id="swup" class="transition-main">
 			<template id="fragment-1"></template>
 			<template id="fragment-2"></template>
 		</div>`);
 		expect(shouldSkipAnimation(fragmentVisit)).toBe(true);
 
 		/** some are not <template> elements */
-		stubGlobalDocument(/*html*/ `<div id="swup">
+		stubGlobalDocument(/*html*/ `<div id="swup" class="transition-main">
 			<template id="fragment-1"></template>
 			<div id="fragment-2"></div>
 		</div>`);

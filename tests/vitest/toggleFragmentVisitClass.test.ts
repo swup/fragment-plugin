@@ -6,7 +6,7 @@ import { FragmentVisit } from '../../src/index.js';
 describe('toggleFragmentVisitClass()', () => {
 	it("should toggle a fragment visit's name on the classList of all fragment elements", () => {
 		stubGlobalDocument(/*html*/ `
-			<div id="swup">
+			<div id="swup" class="transition-main">
 				<div id="fragment-1"></div>
 				<div id="fragment-2"></div>
 			</div>`);
@@ -28,7 +28,7 @@ describe('toggleFragmentVisitClass()', () => {
 
 	it("should't add classes if the current fragment visit doesn't have a `name`", () => {
 		stubGlobalDocument(/*html*/ `
-			<div id="swup">
+			<div id="swup" class="transition-main">
 				<div id="fragment-1"></div>
 			</div>`);
 

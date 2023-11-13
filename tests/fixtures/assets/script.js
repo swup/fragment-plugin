@@ -49,3 +49,7 @@ function addUniqueIds(selectors) {
 
 addUniqueIds(allContainers);
 swup.hooks.on('content:replace', ({ containers }) => addUniqueIds(containers));
+
+
+swup.hooks.on('visit:start', () => document.documentElement.setAttribute('aria-busy', 'true'));
+swup.hooks.on('visit:end', () => document.documentElement.removeAttribute('aria-busy'));

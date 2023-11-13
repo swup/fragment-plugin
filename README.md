@@ -92,7 +92,7 @@ container.
 ```html
 <body>
   <header>Website</header>
-  <main id="swup" class="transition-main">
+  <main id="swup" class="transition-main" class="transition-main">
     <h1>Users</h1>
     <!-- A list of filters for the users: selecting one will update the list below -->
     <ul>
@@ -370,7 +370,7 @@ If all elements of a visit are `<template>` elements, the `out`/`in`-animation w
 Suppose you have an overlay that you want to present like a modal, above all other content:
 
 ```html
-<div id="swup" class="transition-main">
+<div id="swup" class="transition-main" class="transition-main">
   <!-- This should be placed above everything else, like a modal -->
   <main id="user" class="modal">
     <h1>User 1</h1>
