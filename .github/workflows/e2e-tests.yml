@@ -15,24 +15,27 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      # Cache playwright browsers
-      # @see https://justin.poehnelt.com/posts/caching-playwright-in-github-actions/
-      - uses: actions/cache@v3
+
+      # Cache playwright and dependencies
+      # @see https://playwrightsolutions.com/playwright-github-action-to-cache-the-browser-binaries/
+      - name: Get installed Playwright version
+        id: playwright-version
+        run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').dependencies['@playwright/test'].version)")" >> $GITHUB_ENV
+      - name: Cache playwright binaries
+        uses: actions/cache@v3
         id: playwright-cache
         with:
           path: |
             ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
 
       - run: npm ci
-
       - run: npx playwright install --with-deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-
       - run: npx playwright install-deps
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
 
       - run: npm run build
 
-      - name: Run tests
+      - name: Run playwright tests
         run: npx playwright test --config ./tests/config/playwright.config.ts
