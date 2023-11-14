@@ -8,11 +8,8 @@ on:
 
 jobs:
   playwright:
-    name: 'Playwright Tests'
+    name: 'Run Playwright Tests'
     runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/playwright:v1.39.0-jammy
-
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
@@ -25,5 +22,8 @@ jobs:
       - name: Bundle library
         run: npm run build
 
+      - name: Install playwright browsers
+        run: npx playwright install --with-deps
+
       - name: Run tests
-        run: xvfb-run npx playwright test --config ./tests/config/playwright.config.ts
+        run: npx playwright test --config ./tests/config/playwright.config.ts

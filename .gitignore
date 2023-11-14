@@ -15,3 +15,4 @@ src/packages
 /playwright-report/
 /coverage
 .nyc_output
+report.json
