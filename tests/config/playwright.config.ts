@@ -64,7 +64,7 @@ export default defineConfig({
 	/* Run your local dev server before starting the tests */
 	webServer: {
 		url: baseURL,
-		command: 'npm run test:e2e:start',
+		command: 'npm run test:e2e:serve',
 		reuseExistingServer: !process.env.CI
 	}
 });
