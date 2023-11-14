@@ -1,8 +1,12 @@
 # Changelog
 
+## [0.3.7] - 2023-11-14
+
+- Add playwright tests
+
 ## [0.3.6] - 2023-11-13
 
-- Prevent `<dialog>` fragments from being closed if pressing the <kbd>Escape<kbd> key
+- Prevent `<dialog>` fragments from being closed if pressing the <kbd>Escape</kbd> key
 
 ## [0.3.5] - 2023-11-11
 
@@ -61,6 +65,7 @@
 
 - Initial Release
 
+[0.3.7]: https://github.com/swup/fragment-plugin/releases/tag/0.3.7
 [0.3.6]: https://github.com/swup/fragment-plugin/releases/tag/0.3.6
 [0.3.5]: https://github.com/swup/fragment-plugin/releases/tag/0.3.5
 [0.3.4]: https://github.com/swup/fragment-plugin/releases/tag/0.3.4
