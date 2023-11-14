@@ -7,14 +7,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  playwright:
-    name: 'Run Playwright Tests'
+  run-tests:
+    name: 'Run e2e tests'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+      # Cache playwright browsers
+      # @see https://justin.poehnelt.com/posts/caching-playwright-in-github-actions/
       - uses: actions/cache@v3
         id: playwright-cache
         with:
