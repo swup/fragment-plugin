@@ -1,4 +1,4 @@
-name: Unit tests
+name: E2E tests
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   run-tests:
-    name: Run unit tests
+    name: E2E tests
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -23,6 +23,11 @@ jobs:
 
       - run: npm ci
       - run: npm run build
+      - run: npx playwright install --with-deps
 
       - name: Run tests
-        run: npm run test:unit
+        run: npx playwright test --config ./tests/config/playwright.config.ts
+
+      - uses: daun/playwright-report-summary@v2
+        with:
+          report-file: playwright-results.json

@@ -17,7 +17,7 @@ describe('getFragmentVisitContainers()', () => {
 		spyOnConsole();
 		stubGlobalDocument(
 			/*html*/ `
-			<div id="swup">
+			<div id="swup" class="transition-main">
 				<div id="fragment-1"></div>
 				<div id="fragment-2"></div>
 				<div id="fragment-3" data-swup-fragment-url="/page-2/"></div>

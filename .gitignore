@@ -6,3 +6,13 @@ Thumbs.db
 dist
 *.tgz
 src/packages
+
+# Testing tools and outputs
+/tests/reports/
+/tests/results/
+/tests/fixtures/dist/
+/playwright/.cache/
+/playwright-report/
+/coverage
+.nyc_output
+report.json

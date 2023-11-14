@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Detail</title>
+		<link rel="stylesheet" href="/assets/style.css" />
+	</head>
+	<body>
+		<main id="swup" class="transition-main">
+
+			<dialog open id="detail" class="modal">
+				<main>
+					<h1>Detail</h1>
+					<a href="/list/" data-swup-link-to-fragment="#list" class="modal_close button">close</a>
+					<p>
+						Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eveniet neque at
+						et sapiente voluptate tempore odit earum quam. Illum quia labore quibusdam
+						provident accusantium earum fugiat cumque quidem a, ex itaque laudantium at
+						ad mollitia ab aut quisquam pariatur velit! Est ex iure dolores ducimus
+						porro? Aliquam distinctio quas porro unde! Omnis, est quisquam. Omnis,
+						facere repudiandae molestiae quod ratione cum eos soluta dolorum quidem,
+						asperiores, adipisci officia.
+					</p>
+					<ul class="filters">
+						<li><a href="/list/">All</a></li>
+						<li><a href="/list/filter/green/">Green</a></li>
+						<li><a href="/list/filter/red/">Red</a></li>
+					</ul>
+					<ul>
+						<li><a href="/">Home</a></li>
+					</ul>
+				</main>
+			</dialog>
+
+			<div id="list" data-swup-fragment-url="/list/">
+				<h2>All Items</h2>
+				<ul class="filters">
+					<li><a href="/list/" class="is-active">All</a></li>
+					<li><a href="/list/filter/green/">Green</a></li>
+					<li><a href="/list/filter/red/">Red</a></li>
+				</ul>
+				<ul class="list">
+					<li class="list_item list_item--red">
+						<a class="list_item_link" href="/detail/">1</a>
+					</li>
+					<li class="list_item list_item--green">
+						<a class="list_item_link" href="/detail/">2</a>
+					</li>
+					<li class="list_item list_item--red">
+						<a class="list_item_link" href="/detail/">3</a>
+					</li>
+					<li class="list_item list_item--green">
+						<a class="list_item_link" href="/detail/">4</a>
+					</li>
+				</ul>
+			</div>
+		</main>
+		<script src="/dist/swup.umd.js"></script>
+		<script src="/dist/fragment-plugin.umd.js"></script>
+		<script src="/assets/script.js"></script>
+	</body>
+</html>

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Home</title>
+		<link rel="stylesheet" href="/assets/style.css" />
+	</head>
+	<body>
+		<main id="swup" class="transition-main">
+			<h1>Home</h1>
+			<ul>
+				<li><a href="/list/">Go to list: all items</a></li>
+				<li><a href="/list/filter/red">Go to list: red items</a></li>
+				<li><a href="/list/filter/red">Go to list: green items</a></li>
+				<li><a href="/detail/">Go to detail</a></li>
+			</ul>
+		</main>
+		<!-- <script type="importmap">
+			{
+				"imports": {
+					"swup": "/dist/node_modules/swup/dist/Swup.modern.js",
+					"delegate-it": "/dist/node_modules/delegate-it/index.js",
+					"path-to-regexp": "/dist/node_modules/path-to-regexp/dist.es2015/index.js",
+					"@swup/plugin": "/dist/node_modules/@swup/plugin/dist/index.modern.js",
+					"@swup/fragment-plugin": "/dist/fragment-plugin/index.modern.js",
+				}
+			}
+		</script>
+		<script type="module" src="/assets/script.js"></script> -->
+		<script src="/dist/swup.umd.js"></script>
+		<script src="/dist/fragment-plugin.umd.js"></script>
+		<script src="/assets/script.js"></script>
+	</body>
+</html>

@@ -7,7 +7,7 @@ describe('queryFragmentElement()', () => {
 	it('should correctly query fragment elements', () => {
 		const swup = new Swup();
 		stubGlobalDocument(/*html*/ `
-			<div id="swup"><div id="fragment-1"></div></div>
+			<div id="swup" class="transition-main"><div id="fragment-1"></div></div>
 			<div id="fragment-2"></div>
 		`);
 		expect(queryFragmentElement('#swup', swup)).toBeDefined();

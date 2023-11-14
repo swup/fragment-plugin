@@ -3,7 +3,8 @@
 <div class="shields">
 
 <!--[![npm version](https://img.shields.io/npm/v/@swup/fragment-plugin.svg)](https://www.npmjs.com/package/@swup/fragment-plugin) -->
-[![Test status](https://img.shields.io/github/actions/workflow/status/swup/fragment-plugin/unit-tests.yml?branch=master&label=unit%20tests)](https://github.com/swup/fragment-plugin/actions/workflows/unit-tests.yml)
+[![Unit Tests](https://img.shields.io/github/actions/workflow/status/swup/fragment-plugin/unit-tests.yml?branch=master&label=vitest)](https://github.com/swup/fragment-plugin/actions/workflows/unit-tests.yml)
+[![E2E Tests](https://img.shields.io/github/actions/workflow/status/swup/fragment-plugin/e2e-tests.yml?branch=master&label=playwright)](https://github.com/swup/fragment-plugin/actions/workflows/e2e-tests.yml)
 [![License](https://img.shields.io/github/license/swup/fragment-plugin.svg)](https://github.com/swup/fragment-plugin/blob/master/LICENSE)
 
 </div>
@@ -92,7 +93,7 @@ container.
 ```html
 <body>
   <header>Website</header>
-  <main id="swup" class="transition-main">
+  <main id="swup" class="transition-main" class="transition-main">
     <h1>Users</h1>
     <!-- A list of filters for the users: selecting one will update the list below -->
     <ul>
@@ -370,7 +371,7 @@ If all elements of a visit are `<template>` elements, the `out`/`in`-animation w
 Suppose you have an overlay that you want to present like a modal, above all other content:
 
 ```html
-<div id="swup" class="transition-main">
+<div id="swup" class="transition-main" class="transition-main">
   <!-- This should be placed above everything else, like a modal -->
   <main id="user" class="modal">
     <h1>User 1</h1>

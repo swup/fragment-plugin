@@ -86,7 +86,7 @@ describe('ParsedRule', () => {
 	});
 
 	it('should correctly match a rule', () => {
-		stubGlobalDocument(/*html*/ `<div id="swup"><div id="fragment-1"></div></div>`);
+		stubGlobalDocument(/*html*/ `<div id="swup" class="transition-main"><div id="fragment-1"></div></div>`);
 		const rule = new ParsedRule({
 			from: '/users/',
 			to: '/user/:slug',
@@ -110,12 +110,12 @@ describe('ParsedRule', () => {
 		});
 
 		/** fragment element missing */
-		stubGlobalDocument(/*html*/ `<div id="swup"></div>`);
+		stubGlobalDocument(/*html*/ `<div id="swup" class="transition-main"></div>`);
 		expect(rule.matches({ from: '/foo/', to: '/bar/' })).toBe(false);
 		expect(console.error).toBeCalledWith(new Error('skipping rule since #fragment-1 doesn\'t exist in the current document'), expect.any(Object)) // prettier-ignore
 
 		/** fragment element outside of swup's default containers */
-		stubGlobalDocument(/*html*/ `<div id="swup"></div><div id="fragment-1"></div>`);
+		stubGlobalDocument(/*html*/ `<div id="swup" class="transition-main"></div><div id="fragment-1"></div>`);
 		expect(rule.matches({ from: '/foo/', to: '/bar/' })).toBe(false);
 		expect(console.error).toBeCalledWith(new Error('skipping rule since #fragment-1 is outside of swup\'s default containers'), expect.any(Object)) // prettier-ignore
 	});
