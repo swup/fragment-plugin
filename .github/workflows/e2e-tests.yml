@@ -30,4 +30,4 @@ jobs:
 
       - uses: daun/playwright-report-summary@v2
         with:
-          report-file: results.json
+          report-file: playwright-results.json

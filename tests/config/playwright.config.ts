@@ -34,7 +34,7 @@ export default defineConfig({
 	maxFailures: process.env.CI ? 10 : undefined,
 	/* Reporter to use. See https://playwright.dev/docs/test-reporters */
 	reporter: process.env.CI
-		? [['dot'], ['github'], ['json', { outputFile: '../../report.json' }]]
+		? [['dot'], ['github'], ['json', { outputFile: 'playwright-results.json' }]]
 		: [['list'], ['html', { outputFolder: '../reports/html', open: 'on-failure' }]],
 
 	expect: {
