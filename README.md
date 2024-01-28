@@ -111,7 +111,7 @@ container.
 </body>
 ```
 
-Using the Fragment Plugin, we can update **only** the `#users` list when clicking one of the filters.
+Using Fragment Plugin, we can update **only** the `#users` list when clicking one of the filters.
 The plugin expects an array of rules to recognize and handle fragment visits:
 
 ```js
@@ -270,7 +270,7 @@ Use the `data-swup-fragment-url` attribute to uniquely identify fragment element
 
 In scenarios where overlays are rendered on top of other content, leaving or closing the overlay to
 the same URL it was opened from should ideally not update the content below the overlay as
-nothing has changed. The fragment plugin will normally do that by keeping track of URLs. However,
+nothing has changed. Fragment plugin will normally do that by keeping track of URLs. However,
 when swup was initialized on a subpage with a visible overlay, the plugin doesn't know which URL
 the overlaid content corresponds to. Hence, we need to tell it manually so it can ignore content
 updates without changes.
