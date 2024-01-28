@@ -66,7 +66,7 @@ import SwupFragmentPlugin from '@swup/fragment-plugin';
 Or include the minified production file from a CDN:
 
 ```html
-<script src="https://unpkg.com/@swup/fragment-plugin@0"></script>
+<script src="https://unpkg.com/@swup/fragment-plugin@1"></script>
 ```
 
 ## How it works
