@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.0] - 2024-01-28
+
+- Version 1.0.0 🍾
+
 ## [0.3.7] - 2023-11-14
 
 - Add playwright tests
@@ -65,6 +69,7 @@
 
 - Initial Release
 
+[1.0.0]: https://github.com/swup/fragment-plugin/releases/tag/1.0.0
 [0.3.7]: https://github.com/swup/fragment-plugin/releases/tag/0.3.7
 [0.3.6]: https://github.com/swup/fragment-plugin/releases/tag/0.3.6
 [0.3.5]: https://github.com/swup/fragment-plugin/releases/tag/0.3.5
