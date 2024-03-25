@@ -33,6 +33,7 @@
     "src"
   ],
   "scripts": {
+    "prepare": "husky",
     "build": "swup package:build",
     "dev": "swup package:dev",
     "lint": "swup package:lint",
