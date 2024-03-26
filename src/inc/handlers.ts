@@ -132,7 +132,6 @@ export const beforeContentReplace: Handler<'content:replace'> = function (
 
 	visit.to.document = new DOMParser().parseFromString(cache.fragmentHtml, 'text/html');
 	visit.to.html = cache.fragmentHtml;
-	args.page.html = cache.fragmentHtml;
 
 	if (__DEV__) this.logger?.log(`fragment cache used for ${highlight(visit.to.url!)}`);
 };
