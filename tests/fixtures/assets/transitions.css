@@ -2,32 +2,36 @@
 * Default
 */
 html.is-changing .transition-main {
-	transition: opacity 250ms, transform 250ms;
+	transition:
+		opacity 250ms,
+		transform 250ms;
 }
 html.is-animating .transition-main {
 	opacity: 0;
-  transform: translateY(-30px);
+	transform: translateY(-30px);
 }
 html.is-leaving .transition-main {
-  transform: translateY(30px);
+	transform: translateY(30px);
 }
 /*
 * List
 */
 #list.is-changing {
-  transition: opacity 300ms;
+	transition: opacity 300ms;
 }
 #list.is-animating {
-  opacity: 0;
+	opacity: 0;
 }
 
 /*
 * Modal
 */
 #detail.is-changing {
-  transition: transform 300ms, opacity 300ms;
+	transition:
+		transform 300ms,
+		opacity 300ms;
 }
 #detail.is-animating {
-  opacity: 0;
-  transform: scale(0.9);
+	opacity: 0;
+	transform: scale(0.9);
 }

@@ -20,8 +20,8 @@ type Options = {
  * Represents a Rule
  */
 export default class ParsedRule {
-	readonly matchesFrom;
-	readonly matchesTo;
+	readonly matchesFrom: ReturnType<typeof matchPath>;
+	readonly matchesTo: ReturnType<typeof matchPath>;
 
 	swup: Swup;
 	from: Path;
