@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.0.1] - 2024-03-26
+
+- Compatibility with swup 4.6.0
+
 ## [1.0.0] - 2024-01-28
 
 - Version 1.0.0 🍾
@@ -69,6 +73,7 @@
 
 - Initial Release
 
+[1.0.1]: https://github.com/swup/fragment-plugin/releases/tag/1.0.1
 [1.0.0]: https://github.com/swup/fragment-plugin/releases/tag/1.0.0
 [0.3.7]: https://github.com/swup/fragment-plugin/releases/tag/0.3.7
 [0.3.6]: https://github.com/swup/fragment-plugin/releases/tag/0.3.6

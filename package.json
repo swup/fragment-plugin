@@ -1,7 +1,7 @@
 {
   "name": "@swup/fragment-plugin",
   "amdName": "SwupFragmentPlugin",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A swup plugin for dynamically replacing containers based on rules",
   "type": "module",
   "source": "src/index.ts",
@@ -65,7 +65,7 @@
     "vitest": "^0.34.6"
   },
   "peerDependencies": {
-    "swup": "^4.0.0"
+    "swup": "^4.6.0"
   },
   "browserslist": [
     "extends @swup/browserslist-config"
