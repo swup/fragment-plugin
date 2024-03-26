@@ -20,7 +20,7 @@ type InitOptions = RequireKeys<Options, 'rules'>;
  */
 export default class SwupFragmentPlugin extends PluginBase {
 	readonly name = 'SwupFragmentPlugin';
-	readonly requires = { swup: '>=4' };
+	readonly requires = { swup: '>=4.6' };
 
 	protected _rawRules: Rule[] = [];
 	protected _parsedRules: ParsedRule[] = [];
