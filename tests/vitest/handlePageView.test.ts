@@ -52,7 +52,9 @@ describe('handlePageView()', () => {
 	});
 
 	it('should handle <dialog> fragment elements', () => {
-		stubGlobalDocument(/*html*/ `<div id="swup" class="transition-main"><dialog open id="fragment-1"></div></div>`);
+		stubGlobalDocument(
+			/*html*/ `<div id="swup" class="transition-main"><dialog open id="fragment-1"></div></div>`
+		);
 		handlePageView(fragmentPlugin);
 
 		const dialog = document.querySelector<HTMLDialogElement & FragmentElement>('#fragment-1');
@@ -60,7 +62,9 @@ describe('handlePageView()', () => {
 	});
 
 	it("should ignore fragments outside of swup's main containers", () => {
-		stubGlobalDocument(/*html*/ `<div id="swup" class="transition-main"></div><div id="fragment-1"></div>`);
+		stubGlobalDocument(
+			/*html*/ `<div id="swup" class="transition-main"></div><div id="fragment-1"></div>`
+		);
 		handlePageView(fragmentPlugin);
 
 		const el = document.querySelector('#fragment-1');

@@ -42,14 +42,13 @@ const allContainers = [...new Set([...swup.options.containers, ...fragmentContai
  * This will help to identify persisted elements more easily
  */
 function addUniqueIds(selectors) {
-	selectors.forEach(selector => {
+	selectors.forEach((selector) => {
 		document.querySelector(selector)?.setAttribute('data-uniqueid', uniqueId());
-	})
+	});
 }
 
 addUniqueIds(allContainers);
 swup.hooks.on('content:replace', ({ containers }) => addUniqueIds(containers));
-
 
 swup.hooks.on('visit:start', () => document.documentElement.setAttribute('aria-busy', 'true'));
 swup.hooks.on('visit:end', () => document.documentElement.removeAttribute('aria-busy'));

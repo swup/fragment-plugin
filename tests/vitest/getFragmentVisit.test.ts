@@ -13,7 +13,9 @@ const fragmentPlugin = getMountedPluginInstance({
 
 describe('getFragmentVisit()', () => {
 	beforeEach(() => {
-		stubGlobalDocument(/*html*/ `<div id="swup" class="transition-main"><div id="fragment-1"></div></div>`);
+		stubGlobalDocument(
+			/*html*/ `<div id="swup" class="transition-main"><div id="fragment-1"></div></div>`
+		);
 	});
 	afterEach(() => {
 		vi.restoreAllMocks();

@@ -3,7 +3,7 @@
  * @see https://vitest.dev/config/
  */
 
-import path from "path";
+import path from 'path';
 import { defineConfig } from 'vitest/config';
 
 const __dirname = path.dirname(__filename);
@@ -11,11 +11,7 @@ const __dirname = path.dirname(__filename);
 export default defineConfig({
 	test: {
 		environment: 'jsdom',
-		include: [
-			'tests/vitest/**/*.test.ts'
-		],
-		setupFiles: [
-			path.resolve(__dirname, './vitest.setup.ts')
-		]
+		include: ['tests/vitest/**/*.test.ts'],
+		setupFiles: [path.resolve(__dirname, './vitest.setup.ts')]
 	}
 });
