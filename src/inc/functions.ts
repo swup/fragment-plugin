@@ -45,7 +45,6 @@ function handleLinksToFragments({ logger, swup }: FragmentPlugin): void {
 	const links = document.querySelectorAll<HTMLAnchorElement>(`a[${targetAttribute}]`);
 
 	links.forEach((el) => {
-		console.log({ el });
 		const selector = el.getAttribute(targetAttribute);
 		if (!selector) {
 			// prettier-ignore
