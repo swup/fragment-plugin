@@ -7,7 +7,7 @@ export type Route = {
 };
 
 /** The interface for an augmented Fragment Element */
-export interface FragmentElement extends Element {
+export interface FragmentElement extends HTMLElement {
 	__swupFragment?: {
 		url?: string;
 		selector?: string;

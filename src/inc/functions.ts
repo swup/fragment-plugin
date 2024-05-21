@@ -73,7 +73,6 @@ function handleLinksToFragments({ logger, swup }: FragmentPlugin): void {
 		if (isEqualUrl(fragmentUrl, swup.getCurrentUrl())) {
 			// prettier-ignore
 			if (__DEV__) logger?.warn(`The fragment URL of ${selector} is identical to the current URL. This could mean that [data-swup-fragment-url] needs to be provided by the server.`);
-			return;
 		}
 
 		el.href = fragmentUrl;
@@ -372,7 +371,7 @@ export function queryFragmentElement(
 ): FragmentElement | undefined {
 	for (const containerSelector of swup.options.containers) {
 		const container = document.querySelector(containerSelector);
-		if (container?.matches(fragmentSelector)) return container;
+		if (container?.matches(fragmentSelector)) return container as FragmentElement;
 
 		const fragment = container?.querySelector<FragmentElement>(fragmentSelector);
 		if (fragment) return fragment;
