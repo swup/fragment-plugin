@@ -371,7 +371,7 @@ export function queryFragmentElement(
 ): FragmentElement | undefined {
 	for (const containerSelector of swup.options.containers) {
 		const container = document.querySelector(containerSelector);
-		if (container?.matches(fragmentSelector)) return container;
+		if (container?.matches(fragmentSelector)) return container as FragmentElement;
 
 		const fragment = container?.querySelector<FragmentElement>(fragmentSelector);
 		if (fragment) return fragment;
