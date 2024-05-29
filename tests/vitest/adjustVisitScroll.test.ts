@@ -1,11 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { adjustVisitScroll } from '../../src/inc/functions.js';
+import { adjustVisitScroll, stubVisit } from '../../src/inc/functions.js';
 import Swup from 'swup';
 
 describe('adjustVisitScroll()', () => {
 	it('adjust visit.scroll', () => {
-		// @ts-expect-error
-		const { scroll } = new Swup().createVisit({ to: '' });
+		const { scroll } = stubVisit({ to: '' });
 
 		expect(adjustVisitScroll({ containers: [], scroll: true }, scroll)).toEqual({
 			reset: true

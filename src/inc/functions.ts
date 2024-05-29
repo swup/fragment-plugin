@@ -1,5 +1,5 @@
-import { Location } from 'swup';
-import type { Swup, Visit, VisitScroll } from 'swup';
+import Swup, { Location } from 'swup';
+import type { Visit, VisitScroll } from 'swup';
 import type { default as FragmentPlugin } from '../SwupFragmentPlugin.js';
 import type { Route, Rule, FragmentVisit, FragmentElement } from './defs.js';
 import type ParsedRule from './ParsedRule.js';
@@ -230,8 +230,12 @@ export const toggleFragmentVisitClass = (
 /**
  * Get the first matching rule for a given route
  */
-export const getFirstMatchingRule = (route: Route, rules: ParsedRule[]): ParsedRule | undefined => {
-	return rules.find((rule) => rule.matches(route));
+export const getFirstMatchingRule = (
+	route: Route,
+	rules: ParsedRule[],
+	visit: Visit
+): ParsedRule | undefined => {
+	return rules.find((rule) => rule.matches(route, visit));
 };
 
 /**
@@ -391,4 +395,13 @@ export function cloneRules(rules: Rule[]): Rule[] {
 		to: Array.isArray(rule.to) ? [...rule.to] : rule.to,
 		containers: [...rule.containers]
 	}));
+}
+
+/**
+ * Create a visit object for tests
+ */
+export function stubVisit(options: { from?: string; to: string }) {
+	const swup = new Swup();
+	// @ts-expect-error swup.createVisit is protected
+	return swup.createVisit(options);
 }
