@@ -235,6 +235,12 @@ Using this option, you can re-enable it for selected visits:
 
 Optional, Type: `boolean | string` – If you have [Accessibility Plugin](https://github.com/swup/a11y-plugin/) installed, you can adjust which element to focus for the visit [as described here](https://github.com/swup/a11y-plugin/#visita11yfocus).
 
+#### rule.if
+
+Optional, Type: `(visit) => boolean` – Provide a predicate function for fine-grained control over the matching behavior of a rule.
+
+A predicate function that allows for fine-grained control over the matching behavior of a rule. This function receives the current [visit](https://swup.js.org/visit/) as a parameter, and must return a boolean value. If the function returns `false`, the rule is being skipped for the current visit, even if it matches the current route.
+
 ### debug
 
 Type: `boolean`. Set to `true` for debug information in the console. Defaults to `false`.

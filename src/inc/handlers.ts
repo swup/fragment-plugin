@@ -22,7 +22,7 @@ export const onLinkToSelf: Handler<'link:self'> = function (this: FragmentPlugin
 	const route = getRoute(visit);
 	if (!route) return;
 
-	const rule = getFirstMatchingRule(route, this.parsedRules);
+	const rule = getFirstMatchingRule(route, this.parsedRules, visit);
 
 	if (rule) visit.scroll.reset = false;
 };
@@ -34,7 +34,7 @@ export const onVisitStart: Handler<'visit:start'> = async function (this: Fragme
 	const route = getRoute(visit);
 	if (!route) return;
 
-	const fragmentVisit = this.getFragmentVisit(route);
+	const fragmentVisit = this.getFragmentVisit(route, visit);
 
 	/**
 	 * Bail early if the current route doesn't match

@@ -11,6 +11,7 @@ import {
 import type { Options, Rule, Route, FragmentVisit } from './inc/defs.js';
 import * as handlers from './inc/handlers.js';
 import { __DEV__ } from './inc/env.js';
+import type { Visit } from 'swup';
 
 type RequireKeys<T, K extends keyof T> = Partial<T> & Pick<T, K>;
 type InitOptions = RequireKeys<Options, 'rules'>;
@@ -84,37 +85,52 @@ export default class SwupFragmentPlugin extends PluginBase {
 		cleanupFragmentElements();
 	}
 
+	/**
+	 * Set completely new rules
+	 *
+	 * @access public
+	 */
 	setRules(rules: Rule[]) {
 		this._rawRules = cloneRules(rules);
 		this._parsedRules = rules.map((rule) => this.parseRule(rule));
 		if (__DEV__) this.logger?.log('Updated fragment rules', this.getRules());
 	}
 
+	/**
+	 * Get a clone of the current rules
+	 *
+	 * @access public
+	 */
 	getRules() {
 		return cloneRules(this._rawRules);
 	}
 
+	/**
+	 * Prepend a rule to the existing rules
+	 *
+	 * @access public
+	 */
 	prependRule(rule: Rule) {
 		this.setRules([rule, ...this.getRules()]);
 	}
 
+	/**
+	 * Append a rule to the existing rules
+	 *
+	 * @access public
+	 */
 	appendRule(rule: Rule) {
 		this.setRules([...this.getRules(), rule]);
 	}
 
 	/**
-	 * Add a fragment rule
-	 * @param {Rule} rule 			The rule options
-	 * @param {'start' | 'end'} at 	Should the rule be added to the beginning or end of the existing rules?
+	 * Parse a rule (for e.g. debugging)
+	 *
+	 * @access public
 	 */
-	parseRule({ from, to, containers, name, scroll, focus }: Rule): ParsedRule {
+	parseRule(rule: Rule): ParsedRule {
 		return new ParsedRule({
-			from,
-			to,
-			containers,
-			name,
-			scroll,
-			focus,
+			...rule,
 			logger: this.logger,
 			swup: this.swup
 		});
@@ -122,9 +138,11 @@ export default class SwupFragmentPlugin extends PluginBase {
 
 	/**
 	 * Get the fragment visit object for a given route
+	 *
+	 * @access public
 	 */
-	getFragmentVisit(route: Route): FragmentVisit | undefined {
-		const rule = getFirstMatchingRule(route, this.parsedRules);
+	getFragmentVisit(route: Route, visit?: Visit): FragmentVisit | undefined {
+		const rule = getFirstMatchingRule(route, this.parsedRules, visit || this.swup.visit);
 
 		// Bail early if no rule matched
 		if (!rule) return;

@@ -1,18 +1,12 @@
 import { matchPath, classify, Location } from 'swup';
-import type { Swup, Path } from 'swup';
-import type { Route } from './defs.js';
+import type { Swup, Path, Visit } from 'swup';
+import type { Route, Rule, Predicate } from './defs.js';
 import { dedupe, queryFragmentElement } from './functions.js';
 import Logger, { highlight } from './Logger.js';
 import { __DEV__ } from './env.js';
 
-type Options = {
+type Options = Rule & {
 	swup: Swup;
-	from: Path;
-	to: Path;
-	containers: string[];
-	name?: string;
-	scroll?: boolean | string;
-	focus?: boolean | string;
 	logger?: Logger;
 };
 
@@ -31,6 +25,7 @@ export default class ParsedRule {
 	scroll: boolean | string = false;
 	focus?: boolean | string;
 	logger?: Logger;
+	if: Predicate = () => true;
 
 	constructor(options: Options) {
 		this.swup = options.swup;
@@ -41,6 +36,7 @@ export default class ParsedRule {
 		if (options.name) this.name = classify(options.name);
 		if (typeof options.scroll !== 'undefined') this.scroll = options.scroll;
 		if (typeof options.focus !== 'undefined') this.focus = options.focus;
+		if (typeof options.if === 'function') this.if = options.if;
 
 		this.containers = this.parseContainers(options.containers);
 
@@ -103,7 +99,14 @@ export default class ParsedRule {
 	/**
 	 * Checks if a given route matches this rule
 	 */
-	public matches(route: Route): boolean {
+	public matches(route: Route, visit: Visit): boolean {
+		if (!this.if(visit)) {
+			if (__DEV__) {
+				this.logger?.log(`ignoring fragment rule due to custom rule.if:`, this);
+			}
+			return false;
+		}
+
 		const { url: fromUrl } = Location.fromUrl(route.from);
 		const { url: toUrl } = Location.fromUrl(route.to);
 

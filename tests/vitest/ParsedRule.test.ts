@@ -3,6 +3,7 @@ import ParsedRule from '../../src/inc/ParsedRule.js';
 import Logger from '../../src/inc/Logger.js';
 import { spyOnConsole, stubGlobalDocument } from './inc/helpers.js';
 import Swup from 'swup';
+import { stubVisit } from '../../src/inc/functions.js';
 
 describe('ParsedRule', () => {
 	afterEach(() => {
@@ -93,12 +94,18 @@ describe('ParsedRule', () => {
 			from: '/users/',
 			to: '/user/:slug',
 			containers: ['#fragment-1'],
-			swup: new Swup()
+			swup: new Swup(),
+			if: (visit) => true
 		});
-		expect(rule.matches({ from: '/users/', to: '/user/jane' })).toBe(true);
-		expect(rule.matches({ from: '/users/', to: '/users/' })).toBe(false);
-		expect(rule.matches({ from: '/user/jane', to: '/users/' })).toBe(false);
-		expect(rule.matches({ from: '/user/jane', to: '/user/john' })).toBe(false);
+		const visit = stubVisit({ to: '' });
+		expect(rule.matches({ from: '/users/', to: '/user/jane' }, visit)).toBe(true);
+		expect(rule.matches({ from: '/users/', to: '/users/' }, visit)).toBe(false);
+		expect(rule.matches({ from: '/user/jane', to: '/users/' }, visit)).toBe(false);
+		expect(rule.matches({ from: '/user/jane', to: '/user/john' }, visit)).toBe(false);
+
+		/** Respect rule.if */
+		rule.if = (visit) => false;
+		expect(rule.matches({ from: '/users/', to: '/user/jane' }, visit)).toBe(false);
 	});
 
 	it('should validate selectors if matching a rule', () => {
@@ -110,17 +117,18 @@ describe('ParsedRule', () => {
 			swup: new Swup(),
 			logger: new Logger()
 		});
+		const visit = stubVisit({ to: '' });
 
 		/** fragment element missing */
 		stubGlobalDocument(/*html*/ `<div id="swup" class="transition-main"></div>`);
-		expect(rule.matches({ from: '/foo/', to: '/bar/' })).toBe(false);
+		expect(rule.matches({ from: '/foo/', to: '/bar/' }, visit)).toBe(false);
 		expect(console.error).toBeCalledWith(new Error('skipping rule since #fragment-1 doesn\'t exist in the current document'), expect.any(Object)) // prettier-ignore
 
 		/** fragment element outside of swup's default containers */
 		stubGlobalDocument(
 			/*html*/ `<div id="swup" class="transition-main"></div><div id="fragment-1"></div>`
 		);
-		expect(rule.matches({ from: '/foo/', to: '/bar/' })).toBe(false);
+		expect(rule.matches({ from: '/foo/', to: '/bar/' }, visit)).toBe(false);
 		expect(console.error).toBeCalledWith(new Error('skipping rule since #fragment-1 is outside of swup\'s default containers'), expect.any(Object)) // prettier-ignore
 	});
 });
