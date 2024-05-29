@@ -94,13 +94,18 @@ describe('ParsedRule', () => {
 			from: '/users/',
 			to: '/user/:slug',
 			containers: ['#fragment-1'],
-			swup: new Swup()
+			swup: new Swup(),
+			if: (visit) => true
 		});
 		const visit = stubVisit({ to: '' });
 		expect(rule.matches({ from: '/users/', to: '/user/jane' }, visit)).toBe(true);
 		expect(rule.matches({ from: '/users/', to: '/users/' }, visit)).toBe(false);
 		expect(rule.matches({ from: '/user/jane', to: '/users/' }, visit)).toBe(false);
 		expect(rule.matches({ from: '/user/jane', to: '/user/john' }, visit)).toBe(false);
+
+		/** Respect rule.if */
+		rule.if = (visit) => false;
+		expect(rule.matches({ from: '/users/', to: '/user/jane' }, visit)).toBe(false);
 	});
 
 	it('should validate selectors if matching a rule', () => {
