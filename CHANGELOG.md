@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.0] - 2024-05-29
+
+- Match rules conditionally: [`rule.if`](https://swup.js.org/plugins/fragment-plugin/#rule-if)
+
 ## [1.0.2] - 2024-05-21
 
 - always update the `href` of `a[data-swup-link-to-fragment]`, even if it's the current URL
@@ -77,6 +81,7 @@
 
 - Initial Release
 
+[1.1.0]: https://github.com/swup/fragment-plugin/releases/tag/1.1.0
 [1.0.2]: https://github.com/swup/fragment-plugin/releases/tag/1.0.2
 [1.0.1]: https://github.com/swup/fragment-plugin/releases/tag/1.0.1
 [1.0.0]: https://github.com/swup/fragment-plugin/releases/tag/1.0.0
