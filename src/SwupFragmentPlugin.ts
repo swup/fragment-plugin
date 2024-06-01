@@ -142,9 +142,12 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * @access public
 	 */
 	getFragmentVisit(route: Route, visit?: Visit): FragmentVisit | undefined {
-		// @ts-expect-error createVisit is protected
-		visit = visit || this.swup.createVisit(route);
-		const rule = getFirstMatchingRule(route, this.parsedRules, visit || this.swup.visit);
+		const rule = getFirstMatchingRule(
+			route,
+			this.parsedRules,
+			// @ts-expect-error createVisit is protected
+			visit || this.swup.createVisit(route)
+		);
 
 		// Bail early if no rule matched
 		if (!rule) return;
