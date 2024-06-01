@@ -157,6 +157,11 @@ export default class SwupFragmentPlugin extends PluginBase {
 			this.logger
 		);
 
+		/** Bail early if there are no fragment elements found for this visit */
+		if (!containers.length) {
+			return;
+		}
+
 		// Pick properties from the current rule that should be projected into the fragmentVisit object
 		const { name, scroll, focus } = rule;
 

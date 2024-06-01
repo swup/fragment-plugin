@@ -41,15 +41,4 @@ describe('getFragmentVisit()', () => {
 
 		expect(fragmentVisit).toBeUndefined();
 	});
-
-	it('should allow zero containers', () => {
-		const fragmentVisit = fragmentPlugin.getFragmentVisit({ from: '/page-3/', to: '/page-4/' });
-
-		expect(fragmentVisit).toEqual({
-			containers: [],
-			name: undefined,
-			scroll: false,
-			focus: undefined
-		});
-	});
 });

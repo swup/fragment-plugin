@@ -116,7 +116,12 @@ function prepareFragmentElements({ parsedRules, swup, logger }: FragmentPlugin):
 }
 
 /**
- * Get all containers that should be replaced for a given visit's route
+ * Get all containers that should be replaced for a given visit's route.
+ * Ignores containers that already match the current URL, if the visit can't be considered a reload.
+ *
+ * A visit is being considered a reload, if one of these conditions apply:
+ * 	- `route.from` equal to `route.to`
+ *  - all containers match the current url
  */
 export const getFragmentVisitContainers = (
 	route: Route,
@@ -124,40 +129,50 @@ export const getFragmentVisitContainers = (
 	swup: Swup,
 	logger?: Logger
 ) => {
-	const isReload = isEqualUrl(route.from, route.to);
+	const records: { selector: string; el: FragmentElement }[] = selectors
+		.map((selector) => {
+			const el = document.querySelector<FragmentElement>(selector);
 
-	const containers = selectors.filter((selector) => {
-		const el = document.querySelector<FragmentElement>(selector);
-
-		if (!el) {
-			if (__DEV__) logger?.log(`${highlight(selector)} missing in current document`);
-			return false;
-		}
-
-		if (!queryFragmentElement(selector, swup)) {
-			if (__DEV__) {
-				// prettier-ignore
-				logger?.error(`${highlight(selector)} is outside of swup's default containers`);
+			if (!el) {
+				if (__DEV__) logger?.log(`${highlight(selector)} missing in current document`);
+				return false;
 			}
-			return false;
-		}
 
-		if (!isReload && elementMatchesFragmentUrl(el, route.to)) {
-			if (__DEV__) {
-				// prettier-ignore
-				logger?.log(`ignoring fragment ${highlight(selector)} as it already matches the current URL`);
+			const fragmentElement = queryFragmentElement(selector, swup);
+
+			if (!fragmentElement) {
+				if (__DEV__) {
+					// prettier-ignore
+					logger?.error(`${highlight(selector)} is outside of swup's default containers`);
+				}
+				return false;
 			}
-			return false;
-		}
 
-		return true;
-	});
+			return {
+				selector,
+				el
+			};
+		})
+		.filter((record): record is { selector: string; el: FragmentElement } => !!record);
 
-	if (__DEV__) {
-		logger?.warnIf(!containers.length, `no containers will be replaced during this visit`);
-	}
+	const isReload =
+		isEqualUrl(route.from, route.to) ||
+		records.every((record) => elementMatchesFragmentUrl(record.el, route.to));
 
-	return containers;
+	const finalRecords = isReload
+		? records
+		: records.filter((record) => {
+				if (elementMatchesFragmentUrl(record.el, route.to)) {
+					if (__DEV__) {
+						// prettier-ignore
+						logger?.log(`ignoring fragment ${highlight(record.selector)} as it already matches the current URL`);
+					}
+					return false;
+				}
+				return true;
+			});
+
+	return finalRecords.map((record) => record.selector);
 };
 
 /**

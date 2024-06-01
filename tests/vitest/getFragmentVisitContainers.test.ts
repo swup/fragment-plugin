@@ -48,13 +48,30 @@ describe('getFragmentVisitContainers()', () => {
 	});
 
 	it('should get the correct containers when navigating to the same URL', () => {
-		const fragmentContainers = getFragmentVisitContainers(
-			{ from: '/page-1/', to: '/page-1/' },
-			['#fragment-1', '#fragment-2', '#fragment-3', '#fragment-outside', '#fragment-missing'],
-			fragmentPlugin.swup,
-			fragmentPlugin.logger
-		);
+		// route.from is equal to route.to
+		expect(
+			getFragmentVisitContainers(
+				{ from: '/page-1/', to: '/page-1/' },
+				[
+					'#fragment-1',
+					'#fragment-2',
+					'#fragment-3',
+					'#fragment-outside',
+					'#fragment-missing'
+				],
+				fragmentPlugin.swup,
+				fragmentPlugin.logger
+			)
+		).toEqual(['#fragment-1', '#fragment-2', '#fragment-3']);
 
-		expect(fragmentContainers).toEqual(['#fragment-1', '#fragment-2', '#fragment-3']);
+		// all containers match route.to
+		expect(
+			getFragmentVisitContainers(
+				{ from: '/page-1/', to: '/page-2/' },
+				['#fragment-3'],
+				fragmentPlugin.swup,
+				fragmentPlugin.logger
+			)
+		).toEqual(['#fragment-3']);
 	});
 });
