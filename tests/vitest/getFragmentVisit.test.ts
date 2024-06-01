@@ -7,6 +7,11 @@ const fragmentPlugin = getMountedPluginInstance({
 			from: '/page-1/',
 			to: '/page-2/',
 			containers: ['#fragment-1']
+		},
+		{
+			from: '/page-3/',
+			to: '/page-4/',
+			containers: []
 		}
 	]
 });
@@ -35,5 +40,16 @@ describe('getFragmentVisit()', () => {
 		const fragmentVisit = fragmentPlugin.getFragmentVisit({ from: '/foo/', to: '/bar/' });
 
 		expect(fragmentVisit).toBeUndefined();
+	});
+
+	it('should allow zero containers', () => {
+		const fragmentVisit = fragmentPlugin.getFragmentVisit({ from: '/page-3/', to: '/page-4/' });
+
+		expect(fragmentVisit).toEqual({
+			containers: [],
+			name: undefined,
+			scroll: false,
+			focus: undefined
+		});
 	});
 });
