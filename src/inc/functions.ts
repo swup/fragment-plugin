@@ -126,7 +126,7 @@ export const getFragmentVisitContainers = (
 ) => {
 	const isReload = isEqualUrl(route.from, route.to);
 
-	return selectors.filter((selector) => {
+	const containers = selectors.filter((selector) => {
 		const el = document.querySelector<FragmentElement>(selector);
 
 		if (!el) {
@@ -143,14 +143,21 @@ export const getFragmentVisitContainers = (
 		}
 
 		if (!isReload && elementMatchesFragmentUrl(el, route.to)) {
-			if (__DEV__)
+			if (__DEV__) {
 				// prettier-ignore
 				logger?.log(`ignoring fragment ${highlight(selector)} as it already matches the current URL`);
+			}
 			return false;
 		}
 
 		return true;
 	});
+
+	if (__DEV__) {
+		logger?.warnIf(!containers.length, `no containers will be replaced during this visit`);
+	}
+
+	return containers;
 };
 
 /**
