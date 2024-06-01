@@ -2,7 +2,7 @@
 
 ## [1.1.1] - 2024-06-01
 
-- Allow fragment visits where no container will be replaced
+- Optimize logic of persisting fragment elements
 - Optimize API usage of `getFragmentVisit`
 
 ## [1.1.0] - 2024-05-29
