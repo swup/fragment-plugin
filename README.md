@@ -262,7 +262,7 @@ Type: `boolean`. Set to `true` for debug information in the console. Defaults to
 
 - The `containers` of the matching rule **need to be shared between the current and the incoming document**
 - For each selector in the `containers` array, the **first** matching element in the DOM will be selected
-- The plugin will check if an element already matches the new URL before replacing it
+- If a visit isn't be considered a reload of the current page, fragment elements that already match the new URL will be ignored
 
 ## Advanced use cases
 
