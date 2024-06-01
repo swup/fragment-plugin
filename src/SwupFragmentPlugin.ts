@@ -142,6 +142,8 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * @access public
 	 */
 	getFragmentVisit(route: Route, visit?: Visit): FragmentVisit | undefined {
+		// @ts-expect-error createVisit is protected
+		visit = visit || this.swup.createVisit(route);
 		const rule = getFirstMatchingRule(route, this.parsedRules, visit || this.swup.visit);
 
 		// Bail early if no rule matched
@@ -154,8 +156,6 @@ export default class SwupFragmentPlugin extends PluginBase {
 			this.swup,
 			this.logger
 		);
-		// Bail early if there are no containers to be replaced for this visit
-		if (!containers.length) return;
 
 		// Pick properties from the current rule that should be projected into the fragmentVisit object
 		const { name, scroll, focus } = rule;
