@@ -129,7 +129,7 @@ export const getFragmentVisitContainers = (
 	swup: Swup,
 	logger?: Logger
 ): string[] => {
-	const records: { selector: string; el: FragmentElement }[] = selectors
+	let fragments: { selector: string; el: FragmentElement }[] = selectors
 		.map((selector) => {
 			const el = document.querySelector<FragmentElement>(selector);
 
@@ -155,25 +155,27 @@ export const getFragmentVisitContainers = (
 		})
 		.filter((record): record is { selector: string; el: FragmentElement } => !!record);
 
-	const isLinkToSelf = records.every((record) => elementMatchesFragmentUrl(record.el, route.to));
+	const isLinkToSelf = fragments.every((fragment) =>
+		elementMatchesFragmentUrl(fragment.el, route.to)
+	);
 	const isReload =
 		isEqualUrl(route.from, route.to) ||
 		(isLinkToSelf && swup.options.linkToSelf === 'navigate');
 
-	const finalRecords = isReload
-		? records
-		: records.filter((record) => {
-				if (elementMatchesFragmentUrl(record.el, route.to)) {
-					if (__DEV__) {
-						// prettier-ignore
-						logger?.log(`ignoring fragment ${highlight(record.selector)} as it already matches the current URL`);
-					}
-					return false;
+	if (isReload) {
+		fragments = fragments.filter((fragment) => {
+			if (elementMatchesFragmentUrl(fragment.el, route.to)) {
+				if (__DEV__) {
+					// prettier-ignore
+					logger?.log(`ignoring fragment ${highlight(fragment.selector)} as it already matches the current URL`);
 				}
-				return true;
-			});
+				return false;
+			}
+			return true;
+		});
+	}
 
-	return finalRecords.map((record) => record.selector);
+	return fragments.map((fragment) => fragment.selector);
 };
 
 /**
