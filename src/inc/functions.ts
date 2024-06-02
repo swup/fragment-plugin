@@ -128,7 +128,7 @@ export const getFragmentVisitContainers = (
 	selectors: string[],
 	swup: Swup,
 	logger?: Logger
-) => {
+): string[] => {
 	const records: { selector: string; el: FragmentElement }[] = selectors
 		.map((selector) => {
 			const el = document.querySelector<FragmentElement>(selector);
@@ -155,9 +155,10 @@ export const getFragmentVisitContainers = (
 		})
 		.filter((record): record is { selector: string; el: FragmentElement } => !!record);
 
+	const isLinkToSelf = records.every((record) => elementMatchesFragmentUrl(record.el, route.to));
 	const isReload =
 		isEqualUrl(route.from, route.to) ||
-		records.every((record) => elementMatchesFragmentUrl(record.el, route.to));
+		(isLinkToSelf && swup.options.linkToSelf === 'navigate');
 
 	const finalRecords = isReload
 		? records
