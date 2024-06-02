@@ -162,7 +162,7 @@ export const getFragmentVisitContainers = (
 		isEqualUrl(route.from, route.to) ||
 		(isLinkToSelf && swup.options.linkToSelf === 'navigate');
 
-	if (isReload) {
+	if (!isReload) {
 		fragments = fragments.filter((fragment) => {
 			if (elementMatchesFragmentUrl(fragment.el, route.to)) {
 				if (__DEV__) {

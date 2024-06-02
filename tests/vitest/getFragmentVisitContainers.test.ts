@@ -63,8 +63,10 @@ describe('getFragmentVisitContainers()', () => {
 				fragmentPlugin.logger
 			)
 		).toEqual(['#fragment-1', '#fragment-2', '#fragment-3']);
+	});
 
-		// all containers match route.to
+	it("should reload fragments if swup.options.linkToSelf equals 'navigate'", () => {
+		fragmentPlugin.swup.options.linkToSelf = 'navigate';
 		expect(
 			getFragmentVisitContainers(
 				{ from: '/page-1/', to: '/page-2/' },
@@ -73,5 +75,17 @@ describe('getFragmentVisitContainers()', () => {
 				fragmentPlugin.logger
 			)
 		).toEqual(['#fragment-3']);
+	});
+
+	it("should ignore fragments if swup.options.linkToSelf equals 'scroll'", () => {
+		fragmentPlugin.swup.options.linkToSelf = 'scroll';
+		expect(
+			getFragmentVisitContainers(
+				{ from: '/page-1/', to: '/page-2/' },
+				['#fragment-3'],
+				fragmentPlugin.swup,
+				fragmentPlugin.logger
+			)
+		).toEqual([]);
 	});
 });
