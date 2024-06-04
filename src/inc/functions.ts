@@ -121,7 +121,7 @@ function prepareFragmentElements({ parsedRules, swup, logger }: FragmentPlugin):
  *
  * A visit is being considered a reload, if one of these conditions apply:
  * 	- `route.from` equal to `route.to`
- *  - all containers match the current url
+ *  - all containers match the current url and swup is set to navigate on `linkToSelf`
  */
 export const getFragmentVisitContainers = (
 	route: Route,
@@ -158,10 +158,14 @@ export const getFragmentVisitContainers = (
 	const isLinkToSelf = fragments.every((fragment) =>
 		elementMatchesFragmentUrl(fragment.el, route.to)
 	);
+
 	const isReload =
 		isEqualUrl(route.from, route.to) ||
 		(isLinkToSelf && swup.options.linkToSelf === 'navigate');
 
+	/**
+	 * If this is NOT a reload, ignore fragments that already match `route.to`
+	 */
 	if (!isReload) {
 		fragments = fragments.filter((fragment) => {
 			if (elementMatchesFragmentUrl(fragment.el, route.to)) {
