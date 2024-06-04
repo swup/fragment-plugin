@@ -48,13 +48,44 @@ describe('getFragmentVisitContainers()', () => {
 	});
 
 	it('should get the correct containers when navigating to the same URL', () => {
-		const fragmentContainers = getFragmentVisitContainers(
-			{ from: '/page-1/', to: '/page-1/' },
-			['#fragment-1', '#fragment-2', '#fragment-3', '#fragment-outside', '#fragment-missing'],
-			fragmentPlugin.swup,
-			fragmentPlugin.logger
-		);
+		// route.from is equal to route.to
+		expect(
+			getFragmentVisitContainers(
+				{ from: '/page-1/', to: '/page-1/' },
+				[
+					'#fragment-1',
+					'#fragment-2',
+					'#fragment-3',
+					'#fragment-outside',
+					'#fragment-missing'
+				],
+				fragmentPlugin.swup,
+				fragmentPlugin.logger
+			)
+		).toEqual(['#fragment-1', '#fragment-2', '#fragment-3']);
+	});
 
-		expect(fragmentContainers).toEqual(['#fragment-1', '#fragment-2', '#fragment-3']);
+	it("should reload fragments if swup.options.linkToSelf equals 'navigate'", () => {
+		fragmentPlugin.swup.options.linkToSelf = 'navigate';
+		expect(
+			getFragmentVisitContainers(
+				{ from: '/page-1/', to: '/page-2/' },
+				['#fragment-3'],
+				fragmentPlugin.swup,
+				fragmentPlugin.logger
+			)
+		).toEqual(['#fragment-3']);
+	});
+
+	it("should ignore fragments if swup.options.linkToSelf equals 'scroll'", () => {
+		fragmentPlugin.swup.options.linkToSelf = 'scroll';
+		expect(
+			getFragmentVisitContainers(
+				{ from: '/page-1/', to: '/page-2/' },
+				['#fragment-3'],
+				fragmentPlugin.swup,
+				fragmentPlugin.logger
+			)
+		).toEqual([]);
 	});
 });

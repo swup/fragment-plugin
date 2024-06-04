@@ -116,41 +116,70 @@ function prepareFragmentElements({ parsedRules, swup, logger }: FragmentPlugin):
 }
 
 /**
- * Get all containers that should be replaced for a given visit's route
+ * Get all containers that should be replaced for a given visit's route.
+ * Ignores containers that already match the current URL, if the visit can't be considered a reload.
+ *
+ * A visit is being considered a reload, if one of these conditions apply:
+ * 	- `route.from` equal to `route.to`
+ *  - all containers match the current url and swup is set to navigate on `linkToSelf`
  */
 export const getFragmentVisitContainers = (
 	route: Route,
 	selectors: string[],
 	swup: Swup,
 	logger?: Logger
-) => {
-	const isReload = isEqualUrl(route.from, route.to);
+): string[] => {
+	let fragments: { selector: string; el: FragmentElement }[] = selectors
+		.map((selector) => {
+			const el = document.querySelector<FragmentElement>(selector);
 
-	return selectors.filter((selector) => {
-		const el = document.querySelector<FragmentElement>(selector);
-
-		if (!el) {
-			if (__DEV__) logger?.log(`${highlight(selector)} missing in current document`);
-			return false;
-		}
-
-		if (!queryFragmentElement(selector, swup)) {
-			if (__DEV__) {
-				// prettier-ignore
-				logger?.error(`${highlight(selector)} is outside of swup's default containers`);
+			if (!el) {
+				if (__DEV__) logger?.log(`${highlight(selector)} missing in current document`);
+				return false;
 			}
-			return false;
-		}
 
-		if (!isReload && elementMatchesFragmentUrl(el, route.to)) {
-			if (__DEV__)
-				// prettier-ignore
-				logger?.log(`ignoring fragment ${highlight(selector)} as it already matches the current URL`);
-			return false;
-		}
+			const fragmentElement = queryFragmentElement(selector, swup);
 
-		return true;
-	});
+			if (!fragmentElement) {
+				if (__DEV__) {
+					// prettier-ignore
+					logger?.error(`${highlight(selector)} is outside of swup's default containers`);
+				}
+				return false;
+			}
+
+			return {
+				selector,
+				el
+			};
+		})
+		.filter((record): record is { selector: string; el: FragmentElement } => !!record);
+
+	const isLinkToSelf = fragments.every((fragment) =>
+		elementMatchesFragmentUrl(fragment.el, route.to)
+	);
+
+	const isReload =
+		isEqualUrl(route.from, route.to) ||
+		(isLinkToSelf && swup.options.linkToSelf === 'navigate');
+
+	/**
+	 * If this is NOT a reload, ignore fragments that already match `route.to`
+	 */
+	if (!isReload) {
+		fragments = fragments.filter((fragment) => {
+			if (elementMatchesFragmentUrl(fragment.el, route.to)) {
+				if (__DEV__) {
+					// prettier-ignore
+					logger?.log(`ignoring fragment ${highlight(fragment.selector)} as it already matches the current URL`);
+				}
+				return false;
+			}
+			return true;
+		});
+	}
+
+	return fragments.map((fragment) => fragment.selector);
 };
 
 /**

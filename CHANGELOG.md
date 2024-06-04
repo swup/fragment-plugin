@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.1.1] - 2024-06-01
+
+- Optimize logic of persisting fragment elements
+- Optimize API usage of `getFragmentVisit`
+
 ## [1.1.0] - 2024-05-29
 
 - Match rules conditionally: [`rule.if`](https://swup.js.org/plugins/fragment-plugin/#rule-if)
@@ -81,6 +86,7 @@
 
 - Initial Release
 
+[1.1.1]: https://github.com/swup/fragment-plugin/releases/tag/1.1.1
 [1.1.0]: https://github.com/swup/fragment-plugin/releases/tag/1.1.0
 [1.0.2]: https://github.com/swup/fragment-plugin/releases/tag/1.0.2
 [1.0.1]: https://github.com/swup/fragment-plugin/releases/tag/1.0.1
