@@ -158,29 +158,29 @@ html.is-animating .transition-main {
 
 ## Options
 
-### Type Signature: `Options`
+```ts
+/** A path to match URLs against */
+type Path = string | RegExp | Array<string | RegExp>;
 
-```js
+/** A fragment rule */
+export type Rule = {
+  from: Path;
+  to: Path;
+  containers: string[];
+  name?: string;
+  scroll?: boolean | string;
+  focus?: boolean | string;
+  if?: Predicate;
+};
+
+/** The plugin options */
 export type Options = {
   rules: Rule[];
   debug?: boolean;
 };
 ```
 
-### Type Signature: `Rule`
-
-```js
-export type Rule = {
-  from: string | string[];
-  to: string | string[];
-  containers: string[];
-  name?: string;
-  scroll?: boolean | string;
-  focus?: boolean | string;
-};
-```
-
-### rules
+### `rules`
 
 The rules that define whether a visit will be considered a fragment visit. Each rule consists of
 mandatory `from` and `to` URL paths, an array of selectors `containers`, as well as an optional
@@ -200,15 +200,15 @@ The rule's `from`/`to` paths are converted to a regular expression by [path-to-r
 }
 ```
 
-#### `from`
+#### `rule.from`
 
 Required, Type: `string | string[]` – The path(s) to match against the previous URL
 
-#### `to`
+#### `rule.to`
 
 Required, Type: `string | string[]` – The path(s) to match against the next URL
 
-#### `containers`
+#### `rule.containers`
 
 Required, Type: `string[]` – Selectors of containers to be replaced if the visit matches.
 
@@ -219,11 +219,11 @@ Required, Type: `string[]` – Selectors of containers to be replaced if the vis
 - if **any** of the selectors in `containers` doesn't return a match in the current document, the rule will be skipped.
 - Fragment elements **must either match a swup container or be a descendant of one of them**
 
-#### `name`
+#### `rule.name`
 
-Optional, Type: `string` – A name for this rule to allow scoped styling, ideally in kebab-case
+Optional, Type: `string` – A name for this rule to allow scoped styling, ideally in `kebab-case`
 
-#### `scroll`
+#### `rule.scroll`
 
 Optional, Type: `boolean | string` – By default, scrolling will be disabled for fragment visits.
 Using this option, you can re-enable it for selected visits:
@@ -231,11 +231,11 @@ Using this option, you can re-enable it for selected visits:
 - `true` will scroll to the top
 - `'#my-element'` will scroll to the first element matching the selector
 
-#### `focus`
+#### `rule.focus`
 
 Optional, Type: `boolean | string` – If you have [Accessibility Plugin](https://github.com/swup/a11y-plugin/) installed, you can adjust which element to focus for the visit [as described here](https://github.com/swup/a11y-plugin/#visita11yfocus).
 
-#### `if`
+#### `rule.if`
 
 Optional, Type: `(visit) => boolean` – A predicate function that allows for fine-grained control over the matching behavior of a rule. The function receives the current [visit](https://swup.js.org/visit/) as a parameter. If the function returns `false`, the related rule is being skipped for the current visit, even if it matches the current route.
 
@@ -249,7 +249,7 @@ Optional, Type: `boolean`, Default `false`. Set to `true` for debug information 
 }
 ```
 
-> **Note** to keep the bundle size small, UMD builds are stripped from all debug messages, so `debug` won't have an effect there.
+> [!IMPORTANT] to keep the bundle size small, UMD builds are stripped from all debug messages, so `debug` won't have an effect there.
 
 ## How rules are matched
 
@@ -324,7 +324,7 @@ tracked URL of the fragment matching the selector provided by the attribute. The
 </main>
 ```
 
-> **Note** To keep your markup semantic and accessible, we recommend you **always provide a default value** for the link's `href` attribute, even though it will be updated automatically at runtime:
+> [!TIP] To keep your markup semantic and accessible, we recommend you **always provide a default value** for the link's `href` attribute, even though it will be updated automatically at runtime:
 
 ```diff
 <a
