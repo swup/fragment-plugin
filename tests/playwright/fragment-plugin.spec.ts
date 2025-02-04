@@ -51,6 +51,22 @@ test.describe('Fragment Plugin', () => {
 		await expect(page.locator('#list h2')).toHaveText('Green Items');
 	});
 
+	test('should handle <dialog[open]> fragments', async ({ page }) => {
+		await page.goto('/list/');
+
+		await clickOnLink(page, '/detail/');
+
+		const dialog = page.locator('dialog[data-swup-fragment]');
+
+		await expect(dialog).toBeVisible();
+
+		// Check if the dialog is focussed
+		await expect(dialog).toBeFocused();
+
+		// Check if the dialog is in the top layer
+		expect(await dialog.evaluate((el) => el.matches(':modal'))).toBe(true);
+	});
+
 	test('should not scroll', async ({ page }) => {
 		await page.goto('/list/');
 
