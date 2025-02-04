@@ -32,7 +32,8 @@ function showDialogs({ logger }: FragmentPlugin): void {
 			if (el.__swupFragment.modalShown) return;
 			el.__swupFragment.modalShown = true;
 			el.removeAttribute('open');
-			el.showModal();
+			/** don't assume showModal exists – otherwise unit tests will fail */
+			el.showModal?.();
 			el.focus();
 			el.addEventListener('keydown', (e) => e.key === 'Escape' && e.preventDefault());
 		});
