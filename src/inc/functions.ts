@@ -34,7 +34,6 @@ function showDialogs({ logger }: FragmentPlugin): void {
 			el.removeAttribute('open');
 			/** don't assume showModal exists – otherwise unit tests will fail */
 			el.showModal?.();
-			el.focus();
 			el.addEventListener('keydown', (e) => e.key === 'Escape' && e.preventDefault());
 		});
 }

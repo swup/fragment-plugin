@@ -60,9 +60,6 @@ test.describe('Fragment Plugin', () => {
 
 		await expect(dialog).toBeVisible();
 
-		// Check if the dialog is focussed
-		await expect(dialog).toBeFocused();
-
 		// Check if the dialog is in the top layer
 		expect(await dialog.evaluate((el) => el.matches(':modal'))).toBe(true);
 	});
