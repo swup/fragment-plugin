@@ -385,7 +385,7 @@ If all elements of a visit are `<template>` elements, the `out`/`in`-animation w
 > [!TIP]
 > Fragment Plugin will detect `<dialog open>`-fragment elements automatically on every page view and
 > move them to the [top layer](https://developer.mozilla.org/en-US/docs/Glossary/Top_layer)
-> automatically. This has drastically simplifies accesssiblity and styling.
+> automatically. This has the benefit of simplified accesssiblity handling and styling.
 
 ## API methods
 
