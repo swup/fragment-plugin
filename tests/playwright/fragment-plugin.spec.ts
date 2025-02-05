@@ -51,7 +51,7 @@ test.describe('Fragment Plugin', () => {
 		await expect(page.locator('#list h2')).toHaveText('Green Items');
 	});
 
-	test('should handle <dialog[open]> fragments', async ({ page }) => {
+	test('should move <dialog> fragments to the top layer', async ({ page }) => {
 		await page.goto('/list/');
 
 		await clickOnLink(page, '/detail/');
@@ -60,7 +60,6 @@ test.describe('Fragment Plugin', () => {
 
 		await expect(dialog).toBeVisible();
 
-		// Check if the dialog is in the top layer
 		expect(await dialog.evaluate((el) => el.matches(':modal'))).toBe(true);
 	});
 
