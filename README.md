@@ -331,7 +331,9 @@ tracked URL of the fragment matching the selector provided by the attribute. The
 </main>
 ```
 
-> [!TIP] To keep your markup semantic and accessible, we recommend you **always provide a default value** for the link's `href` attribute, even though it will be updated automatically at runtime:
+> [!TIP]
+> To keep your markup semantic and accessible, we recommend you **always provide a default value**
+> for the link's `href` attribute, even though it will be updated automatically at runtime:
 
 ```diff
 <a
@@ -380,7 +382,10 @@ If all elements of a visit are `<template>` elements, the `out`/`in`-animation w
 </main>
 ```
 
-> [!TIP] Fragment Plugin will detect `<dialog open>`-fragment elements automatically on every page view and move them to the [top layer](https://developer.mozilla.org/en-US/docs/Glossary/Top_layer) automatically. This has drastically simplifies accesssiblity and styling.
+> [!TIP]
+> Fragment Plugin will detect `<dialog open>`-fragment elements automatically on every page view and
+> move them to the [top layer](https://developer.mozilla.org/en-US/docs/Glossary/Top_layer)
+> automatically. This has drastically simplifies accesssiblity and styling.
 
 ## API methods
 
