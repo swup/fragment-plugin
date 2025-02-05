@@ -370,7 +370,7 @@ If all elements of a visit are `<template>` elements, the `out`/`in`-animation w
 
 ```html
 <!-- /detail/1 -->
-<dialog open id="modal" aria-role="article">
+<dialog open id="modal">
   <main>
     <h1>Detail 1</h1>
   </main>
