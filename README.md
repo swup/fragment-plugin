@@ -277,7 +277,7 @@ when swup was initialized on a subpage with an already-visible modal, the plugin
 
 ```diff
 <!-- the modal -->
-<dialog id="modal">
+<dialog open id="modal">
   <main>
     <h1>User 1</h1>
     <p>Lorem ipsum dolor sit amet...</p>
@@ -311,7 +311,7 @@ where to point that link requires knowing where the current overlay was opened f
 tracked URL of the fragment matching the selector provided by the attribute. The code below will make sure the close button will always point at the last known URL of the `#list` fragment to allow seamlessly closing the overlay:
 
 ```diff
-<dialog id="modal">
+<dialog open id="modal">
   <main>
     <!-- `href` will be synced to the fragment URL of #list at runtime: -->
 +   <a href="" data-swup-link-to-fragment="#list">Close</a>
@@ -380,7 +380,7 @@ If all elements of a visit are `<template>` elements, the `out`/`in`-animation w
 </main>
 ```
 
-Fragment Plugin will detect `<dialog open>`-fragment elements automatically on every page view and move them to the [top layer](https://developer.mozilla.org/en-US/docs/Glossary/Top_layer) automatically. This has advantages for both accesssiblity as well as styling.
+> [!TIP] Fragment Plugin will detect `<dialog open>`-fragment elements automatically on every page view and move them to the [top layer](https://developer.mozilla.org/en-US/docs/Glossary/Top_layer) automatically. This has advantages for both accesssiblity as well as styling.
 
 ## API methods
 
