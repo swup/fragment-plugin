@@ -47,9 +47,7 @@ https://github.com/swup/fragment-plugin/assets/869813/ecaf15d7-ec72-43e8-898a-64
 - [How rules are matched](#how-rules-are-matched)
 - [How fragment containers are found](#how-fragment-containers-are-found)
 - [Advanced use cases](#advanced-use-cases)
-- [Skip out/in animations using `<template>`](#skip-out-in-animations-using-template)
-- [Modals as children of `transform`ed parents](#modals-as-children-of-transformed-parents)
-- [Modals and Accessibility](#modals-and-accessibility)
+- [Skip animations using `<template>`](#skip-animations-using-template)
 - [API Methods](#api-methods)
 
 ## Installation
@@ -266,36 +264,41 @@ Optional, Type: `boolean`, Default `false`. Set to `true` for debug information 
 
 Creating the rules for your fragment visits should be enough to enable dynamic updates on most
 sites. However, there are some advanced use cases that require adding certain attributes to the
-fragment elements themselves or to links on the page. These tend to be situations where overlays are
-involved and swup doesn't know which page the overlay was opened from.
+fragment elements themselves or to links on the page. These tend to be situations where **modal dialogs** are involved and swup doesn't know which page the modal was opened from.
 
 ### Fragment URL
 
 Use the `data-swup-fragment-url` attribute to uniquely identify fragment elements.
 
-In scenarios where overlays are rendered on top of other content, leaving or closing the overlay to
-the same URL it was opened from should ideally not update the content below the overlay as
+In scenarios where a modal is rendered on top of other content, leaving or closing the modal to
+the same URL it was opened from should ideally not update the content behind it as
 nothing has changed. Fragment plugin will normally do that by keeping track of URLs. However,
-when swup was initialized on a subpage with a visible overlay, the plugin doesn't know which URL
-the overlaid content corresponds to. Hence, we need to tell it manually so it can ignore content
-updates without changes.
+when swup was initialized on a subpage with an already-visible modal, the plugin doesn't know which URL the content behind it corresponds to. Hence, we need to tell swup manually so it can persist content when closing the modal.
 
 ```diff
-<main id="overlay">
-  <h1>User 1</h1>
-  <p>Lorem ipsum dolor sit amet...</p>
+<!-- the modal -->
+<dialog id="modal">
+  <main>
+    <h1>User 1</h1>
+    <p>Lorem ipsum dolor sit amet...</p>
+  </main>
+</dialog>
+<!-- the content behind the modal -->
+<main>
+  <section
+    id="list"
++   data-swup-fragment-url="/users/"
+    >
+    <ul>
+      <li>User 1</li>
+      <li>User 2</li>
+      <li>User 3</li>
+    </ul>
+  </section>
 </main>
-<section id="list"
-+  data-swup-fragment-url="/users/">
-  <ul>
-    <li>User 1</li>
-    <li>User 2</li>
-    <li>User 3</li>
-  </ul>
-</section>
 ```
 
-### Link to fragment
+### Link to another fragment
 
 Use the `data-swup-link-to-fragment` attribute to automatically update links pointing to a fragment.
 
@@ -308,19 +311,23 @@ where to point that link requires knowing where the current overlay was opened f
 tracked URL of the fragment matching the selector provided by the attribute. The code below will make sure the close button will always point at the last known URL of the `#list` fragment to allow seamlessly closing the overlay:
 
 ```diff
-<section id="list"
-  data-swup-fragment-url="/users/">
-  <ul>
-    <li>User 1</li>
-    <li>User 2</li>
-    <li>User 3</li>
-  </ul>
-</section>
-<main id="overlay">
-  <!-- `href` will be synced to the fragment URL of #list at runtime: -->
-+ <a href="" data-swup-link-to-fragment="#list">Close</a>
-  <h1>User 1</h1>
-  <p>Lorem ipsum dolor sit amet...</p>
+<dialog id="modal">
+  <main>
+    <!-- `href` will be synced to the fragment URL of #list at runtime: -->
++   <a href="" data-swup-link-to-fragment="#list">Close</a>
+    <h1>User 1</h1>
+    <p>Lorem ipsum dolor sit amet...</p>
+  </main>
+</dialog>
+<main>
+  <section id="list"
+    data-swup-fragment-url="/users/">
+    <ul>
+      <li>User 1</li>
+      <li>User 2</li>
+      <li>User 3</li>
+    </ul>
+  </section>
 </main>
 ```
 
@@ -332,7 +339,7 @@ tracked URL of the fragment matching the selector provided by the attribute. The
   data-swup-link-to-fragment="#list">Close</a>
 ```
 
-## Skip out/in animations using `<template>`
+## Skip animations using `<template>`
 
 If all elements of a visit are `<template>` elements, the `out`/`in`-animation will automatically be skipped. This can come in handy for modals:
 
@@ -361,99 +368,19 @@ If all elements of a visit are `<template>` elements, the `out`/`in`-animation w
 
 ```html
 <!-- /detail/1 -->
-<main id="modal">
-  <h1>Detail 1</h1>
-</main>
-<div>
+<dialog open id="modal" aria-role="article">
+  <main>
+    <h1>Detail 1</h1>
+  </main>
+</dialog>
+<main>
   <ul>
     <!-- list of items that will open in the #modal -->
   </ul>
-</div>
+</main>
 ```
 
-## Modals as children of `transform`ed parents
-
-Suppose you have an overlay that you want to present like a modal, above all other content:
-
-```html
-<div id="swup" class="transition-main" class="transition-main">
-  <!-- This should be placed above everything else, like a modal -->
-  <main id="user" class="modal">
-    <h1>User 1</h1>
-    <p>Lorem ipsum dolor...</p>
-  </main>
-  <!-- The list of users, overlayed by the modal above -->
-  <section>
-    <ul>
-      <li><a href="/user/1/">User 1</a></li>
-      <li><a href="/user/2/">User 2</a></li>
-      <li><a href="/user/3/">User 3</a></li>
-    </ul>
-  </section>
-</div>
-```
-
-You might have this (minimal) CSS to make the `#user` appear as a modal above everything else:
-
-```css
-.modal {
-  position: fixed;
-  inset: 0;
-  z-index: 99999;
-}
-```
-
-This will work fine, until you apply a `transform` to one of the modal's parent elements:
-
-```css
-html.is-changing .transition-main {
-  transition:
-    opacity 250ms,
-    transform 250ms;
-}
-html.is-animating .transition-main {
-  opacity: 0;
-  /* `transform` will misplace the .modal's positioning during an animated page visit */
-  transform: translateY(20px);
-}
-```
-
-The reason for this is that a CSS `transform` establishes a [containing block for all descendants](https://www.w3.org/TR/css-transforms-1/#containing-block-for-all-descendants).
-
-You have two options to fix this:
-
-1. Don't apply CSS `transform`s to any of the parents of a modal
-2. Use `<dialog open>` for the modal:
-
-```diff
-- <main id="overlay" class="modal">
-+ <dialog open id="overlay" aria-role="article">
-+   <main>
-      <h1>User 1</h1>
-      <p>Lorem ipsum dolor...</p>
-- </main>
-+   </main>
-+ </dialog>
-```
-
-Fragment Plugin will detect `<dialog open>`-fragment elements automatically on every page view and run [`showModal()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/showModal) on them, putting them on the [top layer](https://developer.mozilla.org/en-US/docs/Glossary/Top_layer) and thus allows them to not be affected by parent element styles, anymore.
-
-## Modals and accessibility
-
-### Element order
-
-The first `<main>` element in a document will be considered the main content by assistive technology. If you are using the [A11y Plugin](https://swup.js.org/plugins/a11y-plugin/), that's also the element that will automatically be focused upon page visits. For that reason, **you should always put your modal before any overlayed content**, if it should be considered the primary content of a page.
-
-### Pros and cons of using a `<dialog open>` element for modals
-
-**Pros**:
-
-- The modal's positioning won't be affected by `transform` animations on any of it's parents.
-- Focus trapping will be natively available for the modal without you having to do anything.
-
-**Cons**:
-
-- Wrapping your `<main>` content inside a `<dialog>` will produce [semantically incorrect markup](https://stackoverflow.com/a/75007908/586823). We still think it's the cleanest approach for now, until the [Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API) reaches [wider browser support](https://caniuse.com/?search=popover).
+Fragment Plugin will detect `<dialog open>`-fragment elements automatically on every page view and move them to the [top layer](https://developer.mozilla.org/en-US/docs/Glossary/Top_layer) automatically. This has advantages for both accesssiblity as well as styling.
 
 ## API methods
 
