@@ -1,7 +1,7 @@
 name: Redeploy Docs
 on:
   push:
-    branches: [master]
+    branches: [main]
 
 jobs:
   redeploy-docs:
