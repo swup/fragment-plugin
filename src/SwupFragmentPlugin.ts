@@ -6,7 +6,8 @@ import {
 	cleanupFragmentElements,
 	getFirstMatchingRule,
 	getFragmentVisitContainers,
-	cloneRules
+	cloneRules,
+	validateRules
 } from './inc/functions.js';
 import type { Options, Rule, Route, FragmentVisit } from './inc/defs.js';
 import * as handlers from './inc/handlers.js';
@@ -91,6 +92,7 @@ export default class SwupFragmentPlugin extends PluginBase {
 	 * @access public
 	 */
 	setRules(rules: Rule[]) {
+		rules = validateRules(rules);
 		this._rawRules = cloneRules(rules);
 		this._parsedRules = rules.map((rule) => this.parseRule(rule));
 		if (__DEV__) this.logger?.log('Updated fragment rules', this.getRules());

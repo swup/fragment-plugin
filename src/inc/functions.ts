@@ -414,6 +414,28 @@ export function queryFragmentElement(
 }
 
 /**
+ * Validate rules and remove invalid ones
+ */
+export function validateRules(rules: Rule[]): Rule[] {
+	return rules
+		.map((rule) => {
+			if (isEmptyArray(rule.to)) rule.to = '';
+			if (isEmptyArray(rule.from)) rule.from = '';
+			return rule;
+		})
+		.filter((rule) => {
+			const { from, to } = rule;
+
+			if (!to || !from) {
+				console.error('rule.from and rule.to may not be empty:', rule);
+				return false;
+			}
+
+			return true;
+		});
+}
+
+/**
  * Clone fragment rules (replacement for `structuredClone`)
  */
 export function cloneRules(rules: Rule[]): Rule[] {
@@ -434,4 +456,11 @@ export function stubVisit(options: { from?: string; to: string }) {
 	const swup = new Swup();
 	// @ts-expect-error swup.createVisit is protected
 	return swup.createVisit(options);
+}
+
+/**
+ * Check if a value is an empty array
+ */
+export function isEmptyArray(value: any) {
+	return Array.isArray(value) && value.length === 0;
 }
