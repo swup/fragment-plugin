@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.2] - 2025-05-30
+
+- Only move `<dialog>` elements with an `[open]` attribute to the top layer
+
 ## [1.1.1] - 2024-06-01
 
 - Optimize logic of persisting fragment elements
@@ -86,6 +90,7 @@
 
 - Initial Release
 
+[1.1.2]: https://github.com/swup/fragment-plugin/releases/tag/1.1.2
 [1.1.1]: https://github.com/swup/fragment-plugin/releases/tag/1.1.1
 [1.1.0]: https://github.com/swup/fragment-plugin/releases/tag/1.1.0
 [1.0.2]: https://github.com/swup/fragment-plugin/releases/tag/1.0.2
