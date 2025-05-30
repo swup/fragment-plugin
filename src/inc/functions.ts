@@ -23,7 +23,7 @@ export const handlePageView = (fragmentPlugin: FragmentPlugin): void => {
  */
 function showDialogs({ logger }: FragmentPlugin): void {
 	document
-		.querySelectorAll<HTMLDialogElement & FragmentElement>('dialog[data-swup-fragment]')
+		.querySelectorAll<HTMLDialogElement & FragmentElement>('dialog[data-swup-fragment][open]')
 		.forEach((el) => {
 			if (!el.__swupFragment) {
 				if (__DEV__) logger?.warn(`fragment properties missing on element:`, el);
