@@ -17,13 +17,13 @@ export const handlePageView = (fragmentPlugin: FragmentPlugin): void => {
 };
 
 /**
- * Run `showModal` for all `<dialog[data-swup-fragment]>` elements
- * This puts them on the top layer and makes them ignore css `transform`s on parent elements
+ * Run `showModal` for all `<dialog[data-swup-fragment][open]>` elements
+ * This puts them on the top layer and makes them ignore css transforms on parent elements
  * @see https://developer.mozilla.org/en-US/docs/Glossary/Top_layer
  */
 function showDialogs({ logger }: FragmentPlugin): void {
 	document
-		.querySelectorAll<HTMLDialogElement & FragmentElement>('dialog[data-swup-fragment]')
+		.querySelectorAll<HTMLDialogElement & FragmentElement>('dialog[data-swup-fragment][open]')
 		.forEach((el) => {
 			if (!el.__swupFragment) {
 				if (__DEV__) logger?.warn(`fragment properties missing on element:`, el);

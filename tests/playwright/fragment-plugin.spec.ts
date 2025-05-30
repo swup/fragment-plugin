@@ -51,12 +51,12 @@ test.describe('Fragment Plugin', () => {
 		await expect(page.locator('#list h2')).toHaveText('Green Items');
 	});
 
-	test('should move <dialog> fragments to the top layer', async ({ page }) => {
+	test('should move <dialog open> fragments to the top layer', async ({ page }) => {
 		await page.goto('/list/');
 
 		await clickOnLink(page, '/detail/');
 
-		const dialog = page.locator('dialog[data-swup-fragment]');
+		const dialog = page.locator('dialog[data-swup-fragment][open]');
 
 		await expect(dialog).toBeVisible();
 
