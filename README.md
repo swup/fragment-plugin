@@ -1,13 +1,13 @@
 # Swup Fragment Plugin
 
-<!-- swup-docs-hide-start -->
+<!-- swup-docs-ignore-start -->
 
 [![npm version](https://img.shields.io/npm/v/@swup/fragment-plugin.svg)](https://www.npmjs.com/package/@swup/fragment-plugin)
 [![Unit Tests](https://img.shields.io/github/actions/workflow/status/swup/fragment-plugin/unit-tests.yml?branch=main&label=vitest)](https://github.com/swup/fragment-plugin/actions/workflows/unit-tests.yml)
 [![E2E Tests](https://img.shields.io/github/actions/workflow/status/swup/fragment-plugin/e2e-tests.yml?branch=main&label=playwright)](https://github.com/swup/fragment-plugin/actions/workflows/e2e-tests.yml)
 [![License](https://img.shields.io/github/license/swup/fragment-plugin.svg)](https://github.com/swup/fragment-plugin/blob/main/LICENSE)
 
-<!-- swup-docs-hide-end -->
+<!-- swup-docs-ignore-end -->
 
 A [swup](https://swup.js.org) plugin for dynamically replacing containers based on rules 🧩
 
