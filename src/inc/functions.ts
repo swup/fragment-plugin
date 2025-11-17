@@ -53,11 +53,7 @@ function handleLinksToFragments({ logger, swup }: FragmentPlugin): void {
 			return;
 		}
 
-		const fragmentSelectors = selectors
-			.trim()
-			.split(',')
-			.map((sel) => sel.trim());
-
+		const fragmentSelectors = parseLinkToFragmentAttribute(selectors);
 		const fragment = queryFragmentElementSelectorList(fragmentSelectors, swup);
 
 		if (!fragment) {
@@ -449,6 +445,18 @@ export function cloneRules(rules: Rule[]): Rule[] {
 		to: Array.isArray(rule.to) ? [...rule.to] : rule.to,
 		containers: [...rule.containers]
 	}));
+}
+
+/**
+ * Parses a fragment link attribute value into an array of fragment selectors
+ */
+export function parseLinkToFragmentAttribute(value: string): string[] {
+	const fragmentSelectors = value
+		.trim()
+		.split(',')
+		.map((sel) => sel.trim());
+
+	return fragmentSelectors;
 }
 
 /**
