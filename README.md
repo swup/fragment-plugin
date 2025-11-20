@@ -340,6 +340,15 @@ tracked URL of the fragment matching the selector provided by the attribute. The
   data-swup-link-to-fragment="#list">Close</a>
 ```
 
+The attribute also supports multiple selectors separated by commas, syncing to whichever fragment matches first.
+
+```diff
+<a
+  href="/users/"
++  data-swup-link-to-fragment="#main, #list"
+>Close</a>
+```
+
 ## Skip animations using `<template>`
 
 If all elements of a visit are `<template>` elements, the `out`/`in`-animation will automatically be skipped. This can come in handy for modals:
