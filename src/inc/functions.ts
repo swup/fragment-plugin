@@ -58,9 +58,12 @@ function handleLinksToFragments({ logger, swup }: FragmentPlugin): void {
 
 		if (!fragment) {
 			if (__DEV__) {
+				const verb = fragmentSelectors.length > 1 ? 'are' : 'is';
+				const selectorDisplay = highlight(fragmentSelectors.join(', '));
+
 				logger?.log(
 					// prettier-ignore
-					`ignoring ${highlight(`[${targetAttribute}="${selectors}"]`)} as ${highlight(selectors)} is missing`
+					`ignoring ${highlight(`[${targetAttribute}="${selectors}"]`)} as ${selectorDisplay} ${verb} missing`
 				);
 			}
 			return;
