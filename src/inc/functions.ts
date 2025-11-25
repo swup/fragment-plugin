@@ -46,19 +46,24 @@ function handleLinksToFragments({ logger, swup }: FragmentPlugin): void {
 	const links = document.querySelectorAll<HTMLAnchorElement>(`a[${targetAttribute}]`);
 
 	links.forEach((el) => {
-		const selector = el.getAttribute(targetAttribute);
-		if (!selector) {
+		const selectors = el.getAttribute(targetAttribute)?.trim();
+		if (!selectors) {
 			// prettier-ignore
 			if (__DEV__) logger?.warn(`[${targetAttribute}] needs to contain a valid fragment selector`);
 			return;
 		}
 
-		const fragment = queryFragmentElement(selector, swup);
+		const fragmentSelectors = parseLinkToFragmentAttribute(selectors);
+		const fragment = queryFragmentElementSelectorList(fragmentSelectors, swup);
+
 		if (!fragment) {
 			if (__DEV__) {
+				const verb = fragmentSelectors.length > 1 ? 'are' : 'is';
+				const selectorDisplay = highlight(fragmentSelectors.join(', '));
+
 				logger?.log(
 					// prettier-ignore
-					`ignoring ${highlight(`[${targetAttribute}="${selector}"]`)} as ${highlight(selector)} is missing`
+					`ignoring ${highlight(`[${targetAttribute}="${selectors}"]`)} as ${selectorDisplay} ${verb} missing`
 				);
 			}
 			return;
@@ -66,14 +71,14 @@ function handleLinksToFragments({ logger, swup }: FragmentPlugin): void {
 
 		const fragmentUrl = fragment.__swupFragment?.url;
 		if (!fragmentUrl) {
-			if (__DEV__) logger?.warn(`no fragment infos found on ${selector}`);
+			if (__DEV__) logger?.warn(`no fragment infos found on #${fragment.id}`);
 			return;
 		}
 
 		// Help finding suspicious fragment urls
 		if (isEqualUrl(fragmentUrl, swup.getCurrentUrl())) {
 			// prettier-ignore
-			if (__DEV__) logger?.warn(`The fragment URL of ${selector} is identical to the current URL. This could mean that [data-swup-fragment-url] needs to be provided by the server.`);
+			if (__DEV__) logger?.warn(`The fragment URL of #${fragment.id} is identical to the current URL. This could mean that [data-swup-fragment-url] needs to be provided by the server.`);
 		}
 
 		el.href = fragmentUrl;
@@ -394,6 +399,24 @@ export function adjustVisitScroll(fragmentVisit: FragmentVisit, scroll: VisitScr
 }
 
 /**
+ * Queries a list of fragment element selectors via `queryFragmentElement` and returns the first match. *
+ *
+ */
+export function queryFragmentElementSelectorList(
+	fragmentSelectors: Array<string>,
+	swup: Swup
+): FragmentElement | undefined {
+	const selectors = fragmentSelectors.map((sel) => sel.trim());
+
+	for (const selector of selectors) {
+		const fragment = queryFragmentElement(selector, swup);
+		if (fragment) return fragment;
+	}
+
+	return;
+}
+
+/**
  * Queries a fragment element. Needs to be either:
  *
  * - one of swup's default containers
@@ -425,6 +448,18 @@ export function cloneRules(rules: Rule[]): Rule[] {
 		to: Array.isArray(rule.to) ? [...rule.to] : rule.to,
 		containers: [...rule.containers]
 	}));
+}
+
+/**
+ * Parses a fragment link attribute value into an array of fragment selectors
+ */
+export function parseLinkToFragmentAttribute(value: string): string[] {
+	const fragmentSelectors = value
+		.trim()
+		.split(',')
+		.map((sel) => sel.trim());
+
+	return fragmentSelectors;
 }
 
 /**
