@@ -16,6 +16,7 @@ export interface FragmentElement extends HTMLElement {
 }
 
 export type Predicate = (visit: Visit) => boolean;
+export type ScrollPredicate = (visit: Visit) => boolean | string;
 
 /** A fragment rule */
 export type Rule = {
@@ -23,7 +24,7 @@ export type Rule = {
 	to: Path;
 	containers: string[];
 	name?: string;
-	scroll?: boolean | string;
+	scroll?: ScrollPredicate | boolean | string;
 	focus?: boolean | string;
 	if?: Predicate;
 };
@@ -38,6 +39,6 @@ export type Options = {
 export type FragmentVisit = {
 	name?: string;
 	containers: string[];
-	scroll: boolean | string;
+	scroll: ScrollPredicate | boolean | string;
 	focus?: boolean | string;
 };
