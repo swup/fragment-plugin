@@ -52,7 +52,7 @@ describe('adjustVisitScroll()', () => {
 		});
 	});
 
-	it('callback receives correct Visit object', () => {
+	it('receives Visit object in callback', () => {
 		const visit = stubVisit({ from: '/blog', to: '/blog/post-1' });
 		let receivedVisit = visit;
 
