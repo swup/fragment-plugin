@@ -5,11 +5,11 @@ describe('adjustVisitScroll()', () => {
 	it('adjust visit.scroll with boolean values', () => {
 		const visit = stubVisit({ to: '' });
 
-		expect(adjustVisitScroll({ containers: [], scroll: true }, visit.scroll, visit)).toEqual({
+		expect(adjustVisitScroll({ containers: [], scroll: true }, visit)).toEqual({
 			reset: true
 		});
 
-		expect(adjustVisitScroll({ containers: [], scroll: false }, visit.scroll, visit)).toEqual({
+		expect(adjustVisitScroll({ containers: [], scroll: false }, visit)).toEqual({
 			reset: false
 		});
 	});
@@ -17,7 +17,7 @@ describe('adjustVisitScroll()', () => {
 	it('adjust visit.scroll with string selector', () => {
 		const visit = stubVisit({ to: '' });
 
-		expect(adjustVisitScroll({ containers: [], scroll: '#top' }, visit.scroll, visit)).toEqual({
+		expect(adjustVisitScroll({ containers: [], scroll: '#top' }, visit)).toEqual({
 			reset: true,
 			target: '#top'
 		});
@@ -27,16 +27,12 @@ describe('adjustVisitScroll()', () => {
 		const visit = stubVisit({ to: '/page' });
 
 		// Callback returning true
-		expect(
-			adjustVisitScroll({ containers: [], scroll: () => true }, visit.scroll, visit)
-		).toEqual({
+		expect(adjustVisitScroll({ containers: [], scroll: () => true }, visit)).toEqual({
 			reset: true
 		});
 
 		// Callback returning false
-		expect(
-			adjustVisitScroll({ containers: [], scroll: () => false }, visit.scroll, visit)
-		).toEqual({
+		expect(adjustVisitScroll({ containers: [], scroll: () => false }, visit)).toEqual({
 			reset: false
 		});
 	});
@@ -44,9 +40,7 @@ describe('adjustVisitScroll()', () => {
 	it('adjust visit.scroll with callback returning string selector', () => {
 		const visit = stubVisit({ to: '/page' });
 
-		expect(
-			adjustVisitScroll({ containers: [], scroll: () => '#my-element' }, visit.scroll, visit)
-		).toEqual({
+		expect(adjustVisitScroll({ containers: [], scroll: () => '#my-element' }, visit)).toEqual({
 			reset: true,
 			target: '#my-element'
 		});
@@ -64,7 +58,6 @@ describe('adjustVisitScroll()', () => {
 					return true;
 				}
 			},
-			visit.scroll,
 			visit
 		);
 
