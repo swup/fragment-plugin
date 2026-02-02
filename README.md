@@ -167,7 +167,7 @@ export type Rule = {
   name?: string;
   scroll?: boolean | string;
   focus?: boolean | string;
-  if?: Predicate;
+  if?: IfPredicate;
 };
 
 /** The plugin options */

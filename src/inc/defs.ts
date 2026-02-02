@@ -15,7 +15,7 @@ export interface FragmentElement extends HTMLElement {
 	};
 }
 
-export type Predicate = (visit: Visit) => boolean;
+export type IfPredicate = (visit: Visit) => boolean;
 export type ScrollPredicate = (visit: Visit) => boolean | string;
 
 /** A fragment rule */
@@ -26,7 +26,7 @@ export type Rule = {
 	name?: string;
 	scroll?: ScrollPredicate | boolean | string;
 	focus?: boolean | string;
-	if?: Predicate;
+	if?: IfPredicate;
 };
 
 /** The plugin options */
