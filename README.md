@@ -165,7 +165,7 @@ export type Rule = {
   to: Path;
   containers: string[];
   name?: string;
-  scroll?: boolean | string;
+  scroll?: ScrollPredicate | boolean | string;
   focus?: boolean | string;
   if?: IfPredicate;
 };
@@ -222,11 +222,12 @@ Optional, Type: `string` – A name for this rule to allow scoped styling, ideal
 
 #### `rule.scroll`
 
-Optional, Type: `boolean | string` – By default, scrolling will be disabled for fragment visits.
+Optional, Type: `ScrollPredicate | boolean | string` – By default, scrolling will be disabled for fragment visits.
 Using this option, you can re-enable it for selected visits:
 
 - `true` will scroll to the top
 - `'#my-element'` will scroll to the first element matching the selector
+- A callback function receiving the current [visit](https://swup.js.org/visit/) object, returning a `boolean` or a `string` selector
 
 #### `rule.focus`
 
