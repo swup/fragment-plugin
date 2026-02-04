@@ -48,7 +48,7 @@ export const onVisitStart: Handler<'visit:start'> = async function (this: Fragme
 		this.logger?.log(`fragment visit: ${highlight(visit.fragmentVisit.containers.join(', '))}`);
 	}
 
-	visit.scroll = adjustVisitScroll(fragmentVisit, visit.scroll);
+	visit.scroll = adjustVisitScroll(fragmentVisit, visit);
 
 	// Fragment Plugin can't know if Accesssibilty Plugin is installed
 	// @ts-expect-error

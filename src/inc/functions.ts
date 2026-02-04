@@ -388,13 +388,22 @@ export function dedupe<T>(arr: Array<T>): Array<T> {
 /**
  * Adjusts visit.scroll based on given fragment visit
  */
-export function adjustVisitScroll(fragmentVisit: FragmentVisit, scroll: VisitScroll): VisitScroll {
-	if (typeof fragmentVisit.scroll === 'boolean') {
-		return { ...scroll, reset: fragmentVisit.scroll };
+export function adjustVisitScroll(fragmentVisit: FragmentVisit, visit: Visit): VisitScroll {
+	const scroll = visit.scroll;
+	let scrollValue = fragmentVisit.scroll;
+
+	if (typeof scrollValue === 'function') {
+		scrollValue = scrollValue(visit);
 	}
-	if (typeof fragmentVisit.scroll === 'string' && !scroll.target) {
-		return { ...scroll, target: fragmentVisit.scroll };
+
+	if (typeof scrollValue === 'boolean') {
+		return { ...scroll, reset: scrollValue };
 	}
+
+	if (typeof scrollValue === 'string' && !scroll.target) {
+		return { ...scroll, target: scrollValue };
+	}
+
 	return scroll;
 }
 

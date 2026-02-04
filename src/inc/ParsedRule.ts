@@ -1,6 +1,6 @@
 import { matchPath, classify, Location } from 'swup';
 import type { Swup, Path, Visit } from 'swup';
-import type { Route, Rule, Predicate } from './defs.js';
+import type { Route, Rule, IfPredicate, ScrollPredicate } from './defs.js';
 import { dedupe, queryFragmentElement } from './functions.js';
 import Logger, { highlight } from './Logger.js';
 import { __DEV__ } from './env.js';
@@ -22,10 +22,10 @@ export default class ParsedRule {
 	to: Path;
 	containers: string[];
 	name?: string;
-	scroll: boolean | string = false;
+	scroll: ScrollPredicate | boolean | string = false;
 	focus?: boolean | string;
 	logger?: Logger;
-	if: Predicate = () => true;
+	if: IfPredicate = () => true;
 
 	constructor(options: Options) {
 		this.swup = options.swup;
