@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.3.0] - 2026-02-04
+
+- Support `rule.scroll` to be set dynamically by a callback function (#94, thanks @ovenum)
+
 ## [1.2.0] - 2025-11-25
 
 - Support multiple fragment selectors in `data-swup-link-to-fragment` attribute (#92, thanks @ovenum)
@@ -94,6 +98,7 @@
 
 - Initial Release
 
+[1.3.0]: https://github.com/swup/fragment-plugin/releases/tag/1.3.0
 [1.2.0]: https://github.com/swup/fragment-plugin/releases/tag/1.2.0
 [1.1.2]: https://github.com/swup/fragment-plugin/releases/tag/1.1.2
 [1.1.1]: https://github.com/swup/fragment-plugin/releases/tag/1.1.1
