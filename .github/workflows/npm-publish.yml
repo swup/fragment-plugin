@@ -8,17 +8,17 @@ on:
   workflow_dispatch:
 
 permissions:
-  id-token: write  # Required for OIDC
   contents: read
+  id-token: write # For OIDC Trusted Publishing
 
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          node-version: 22
           registry-url: https://registry.npmjs.org
+          node-version: 24
       - run: npm ci
-      - run: npm publish --provenance --access public
+      - run: npm publish --access public
