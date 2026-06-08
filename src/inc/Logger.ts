@@ -1,10 +1,13 @@
 import { __TEST__ } from './env.js';
+
+const isFirefox = navigator.userAgent.includes('Firefox');
+
 /**
  * Wrap a string in an escape sequence
  * @see https://stackoverflow.com/a/68373080/586823
  */
 const wrapInEscapeSequence = (s: string, open: number, close: number): string => {
-	if (s == null) return s;
+	if (isFirefox || s == null) return s;
 	return `\x1b[${open}m${String(s)}\x1b[${close}m`;
 };
 
