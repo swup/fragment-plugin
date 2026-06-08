@@ -1,7 +1,6 @@
 import { __TEST__ } from './env.js';
 
 const isFirefox = navigator.userAgent.includes('Firefox');
-console.log({ isFirefox });
 
 /**
  * Wrap a string in an escape sequence
