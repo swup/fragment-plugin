@@ -14,7 +14,7 @@ declare module 'swup' {
 	export interface Visit {
 		fragmentVisit?: FragmentVisit;
 	}
-	export interface CacheData {
+	export interface PageData {
 		fragmentHtml?: string;
 	}
 }
